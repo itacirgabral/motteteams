@@ -6,6 +6,7 @@ const version = process.env.APP_VERSION || '3.3.1'
 const zapland = async ({
   shard,
   zaphandlers: {
+    blocklistUpdate,
     open,
     connecting,
     connectionValidated,
@@ -17,12 +18,15 @@ const zapland = async ({
     userStatusUpdate,
     chatNew,
     contactsReceived,
+    contactUpdate,
     chatsReceived,
     chatsUpdate,
     chatUpdate,
     messageStatusUpdate,
     groupParticipantsUpdate,
     groupUpdate,
+    messageNew,
+    userPresenceUpdate,
     receivedPong
   },
   redis
@@ -57,6 +61,10 @@ const zapland = async ({
   conn.on('group-participants-update', groupParticipantsUpdate)
   conn.on('group-update', groupUpdate)
   conn.on('received-pong', receivedPong)
+  conn.on('blocklist-update', blocklistUpdate)
+  conn.on('contact-update', contactUpdate)
+  conn.on('message-new', messageNew)
+  conn.on('user-presence-update', userPresenceUpdate)
 
   await conn.connect()
 
