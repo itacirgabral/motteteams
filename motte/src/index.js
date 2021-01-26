@@ -69,8 +69,9 @@ const trafficwand = async () => {
               break
             case 'disconnect':
               if (patchpanel.has(leftover.shard)) {
-                const { connP } = patchpanel.get(leftover.shard)
+                const { connP, drummer } = patchpanel.get(leftover.shard)
                 patchpanel.delete(leftover.shard)
+                drummer.playing = false
                 connP
                   .then(conn => {
                     conn.close()
