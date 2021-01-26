@@ -1,0 +1,25 @@
+{
+  "name": "mandapaixao",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": " npx node-dev -r dotenv/config index.js",
+    "start": " node -r dotenv/config index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "ioredis": "^4.19.4",
+    "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.2"
+  },
+  "devDependencies": {
+    "node-dev": "^6.2.0"
+  }
+}

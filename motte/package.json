@@ -1,0 +1,29 @@
+{
+  "name": "motte",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/itacirgabral/motte",
+  "license": "MIT",
+  "scripts": {
+    "dev": "npx node-dev -r dotenv/config ./src/index.js",
+    "debug": "npx node-dev --inspect=0.0.0.0:9229 -r dotenv/config ./src/index.js",
+    "start": "node -r dotenv/config ./src/index.js"
+  },
+  "devDependencies": {
+    "eslint": "^7.18.0",
+    "eslint-config-standard": "^15.0.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.1.0",
+    "node-dev": "^6.2.0"
+  },
+  "dependencies": {
+    "@adiwajshing/baileys": "^3.4.1",
+    "dotenv": "^8.2.0",
+    "form-data": "^3.0.0",
+    "ioredis": "^4.19.4",
+    "jsonwebtoken": "^8.5.1",
+    "node-fetch": "^2.6.1"
+  }
+}
