@@ -3,9 +3,9 @@
  * on (event: 'received-pong', listener: () => void): this
  */
 
-const receivedPong = ({ shard, redis, connP }) => {
-  const newsKey = `zap:${shard}:news`
-  const pongKey = `zap:${shard}:pong`
+const receivedPong = (seed) => {
+  const newsKey = `zap:${seed.shard}:news`
+  const pongKey = `zap:${seed.shard}:pong`
   const EX = 'EX'
   const ttl = 30
 
@@ -13,10 +13,13 @@ const receivedPong = ({ shard, redis, connP }) => {
     const now = Date.now()
     const json = JSON.stringify({ event: 'received-pong', data: null })
 
-    const pipeline = redis.pipeline()
+    const pipeline = seed.redis.pipeline()
     pipeline.set(pongKey, now, EX, ttl)
     pipeline.publish(newsKey, json)
     await pipeline.exec()
+
+    console.log('### received-pong conn ########')
+    console.dir(seed?.conn)
   }
 }
 

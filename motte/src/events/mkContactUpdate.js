@@ -2,15 +2,15 @@
  * when a contact is updated
  * on (event: 'contact-update', listener: (update: WAContactUpdate) => void): this
  */
-const contactUpdate = ({ shard, redis, connP }) => {
-  const logKey = `zap:${shard}:log`
-  const newsKey = `zap:${shard}:news`
+const contactUpdate = (seed) => {
+  const logKey = `zap:${seed.shard}:log`
+  const newsKey = `zap:${seed.shard}:news`
 
   return async (update) => {
     const json = JSON.stringify({ event: 'contact-update', data: update })
-    const pipeline = redis.pipeline()
+    const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)
-    pipeline.ltrim(logKey, 0, 99)
+    pipeline.ltrim(logKey, 0, 999)
     pipeline.publish(newsKey, json)
 
     await pipeline.exec()

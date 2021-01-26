@@ -2,16 +2,17 @@
  * when the group is updated
  * on (event: 'group-update', listener: (update: Partial<WAGroupMetadata> & {jid: string, actor?: string}) => void): this
  */
-const groupUpdate = ({ shard, redis, connP }) => {
-  const logKey = `zap:${shard}:log`
-  const newsKey = `zap:${shard}:news`
+const groupUpdate = (seed) => {
+  const logKey = `zap:${seed.shard}:log`
+  const newsKey = `zap:${seed.shard}:news`
 
   return async (user) => {
     const json = JSON.stringify({ event: 'group-update', data: user })
-    const pipeline = redis.pipeline()
+    const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)
-    pipeline.ltrim(logKey, 0, 99)
+    pipeline.ltrim(logKey, 0, 999)
     pipeline.publish(newsKey, json)
+
     await pipeline.exec()
   }
 }

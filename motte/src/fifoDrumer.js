@@ -8,12 +8,12 @@ const delay = require('./delay')
 ** I'll grind his bones to make my bread.
 */
 
-const fifoDrumer = ({ shard, redis, connP, redisB }) => {
-  const fifoRawKey = `zap:${shard}:fifo:rawBread`
-  const lastRawKey = `zap:${shard}:last:rawBread`
+const fifoDrumer = (seed) => {
+  const fifoRawKey = `zap:${seed.shard}:fifo:rawBread`
+  const lastRawKey = `zap:${seed.shard}:last:rawBread`
 
-  const statsKey = `zap:${shard}:stats`
-  const markkey = `zap:${shard}:mark`
+  const statsKey = `zap:${seed.shard}:stats`
+  const markkey = `zap:${seed.shard}:mark`
   const lastsentmessagetimestamp = 'lastsentmessagetimestamp'
   const lastdeltatimemessage = 'lastdeltatimemessage'
   const totalsentmessage = 'totalsentmessage'
@@ -26,12 +26,12 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
   }
 
   process.nextTick(async () => {
-    const pea = await redis.llen(lastRawKey)
+    const pea = await seed.redis.llen(lastRawKey)
     healthcare.playing = healthcare.playing || pea === 0
     const forwardBuffer = {}
 
     while (healthcare.playing) {
-      const rawBread = await redisB.brpoplpush(fifoRawKey, lastRawKey, 0)
+      const rawBread = await seed.redisB.brpoplpush(fifoRawKey, lastRawKey, 0)
       const { type, ...crumb } = JSON.parse(rawBread)
 
       /*
@@ -42,25 +42,23 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         const delta = msg.length
         const waittime = delta > 50 ? 6000 : delta * 100 + 100
 
-        const conn = await connP
-
-        await conn.chatRead(jid)
-        await conn.updatePresence(jid, Presence.composing)
-        await delay(waittime)
+        await seed.conn.chatRead(jid)
+        await seed.conn.updatePresence(jid, Presence.composing)
+        await seed.delay(waittime)
 
         const timestampStart = Date.now()
 
         let quotedmessage
         if (quote) {
-          quotedmessage = await conn.loadMessage(jid, quote)
+          quotedmessage = await seed.conn.loadMessage(jid, quote)
         }
 
         let bakedBread
         if (quote && !quotedmessage) {
           bakedBread = false
-          await redis.hincrby(statsKey, totalsentmessage, 1)
+          await seed.redis.hincrby(statsKey, totalsentmessage, 1)
         } else {
-          bakedBread = await conn.sendMessage(jid, msg, MessageType.text, { quoted: quotedmessage })
+          bakedBread = await seed.conn.sendMessage(jid, msg, MessageType.text, { quoted: quotedmessage })
             .catch(() => {
               healthcare.playing = false
               return false
@@ -70,10 +68,10 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         if (bakedBread) {
           const messageid = bakedBread.key.id
           const timestampFinish = Date.now()
-          await conn.updatePresence(jid, Presence.available)
+          await seed.conn.updatePresence(jid, Presence.available)
           const deltatime = timestampFinish - timestampStart
 
-          const pipeline = redis.pipeline()
+          const pipeline = seed.redis.pipeline()
           pipeline.ltrim(lastRawKey, 0, -2)
           pipeline.hset(markkey, messageid, mark)
           pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
@@ -87,25 +85,23 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         const { jid, quote, vcard, mark } = crumb
         const waittime = 300
 
-        const conn = await connP
-
-        await conn.chatRead(jid)
-        await conn.updatePresence(jid, Presence.composing)
+        await seed.conn.chatRead(jid)
+        await seed.conn.updatePresence(jid, Presence.composing)
         await delay(waittime)
 
         const timestampStart = Date.now()
 
         let quotedmessage
         if (quote) {
-          quotedmessage = await conn.loadMessage(jid, quote)
+          quotedmessage = await seed.conn.loadMessage(jid, quote)
         }
 
         let bakedBread
         if (quote && !quotedmessage) {
           bakedBread = false
-          await redis.hincrby(statsKey, totalsentmessage, 1)
+          await seed.redis.hincrby(statsKey, totalsentmessage, 1)
         } else {
-          bakedBread = await conn.sendMessage(jid, { vcard }, MessageType.contact, { quoted: quotedmessage })
+          bakedBread = await seed.conn.sendMessage(jid, { vcard }, MessageType.contact, { quoted: quotedmessage })
             .catch(() => {
               healthcare.playing = false
               return false
@@ -115,10 +111,10 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         if (bakedBread) {
           const messageid = bakedBread.key.id
           const timestampFinish = Date.now()
-          await conn.updatePresence(jid, Presence.available)
+          await seed.conn.updatePresence(jid, Presence.available)
           const deltatime = timestampFinish - timestampStart
 
-          const pipeline = redis.pipeline()
+          const pipeline = seed.redis.pipeline()
           pipeline.ltrim(lastRawKey, 0, -2)
           pipeline.hset(markkey, messageid, mark)
           pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
@@ -132,25 +128,23 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         const { jid, quote, description, latitude, longitude, mark } = crumb
         const waittime = 300
 
-        const conn = await connP
-
-        await conn.chatRead(jid)
-        await conn.updatePresence(jid, Presence.composing)
+        await seed.conn.chatRead(jid)
+        await seed.conn.updatePresence(jid, Presence.composing)
         await delay(waittime)
 
         const timestampStart = Date.now()
 
         let quotedmessage
         if (quote) {
-          quotedmessage = await conn.loadMessage(jid, quote)
+          quotedmessage = await seed.conn.loadMessage(jid, quote)
         }
 
         let bakedBread
         if (quote && !quotedmessage) {
           bakedBread = false
-          await redis.hincrby(statsKey, totalsentmessage, 1)
+          await seed.redis.hincrby(statsKey, totalsentmessage, 1)
         } else {
-          bakedBread = await conn.sendMessage(jid, { address: description, degreesLatitude: latitude, degreesLongitude: longitude }, MessageType.location, { quoted: quotedmessage })
+          bakedBread = await seed.conn.sendMessage(jid, { address: description, degreesLatitude: latitude, degreesLongitude: longitude }, MessageType.location, { quoted: quotedmessage })
             .catch(() => {
               healthcare.playing = false
               return false
@@ -160,10 +154,10 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         if (bakedBread) {
           const messageid = bakedBread.key.id
           const timestampFinish = Date.now()
-          await conn.updatePresence(jid, Presence.available)
+          await seed.conn.updatePresence(jid, Presence.available)
           const deltatime = timestampFinish - timestampStart
 
-          const pipeline = redis.pipeline()
+          const pipeline = seed.redis.pipeline()
           pipeline.ltrim(lastRawKey, 0, -2)
           pipeline.hset(markkey, messageid, mark)
           pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
@@ -177,24 +171,22 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         const { jid, source, wid, mark } = crumb
         const waittime = 300 * (1 + Math.random())
 
-        const conn = await connP
-
-        await conn.chatRead(jid)
-        await conn.updatePresence(jid, Presence.composing)
+        await seed.conn.chatRead(jid)
+        await seed.conn.updatePresence(jid, Presence.composing)
         await delay(waittime)
 
         let m
         if (forwardBuffer.wid === wid) {
           m = forwardBuffer.message
         } else {
-          m = await conn.loadMessage(source, wid)
+          m = await seed.conn.loadMessage(source, wid)
           forwardBuffer.message = m
           forwardBuffer.wid = wid
         }
 
         if (m) {
           const timestampStart = Date.now()
-          const bakedBread = await conn.forwardMessage(jid, m)
+          const bakedBread = await seed.conn.forwardMessage(jid, m)
             .catch(() => {
               healthcare.playing = false
               return false
@@ -202,9 +194,9 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
           if (bakedBread) {
             const messageid = bakedBread.key.id
             const timestampFinish = Date.now()
-            await conn.updatePresence(jid, Presence.available)
+            await seed.conn.updatePresence(jid, Presence.available)
             const deltatime = timestampFinish - timestampStart
-            const pipeline = redis.pipeline()
+            const pipeline = seed.redis.pipeline()
             pipeline.ltrim(lastRawKey, 0, -2)
             pipeline.hset(markkey, messageid, mark)
             pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
@@ -212,7 +204,7 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
             pipeline.hincrby(statsKey, totalsentmessage, 1)
             await pipeline.exec()
           } else {
-            await redis.hincrby(statsKey, totalsentmessage, 1)
+            await seed.redis.hincrby(statsKey, totalsentmessage, 1)
           }
         }
       }
@@ -221,10 +213,8 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         const { jid, quote, path, filename, mimetype, size, mark } = crumb
         const waittime = 300
 
-        const conn = await connP
-
-        await conn.chatRead(jid)
-        await conn.updatePresence(jid, Presence.composing)
+        await seed.conn.chatRead(jid)
+        await seed.conn.updatePresence(jid, Presence.composing)
         await delay(waittime)
 
         let docfile
@@ -237,15 +227,15 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         if (docfile) {
           let quotedmessage
           if (quote) {
-            quotedmessage = await conn.loadMessage(jid, quote)
+            quotedmessage = await seed.conn.loadMessage(jid, quote)
           }
 
           let bakedBread
           if (quote && !quotedmessage) {
             bakedBread = false
-            await redis.hincrby(statsKey, totalsentmessage, 1)
+            await seed.redis.hincrby(statsKey, totalsentmessage, 1)
           } else {
-            bakedBread = await conn.sendMessage(jid, docfile, MessageType.document, { mimetype, filename, quoted: quotedmessage })
+            bakedBread = await seed.conn.sendMessage(jid, docfile, MessageType.document, { mimetype, filename, quoted: quotedmessage })
               .catch(() => {
                 healthcare.playing = false
                 return false
@@ -255,9 +245,9 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
           if (bakedBread) {
             const messageid = bakedBread.key.id
             const timestampFinish = Date.now()
-            await conn.updatePresence(jid, Presence.available)
+            await seed.conn.updatePresence(jid, Presence.available)
             fs.unlinkSync(path)
-            const pipeline = redis.pipeline()
+            const pipeline = seed.redis.pipeline()
             pipeline.ltrim(lastRawKey, 0, -2)
             pipeline.hset(markkey, messageid, mark)
             pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
@@ -274,10 +264,8 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         const { jid, quote, path, size, mark } = crumb
         const waittime = 300
 
-        const conn = await connP
-
-        await conn.chatRead(jid)
-        await conn.updatePresence(jid, Presence.composing)
+        await seed.conn.chatRead(jid)
+        await seed.conn.updatePresence(jid, Presence.composing)
         await delay(waittime)
 
         let voicefile
@@ -290,15 +278,15 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         if (voicefile) {
           let quotedmessage
           if (quote) {
-            quotedmessage = await conn.loadMessage(jid, quote)
+            quotedmessage = await seed.conn.loadMessage(jid, quote)
           }
 
           let bakedBread
           if (quote && !quotedmessage) {
             bakedBread = false
-            await redis.hincrby(statsKey, totalsentmessage, 1)
+            await seed.redis.hincrby(statsKey, totalsentmessage, 1)
           } else {
-            bakedBread = await conn.sendMessage(jid, voicefile, MessageType.audio, { mimetype: Mimetype.ogg, ptt: true, quoted: quotedmessage })
+            bakedBread = await seed.conn.sendMessage(jid, voicefile, MessageType.audio, { mimetype: Mimetype.ogg, ptt: true, quoted: quotedmessage })
               .catch(() => {
                 healthcare.playing = false
                 return false
@@ -308,9 +296,9 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
           if (bakedBread) {
             const messageid = bakedBread.key.id
             const timestampFinish = Date.now()
-            await conn.updatePresence(jid, Presence.available)
+            await seed.conn.updatePresence(jid, Presence.available)
             fs.unlinkSync(path)
-            const pipeline = redis.pipeline()
+            const pipeline = seed.redis.pipeline()
             pipeline.ltrim(lastRawKey, 0, -2)
             pipeline.hset(markkey, messageid, mark)
             pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
@@ -327,10 +315,8 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         const { jid, quote, path, filename, mimetype, size, mark } = crumb
         const waittime = 300
 
-        const conn = await connP
-
-        await conn.chatRead(jid)
-        await conn.updatePresence(jid, Presence.composing)
+        await seed.conn.chatRead(jid)
+        await seed.conn.updatePresence(jid, Presence.composing)
         await delay(waittime)
 
         let imgfile
@@ -343,15 +329,15 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
         if (imgfile) {
           let quotedmessage
           if (quote) {
-            quotedmessage = await conn.loadMessage(jid, quote)
+            quotedmessage = await seed.conn.loadMessage(jid, quote)
           }
 
           let bakedBread
           if (quote && !quotedmessage) {
             bakedBread = false
-            await redis.hincrby(statsKey, totalsentmessage, 1)
+            await seed.redis.hincrby(statsKey, totalsentmessage, 1)
           } else {
-            bakedBread = await conn.sendMessage(jid, imgfile, MessageType.image, { mimetype, filename, quoted: quotedmessage })
+            bakedBread = await seed.conn.sendMessage(jid, imgfile, MessageType.image, { mimetype, filename, quoted: quotedmessage })
               .catch(() => {
                 healthcare.playing = false
                 return false
@@ -361,9 +347,9 @@ const fifoDrumer = ({ shard, redis, connP, redisB }) => {
           if (bakedBread) {
             const messageid = bakedBread.key.id
             const timestampFinish = Date.now()
-            await conn.updatePresence(jid, Presence.available)
+            await seed.conn.updatePresence(jid, Presence.available)
             fs.unlinkSync(path)
-            const pipeline = redis.pipeline()
+            const pipeline = seed.redis.pipeline()
             pipeline.ltrim(lastRawKey, 0, -2)
             pipeline.hset(markkey, messageid, mark)
             pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
