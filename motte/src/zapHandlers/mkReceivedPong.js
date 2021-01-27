@@ -17,9 +17,6 @@ const receivedPong = (seed) => {
     pipeline.set(pongKey, now, EX, ttl)
     pipeline.publish(newsKey, json)
     await pipeline.exec()
-
-    console.log('### received-pong conn ########')
-    console.dir(seed?.conn)
   }
 }
 
