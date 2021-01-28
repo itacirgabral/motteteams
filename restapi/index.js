@@ -11,8 +11,7 @@ const express = require('express')
 const cors = require('cors')
 const multer = require('multer')
 const jsonwebtoken = require('jsonwebtoken')
-const Redis = require("ioredis")
-const { type } = require('os')
+const Redis = require('ioredis')
 
 const app = express()
 const port = 3000
@@ -30,10 +29,10 @@ const redis = new Redis(redisConn)
 const destination = path.join(__dirname, '..', process.env.UPLOADFOLDER)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-      cb(null, destination);
+    cb(null, destination)
   },
   filename: (req, file, cb) => {
-      cb(null, `${Date.now()}${String(Math.random()).slice(2, 6)}.file`)
+    cb(null, `${Date.now()}${String(Math.random()).slice(2, 6)}.file`)
   },
   limits: {
     files: 1,
@@ -48,8 +47,8 @@ app.get('/', (req, res) => {
 })
 
 app.post('/sendtextmessage', express.json(), async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -72,7 +71,7 @@ app.post('/sendtextmessage', express.json(), async (req, res) => {
           quote: req.query.quote,
           msg: req.body.msg
         }))
-    
+
         res.status(200).json({
           type: 'sendtextmessage',
           to: req.body.to,
@@ -94,8 +93,8 @@ app.post('/sendtextmessage', express.json(), async (req, res) => {
 })
 
 app.post('/sendlocationmessage', express.json(), async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -120,7 +119,7 @@ app.post('/sendlocationmessage', express.json(), async (req, res) => {
           latitude: req.body.latitude,
           longitude: req.body.longitude
         }))
-    
+
         res.status(200).json({
           type: 'sendlocationmessage',
           to: req.body.to,
@@ -144,8 +143,8 @@ app.post('/sendlocationmessage', express.json(), async (req, res) => {
 })
 
 app.post('/sendcontactmessage', express.json(), async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -168,7 +167,7 @@ app.post('/sendcontactmessage', express.json(), async (req, res) => {
           quote: req.query.quote,
           vcard: req.body.vcard
         }))
-    
+
         res.status(200).json({
           send: 'sendcontactmessage',
           to: req.body.to,
@@ -192,8 +191,8 @@ app.post('/sendcontactmessage', express.json(), async (req, res) => {
 })
 
 app.post('/forwardmessage', express.json(), async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -239,14 +238,14 @@ app.post('/forwardmessage', express.json(), async (req, res) => {
         jid: `${el.to}@s.whatsapp.net`
       })).map(JSON.stringify))
 
-      res.status(200).json({ 
+      res.status(200).json({
         type: 'forwardmessage',
         source,
         wid,
         to: messages,
         from: shard,
         queueSize
-       })
+      })
     } else {
       res.status(400).end()
     }
@@ -256,8 +255,8 @@ app.post('/forwardmessage', express.json(), async (req, res) => {
 })
 
 app.post('/senddocumentmessage/:to', async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -271,7 +270,7 @@ app.post('/senddocumentmessage/:to', async (req, res) => {
       if (!err) {
         const jid = `${req.params.to}@s.whatsapp.net`
         const alreadyTalkedTo = await redis.sismember(`zap:${shard}:contacts`, jid)
-        
+
         if (alreadyTalkedTo) {
           const mark = crypto.randomBytes(8).toString('base64')
           const rawBread = {
@@ -306,13 +305,13 @@ app.post('/senddocumentmessage/:to', async (req, res) => {
         console.error(err)
         res.status(500)
       }
-    }) 
+    })
   }
 })
 
 app.post('/sendaudiomessage/:to', async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -326,7 +325,7 @@ app.post('/sendaudiomessage/:to', async (req, res) => {
       if (!err) {
         const jid = `${req.params.to}@s.whatsapp.net`
         const alreadyTalkedTo = await redis.sismember(`zap:${shard}:contacts`, jid)
-        
+
         if (alreadyTalkedTo) {
           const mark = crypto.randomBytes(8).toString('base64')
           const rawBread = {
@@ -361,13 +360,13 @@ app.post('/sendaudiomessage/:to', async (req, res) => {
         console.error(err)
         res.status(500)
       }
-    }) 
+    })
   }
 })
 
 app.post('/sendimagemessage/:to', async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -381,7 +380,7 @@ app.post('/sendimagemessage/:to', async (req, res) => {
       if (!err) {
         const jid = `${req.params.to}@s.whatsapp.net`
         const alreadyTalkedTo = await redis.sismember(`zap:${shard}:contacts`, jid)
-        
+
         if (alreadyTalkedTo) {
           const mark = crypto.randomBytes(8).toString('base64')
           const rawBread = {
@@ -416,13 +415,13 @@ app.post('/sendimagemessage/:to', async (req, res) => {
         console.error(err)
         res.status(500)
       }
-    }) 
+    })
   }
 })
 
 app.get('/stats', async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -460,8 +459,8 @@ app.get('/stats', async (req, res) => {
 })
 
 app.post('/signupconnection', express.json(), async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -485,8 +484,8 @@ app.post('/signupconnection', express.json(), async (req, res) => {
 })
 
 app.get('/connect', async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -506,15 +505,14 @@ app.get('/connect', async (req, res) => {
 
       res.status(200).json({ type: typeConnect, shard })
     }, 500)
-
   } else {
     res.status(401).end()
   }
 })
 
 app.get('/disconnect', async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -534,8 +532,8 @@ app.get('/disconnect', async (req, res) => {
 })
 
 app.post('/webhook', express.json(), async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   const { webhook } = req.body
   let shard
   try {
@@ -556,8 +554,8 @@ app.post('/webhook', express.json(), async (req, res) => {
   }
 })
 app.get('/webhook', async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -576,9 +574,9 @@ app.get('/webhook', async (req, res) => {
     res.status(401).end()
   }
 })
-app.put('/webhook',express.json(), async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+app.put('/webhook', express.json(), async (req, res) => {
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   const { webhook } = req.body
   let shard
   try {
@@ -600,8 +598,8 @@ app.put('/webhook',express.json(), async (req, res) => {
   }
 })
 app.delete('/webhook', async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -627,8 +625,8 @@ app.delete('/webhook', async (req, res) => {
 })
 
 app.get('/allcontacts', async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
@@ -647,8 +645,8 @@ app.get('/allcontacts', async (req, res) => {
   }
 })
 app.get('/alreadytalkedto/:number', async (req, res) => {
-  const authorization = req.headers.authorization || "noops"
-  const jwt = authorization.split("Bearer ")[1]
+  const authorization = req.headers.authorization || 'noops'
+  const jwt = authorization.split('Bearer ')[1]
   let shard
   try {
     shard = jsonwebtoken.verify(jwt, jwtSecret)
