@@ -8,6 +8,7 @@ const Redis = require('ioredis')
 
 const uploader = require('./uploader')
 const jwt2shard = require('./jwt2shard')
+const router = require('./router')
 
 const app = express()
 const port = 3000
@@ -389,50 +390,10 @@ app.get('/disconnect', jwt2shard, async (req, res) => {
   res.status(200).json({ type, shard })
 })
 
-app.post('/webhook', jwt2shard, express.json(), async (req, res) => {
-  const shard = req.shard
-  const webhook = req.webhook
-  await redis.set(mkwebhookkey(shard), webhook)
-  res.status(200).json({
-    type: 'createwebhook',
-    shard,
-    webhook
-  })
-})
-app.get('/webhook', jwt2shard, async (req, res) => {
-  const shard = req.shard
-  const webhook = await redis.get(mkwebhookkey(shard))
-  res.status(200).json({
-    type: 'readwebhook',
-    shard,
-    webhook
-  })
-})
-app.put('/webhook', jwt2shard, express.json(), async (req, res) => {
-  const shard = req.shard
-  const { webhook } = req.body
-  const webhookold = await redis.getset(mkwebhookkey(shard), webhook)
-  res.status(200).json({
-    type: 'updatewebhook',
-    shard,
-    webhooknew: webhook,
-    webhookold
-  })
-})
-app.delete('/webhook', jwt2shard, async (req, res) => {
-  const shard = req.shard
-  const key = mkwebhookkey(shard)
-  const pipeline = redis.pipeline()
-  pipeline.get(key)// 0
-  pipeline.del(key)// 1
-  const result = await pipeline.exec()
-
-  res.status(200).json({
-    type: 'removewebhook',
-    shard,
-    webhook: result[0][1]
-  })
-})
+app.post('/webhook', jwt2shard, express.json(), router.webhookpost({ redis, mkwebhookkey }))
+app.get('/webhook', jwt2shard, router.webhookget({ redis, mkwebhookkey }))
+app.put('/webhook', jwt2shard, express.json(), router.webhookput({ redis, mkwebhookkey }))
+app.delete('/webhook', jwt2shard, router.webhookdelete({ redis, mkwebhookkey }))
 
 app.get('/allcontacts', jwt2shard, async (req, res) => {
   const shard = req.shard
