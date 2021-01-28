@@ -1,368 +1,108 @@
-const { MessageType, Presence, Mimetype } = require('@adiwajshing/baileys')
-const fs = require('fs')
-const delay = require('./delay')
+const mkSendTextMessage = require('./mkSendTextMessage')
+const mkSendContactMessage = require('./mkSendContactMessage')
+const mkSendLocationMessage = require('./mkSendLocationMessage')
+const mkSendForwardMessage = require('./mkSendForwardMessage')
+const mkSendDocumentMessage = require('./mkSendDocumentMessage')
+const mkSendAudioMessage = require('./mkSendAudioMessage')
+const mkSendImageMessage = require('./mkSendImageMessage')
+
 /*
 ** Fee-fi-fo-fum,
 ** I smell the blood of an Englishman,
 ** Be he alive, or be he dead
 ** I'll grind his bones to make my bread.
 */
-
 const fifoDrumer = (seed) => {
-  const fifoRawKey = `zap:${seed.shard}:fifo:rawBread`
-  const lastRawKey = `zap:${seed.shard}:last:rawBread`
+  const keys = {
+    fifoRawKey: `zap:${seed.shard}:fifo:rawBread`,
+    lastRawKey: `zap:${seed.shard}:last:rawBread`,
+    statsKey: `zap:${seed.shard}:stats`,
+    markkey: `zap:${seed.shard}:mark`,
+    lastsentmessagetimestamp: 'lastsentmessagetimestamp',
+    lastdeltatimemessage: 'lastdeltatimemessage',
+    totalsentmessage: 'totalsentmessage',
+    totalmediasize: 'totalmediasize'
+  }
 
-  const statsKey = `zap:${seed.shard}:stats`
-  const markkey = `zap:${seed.shard}:mark`
-  const lastsentmessagetimestamp = 'lastsentmessagetimestamp'
-  const lastdeltatimemessage = 'lastdeltatimemessage'
-  const totalsentmessage = 'totalsentmessage'
-  const totalmediasize = 'totalmediasize'
+  const sendTextMessage = mkSendTextMessage(keys)
+  const sendContactMessage = mkSendContactMessage(keys)
+  const sendLocationMessage = mkSendLocationMessage(keys)
+  const sendForwardMessage = mkSendForwardMessage(keys)
+  const sendDocumentMessage = mkSendDocumentMessage(keys)
+  const sendAudioMessage = mkSendAudioMessage(keys)
+  const sendImageMessage = mkSendImageMessage(keys)
 
   const healthcare = {
     playing: true,
-    fifoRawKey,
-    lastRawKey
+    fifoRawKey: keys.fifoRawKey,
+    lastRawKey: keys.lastRawKey
   }
 
   process.nextTick(async () => {
-    const pea = await seed.redis.llen(lastRawKey)
+    const pea = await seed.redis.llen(keys.lastRawKey)
     healthcare.playing = healthcare.playing || pea === 0
-    const forwardBuffer = {}
 
     while (healthcare.playing) {
-      const rawBread = await seed.redisB.brpoplpush(fifoRawKey, lastRawKey, 0)
+      const rawBread = await seed.redisB.brpoplpush(keys.fifoRawKey, keys.lastRawKey, 0)
       if (healthcare.playing) {
         const { type, ...crumb } = JSON.parse(rawBread)
 
-        if (type === 'textMessage_v001') {
-          const { jid, quote, msg, mark } = crumb
-          const delta = msg.length
-          const waittime = delta > 50 ? 6000 : delta * 100 + 100
-
-          await seed.conn.chatRead(jid)
-          await seed.conn.updatePresence(jid, Presence.composing)
-          await seed.delay(waittime)
-
-          const timestampStart = Date.now()
-
-          let quotedmessage
-          if (quote) {
-            quotedmessage = await seed.conn.loadMessage(jid, quote)
-          }
-
-          let bakedBread
-          if (quote && !quotedmessage) {
-            bakedBread = false
-            await seed.redis.hincrby(statsKey, totalsentmessage, 1)
-          } else {
-            bakedBread = await seed.conn.sendMessage(jid, msg, MessageType.text, { quoted: quotedmessage })
-              .catch(() => {
+        switch (type) {
+          case 'textMessage_v001':
+            await sendTextMessage({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
                 healthcare.playing = false
-                return false
               })
-          }
-
-          if (bakedBread) {
-            const messageid = bakedBread.key.id
-            const timestampFinish = Date.now()
-            await seed.conn.updatePresence(jid, Presence.available)
-            const deltatime = timestampFinish - timestampStart
-
-            const pipeline = seed.redis.pipeline()
-            pipeline.ltrim(lastRawKey, 0, -2)
-            pipeline.hset(markkey, messageid, mark)
-            pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
-            pipeline.hset(statsKey, lastdeltatimemessage, deltatime)
-            pipeline.hincrby(statsKey, totalsentmessage, 1)
-            await pipeline.exec()
-          }
-        }
-
-        if (type === 'contactMessage_v001') {
-          const { jid, quote, vcard, mark } = crumb
-          const waittime = 300
-
-          await seed.conn.chatRead(jid)
-          await seed.conn.updatePresence(jid, Presence.composing)
-          await delay(waittime)
-
-          const timestampStart = Date.now()
-
-          let quotedmessage
-          if (quote) {
-            quotedmessage = await seed.conn.loadMessage(jid, quote)
-          }
-
-          let bakedBread
-          if (quote && !quotedmessage) {
-            bakedBread = false
-            await seed.redis.hincrby(statsKey, totalsentmessage, 1)
-          } else {
-            bakedBread = await seed.conn.sendMessage(jid, { vcard }, MessageType.contact, { quoted: quotedmessage })
-              .catch(() => {
+            break
+          case 'contactMessage_v001':
+            await sendContactMessage({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
                 healthcare.playing = false
-                return false
               })
-          }
-
-          if (bakedBread) {
-            const messageid = bakedBread.key.id
-            const timestampFinish = Date.now()
-            await seed.conn.updatePresence(jid, Presence.available)
-            const deltatime = timestampFinish - timestampStart
-
-            const pipeline = seed.redis.pipeline()
-            pipeline.ltrim(lastRawKey, 0, -2)
-            pipeline.hset(markkey, messageid, mark)
-            pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
-            pipeline.hset(statsKey, lastdeltatimemessage, deltatime)
-            pipeline.hincrby(statsKey, totalsentmessage, 1)
-            await pipeline.exec()
-          }
-        }
-
-        if (type === 'locationMessage_v001') {
-          const { jid, quote, description, latitude, longitude, mark } = crumb
-          const waittime = 300
-
-          await seed.conn.chatRead(jid)
-          await seed.conn.updatePresence(jid, Presence.composing)
-          await delay(waittime)
-
-          const timestampStart = Date.now()
-
-          let quotedmessage
-          if (quote) {
-            quotedmessage = await seed.conn.loadMessage(jid, quote)
-          }
-
-          let bakedBread
-          if (quote && !quotedmessage) {
-            bakedBread = false
-            await seed.redis.hincrby(statsKey, totalsentmessage, 1)
-          } else {
-            bakedBread = await seed.conn.sendMessage(jid, { address: description, degreesLatitude: latitude, degreesLongitude: longitude }, MessageType.location, { quoted: quotedmessage })
-              .catch(() => {
+            break
+          case 'locationMessage_v001':
+            await sendLocationMessage({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
                 healthcare.playing = false
-                return false
               })
-          }
-
-          if (bakedBread) {
-            const messageid = bakedBread.key.id
-            const timestampFinish = Date.now()
-            await seed.conn.updatePresence(jid, Presence.available)
-            const deltatime = timestampFinish - timestampStart
-
-            const pipeline = seed.redis.pipeline()
-            pipeline.ltrim(lastRawKey, 0, -2)
-            pipeline.hset(markkey, messageid, mark)
-            pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
-            pipeline.hset(statsKey, lastdeltatimemessage, deltatime)
-            pipeline.hincrby(statsKey, totalsentmessage, 1)
-            await pipeline.exec()
-          }
-        }
-
-        if (type === 'forwardMessage_v001') {
-          const { jid, source, wid, mark } = crumb
-          const waittime = 300 * (1 + Math.random())
-
-          await seed.conn.chatRead(jid)
-          await seed.conn.updatePresence(jid, Presence.composing)
-          await delay(waittime)
-
-          let m
-          if (forwardBuffer.wid === wid) {
-            m = forwardBuffer.message
-          } else {
-            m = await seed.conn.loadMessage(source, wid)
-            forwardBuffer.message = m
-            forwardBuffer.wid = wid
-          }
-
-          if (m) {
-            const timestampStart = Date.now()
-            const bakedBread = await seed.conn.forwardMessage(jid, m)
-              .catch(() => {
+            break
+          case 'forwardMessage_v001':
+            await sendForwardMessage({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
                 healthcare.playing = false
-                return false
               })
-            if (bakedBread) {
-              const messageid = bakedBread.key.id
-              const timestampFinish = Date.now()
-              await seed.conn.updatePresence(jid, Presence.available)
-              const deltatime = timestampFinish - timestampStart
-              const pipeline = seed.redis.pipeline()
-              pipeline.ltrim(lastRawKey, 0, -2)
-              pipeline.hset(markkey, messageid, mark)
-              pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
-              pipeline.hset(statsKey, lastdeltatimemessage, deltatime)
-              pipeline.hincrby(statsKey, totalsentmessage, 1)
-              await pipeline.exec()
-            } else {
-              await seed.redis.hincrby(statsKey, totalsentmessage, 1)
-            }
-          }
-        }
-
-        if (type === 'documentMessage_v001') {
-          const { jid, quote, path, filename, mimetype, size, mark } = crumb
-          const waittime = 300
-
-          await seed.conn.chatRead(jid)
-          await seed.conn.updatePresence(jid, Presence.composing)
-          await delay(waittime)
-
-          let docfile
-          try {
-            docfile = fs.readFileSync(path)
-          } catch (error) {
-            healthcare.playing = false
-            console.error(error)
-          }
-          if (docfile) {
-            let quotedmessage
-            if (quote) {
-              quotedmessage = await seed.conn.loadMessage(jid, quote)
-            }
-
-            let bakedBread
-            if (quote && !quotedmessage) {
-              bakedBread = false
-              await seed.redis.hincrby(statsKey, totalsentmessage, 1)
-            } else {
-              bakedBread = await seed.conn.sendMessage(jid, docfile, MessageType.document, { mimetype, filename, quoted: quotedmessage })
-                .catch(() => {
-                  healthcare.playing = false
-                  return false
-                })
-            }
-
-            if (bakedBread) {
-              const messageid = bakedBread.key.id
-              const timestampFinish = Date.now()
-              await seed.conn.updatePresence(jid, Presence.available)
-              fs.unlinkSync(path)
-              const pipeline = seed.redis.pipeline()
-              pipeline.ltrim(lastRawKey, 0, -2)
-              pipeline.hset(markkey, messageid, mark)
-              pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
-              pipeline.hincrby(statsKey, totalmediasize, size)
-              pipeline.hincrby(statsKey, totalsentmessage, 1)
-              await pipeline.exec()
-            } else {
-              healthcare.playing = false
-            }
-          }
-        }
-
-        if (type === 'audioMessage_v001') {
-          const { jid, quote, path, size, mark } = crumb
-          const waittime = 300
-
-          await seed.conn.chatRead(jid)
-          await seed.conn.updatePresence(jid, Presence.composing)
-          await delay(waittime)
-
-          let voicefile
-          try {
-            voicefile = fs.readFileSync(path)
-          } catch (error) {
-            healthcare.playing = false
-            console.error(error)
-          }
-          if (voicefile) {
-            let quotedmessage
-            if (quote) {
-              quotedmessage = await seed.conn.loadMessage(jid, quote)
-            }
-
-            let bakedBread
-            if (quote && !quotedmessage) {
-              bakedBread = false
-              await seed.redis.hincrby(statsKey, totalsentmessage, 1)
-            } else {
-              bakedBread = await seed.conn.sendMessage(jid, voicefile, MessageType.audio, { mimetype: Mimetype.ogg, ptt: true, quoted: quotedmessage })
-                .catch(() => {
-                  healthcare.playing = false
-                  return false
-                })
-            }
-
-            if (bakedBread) {
-              const messageid = bakedBread.key.id
-              const timestampFinish = Date.now()
-              await seed.conn.updatePresence(jid, Presence.available)
-              fs.unlinkSync(path)
-              const pipeline = seed.redis.pipeline()
-              pipeline.ltrim(lastRawKey, 0, -2)
-              pipeline.hset(markkey, messageid, mark)
-              pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
-              pipeline.hincrby(statsKey, totalmediasize, size)
-              pipeline.hincrby(statsKey, totalsentmessage, 1)
-              await pipeline.exec()
-            } else {
-              healthcare.playing = false
-            }
-          }
-        }
-
-        if (type === 'imageMessage_v001') {
-          const { jid, quote, path, filename, mimetype, size, mark } = crumb
-          const waittime = 300
-
-          await seed.conn.chatRead(jid)
-          await seed.conn.updatePresence(jid, Presence.composing)
-          await delay(waittime)
-
-          let imgfile
-          try {
-            imgfile = fs.readFileSync(path)
-          } catch (error) {
-            healthcare.playing = false
-            console.error(error)
-          }
-          if (imgfile) {
-            let quotedmessage
-            if (quote) {
-              quotedmessage = await seed.conn.loadMessage(jid, quote)
-            }
-
-            let bakedBread
-            if (quote && !quotedmessage) {
-              bakedBread = false
-              await seed.redis.hincrby(statsKey, totalsentmessage, 1)
-            } else {
-              bakedBread = await seed.conn.sendMessage(jid, imgfile, MessageType.image, { mimetype, filename, quoted: quotedmessage })
-                .catch(() => {
-                  healthcare.playing = false
-                  return false
-                })
-            }
-
-            if (bakedBread) {
-              const messageid = bakedBread.key.id
-              const timestampFinish = Date.now()
-              await seed.conn.updatePresence(jid, Presence.available)
-              fs.unlinkSync(path)
-              const pipeline = seed.redis.pipeline()
-              pipeline.ltrim(lastRawKey, 0, -2)
-              pipeline.hset(markkey, messageid, mark)
-              pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
-              pipeline.hincrby(statsKey, totalmediasize, size)
-              await pipeline.exec()
-            } else {
-              healthcare.playing = false
-            }
-          }
+            break
+          case 'documentMessage_v001':
+            await sendDocumentMessage({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
+                healthcare.playing = false
+              })
+            break
+          case 'audioMessage_v001':
+            await sendAudioMessage({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
+                healthcare.playing = false
+              })
+            break
+          case 'imageMessage_v001':
+            await sendImageMessage({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
+                healthcare.playing = false
+              })
+            break
         }
       } else {
         // backward fifo
         const pipeline = seed.redis.pipeline()
-        pipeline.rpush(fifoRawKey, rawBread)
-        pipeline.lpop(lastRawKey)
+        pipeline.rpush(keys.fifoRawKey, rawBread)
+        pipeline.lpop(keys.lastRawKey)
         await pipeline.exec()
       }
     }
