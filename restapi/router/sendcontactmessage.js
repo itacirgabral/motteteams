@@ -1,19 +1,18 @@
 const crypto = require('crypto')
 
-const sendcontactmessage = ({ redis }) => async (req, res) => {
+const sendcontactmessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
   const quote = req.query.quote
   const vcard = req.body.vcard
 
   if (Number.isInteger(Number(req.body.to)) && vcard) {
     const jid = `${req.body.to}@s.whatsapp.net`
-    const alreadyTalkedTo = await redis.sismember(`zap:${shard}:contacts`, jid)
+    const alreadyTalkedTo = await redis.sismember(mkcontactskey(shard), jid)
 
     if (alreadyTalkedTo) {
       const type = 'contactMessage_v001'
       const mark = crypto.randomBytes(8).toString('base64')
-      // const rawBreadKey = `zap:${shard}:fifo:rawBread`
-      const queueSize = await redis.lpush(rawBreadKey, JSON.stringify({
+      const queueSize = await redis.lpush(mkrawbreadkey(shard), JSON.stringify({
         type,
         mark,
         jid,

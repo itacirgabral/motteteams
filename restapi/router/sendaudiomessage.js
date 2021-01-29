@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 const fs = require('fs')
 
-const sendaudiomessage = ({ redis, uploader, mkrawbreadkey }) => async (req, res) => {
+const sendaudiomessage = ({ redis, uploader, mkcontactskey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
   const upload = uploader().single('audio')
   const quote = req.query.quote
@@ -9,7 +9,7 @@ const sendaudiomessage = ({ redis, uploader, mkrawbreadkey }) => async (req, res
   upload(req, res, async (err) => {
     if (!err) {
       const jid = `${req.params.to}@s.whatsapp.net`
-      const alreadyTalkedTo = await redis.sismember(`zap:${shard}:contacts`, jid)
+      const alreadyTalkedTo = await redis.sismember(mkcontactskey(shard), jid)
 
       if (alreadyTalkedTo) {
         const mark = crypto.randomBytes(8).toString('base64')

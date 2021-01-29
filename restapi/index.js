@@ -28,15 +28,15 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.post('/sendtextmessage', jwt2shard, express.json(), router.sendtextmessage({ redis }))
-app.post('/sendlocationmessage', jwt2shard, express.json(), router.sendlocationmessage({ redis }))
-app.post('/sendcontactmessage', jwt2shard, express.json(), router.sendcontactmessage({ redis }))
+app.post('/sendtextmessage', jwt2shard, express.json(), router.sendtextmessage({ redis, mkcontactskey, mkrawbreadkey }))
+app.post('/sendlocationmessage', jwt2shard, express.json(), router.sendlocationmessage({ redis, mkcontactskey, mkrawbreadkey }))
+app.post('/sendcontactmessage', jwt2shard, express.json(), router.sendcontactmessage({ redis, mkcontactskey, mkrawbreadkey }))
 
 app.post('/forwardmessage', jwt2shard, express.json(), router.forwardmessage({ redis, mkcontactskey, mkrawbreadkey }))
 
-app.post('/senddocumentmessage/:to', jwt2shard, router.senddocumentmessage({ redis, uploader, mkrawbreadkey }))
-app.post('/sendaudiomessage/:to', jwt2shard, router.sendaudiomessage({ redis, uploader, mkrawbreadkey }))
-app.post('/sendimagemessage/:to', jwt2shard, router.sendimagemessage({ redis, uploader, mkrawbreadkey }))
+app.post('/senddocumentmessage/:to', jwt2shard, router.senddocumentmessage({ redis, uploader, mkcontactskey, mkrawbreadkey }))
+app.post('/sendaudiomessage/:to', jwt2shard, router.sendaudiomessage({ redis, uploader, mkcontactskey, mkrawbreadkey }))
+app.post('/sendimagemessage/:to', jwt2shard, router.sendimagemessage({ redis, uploader, mkcontactskey, mkrawbreadkey }))
 
 app.post('/webhook', jwt2shard, express.json(), router.webhookpost({ redis, mkwebhookkey }))
 app.get('/webhook', jwt2shard, router.webhookget({ redis, mkwebhookkey }))
