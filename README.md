@@ -1,10 +1,11 @@
 # GMAPI
 
 ## todo
-- [ ] atualizar baileys
-- [ ] refatorar API + blindagem
-- [ ] descongestionas baterista
-- [ ] monitorar conn
+- [x] atualizar baileys
+- [X] remover connP, usar sharedSpace
+- [X] refatorar API + blindagem
+- [ ] reparafusar motte
+- [ ] iniciar baterista separadamente
 
 verificar no motte
 - autoReconnect
@@ -12,3 +13,8 @@ verificar no motte
 - phoneConnected
 - state  WAConnectionState
 - generateForwardMessageContent()
+
+    console.log(`phoneConnected=${conn.phoneConnected}`)
+    console.log(`state=${conn.state}`)
+    // phoneConnected=true
+    // state=open
