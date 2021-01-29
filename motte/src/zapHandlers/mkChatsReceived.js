@@ -7,7 +7,7 @@ const chatsReceived = (seed) => {
   const newsKey = `zap:${seed.shard}:news`
 
   return async (update) => {
-    const json = JSON.stringify({ event: 'chat-new', data: update })
+    const json = JSON.stringify({ event: 'chats-received', data: update })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)
     pipeline.ltrim(logKey, 0, 999)
