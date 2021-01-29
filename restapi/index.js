@@ -327,91 +327,17 @@ app.post('/sendimagemessage/:to', jwt2shard, async (req, res) => {
   })
 })
 
-app.get('/stats', jwt2shard, async (req, res) => {
-  const shard = req.shard
-  const pipeline = redis.pipeline()
-  pipeline.get(`zap:${shard}:pong`) // 0
-  pipeline.hget(`zap:${shard}:stats`, 'lastsentmessagetimestamp') // 1
-  pipeline.hget(`zap:${shard}:stats`, 'sortmeandelta') // 2
-  pipeline.hget(`zap:${shard}:stats`, 'longmeandelta') // 3
-  pipeline.hget(`zap:${shard}:stats`, 'totalsentmessage') // 4
-
-  const [
-    [, pong],
-    [, lastsentmessagetimestamp],
-    [, sortmeandelta],
-    [, longmeandelta],
-    [, totalsentmessage]
-  ] = await pipeline.exec()
-
-  res.status(200).json({
-    type: 'stats',
-    pong,
-    lastsentmessagetimestamp,
-    sortmeandelta,
-    longmeandelta,
-    totalsentmessage
-  })
-})
-
-app.post('/signupconnection', jwt2shard, express.json(), async (req, res) => {
-  if (req.body.url && req.body.shard) {
-    const type = 'signupconnection'
-    const bread = JSON.stringify({ hardid, type, url: req.body.url, shard: req.body.shard })
-
-    await redis.publish(panoptickey, bread)
-    res.status(200).json({ type, url: req.body.url, shard: req.body.shard })
-  } else {
-    res.status(400).end()
-  }
-})
-
-app.get('/connect', jwt2shard, async (req, res) => {
-  const shard = req.shard
-  const typeDisconnect = 'disconnect'
-  const bread = JSON.stringify({ hardid, type: typeDisconnect, shard })
-  await redis.publish(panoptickey, bread)
-
-  setTimeout(async () => {
-    const typeConnect = 'connect'
-    const bread = JSON.stringify({ hardid, type: typeConnect, shard })
-    await redis.publish(panoptickey, bread)
-
-    res.status(200).json({ type: typeConnect, shard })
-  }, 500)
-})
-
-app.get('/disconnect', jwt2shard, async (req, res) => {
-  const shard = req.shard
-  const type = 'disconnect'
-  const bread = JSON.stringify({ hardid, type, shard })
-
-  await redis.publish(panoptickey, bread)
-  res.status(200).json({ type, shard })
-})
-
 app.post('/webhook', jwt2shard, express.json(), router.webhookpost({ redis, mkwebhookkey }))
 app.get('/webhook', jwt2shard, router.webhookget({ redis, mkwebhookkey }))
 app.put('/webhook', jwt2shard, express.json(), router.webhookput({ redis, mkwebhookkey }))
 app.delete('/webhook', jwt2shard, router.webhookdelete({ redis, mkwebhookkey }))
 
-app.get('/allcontacts', jwt2shard, async (req, res) => {
-  const shard = req.shard
-  const contacts = await redis.smembers(mkcontactskey(shard))
-  res.status(200).json({
-    type: 'allcontacts',
-    contacts: contacts.map(el => el.split('@s.whatsapp.net')[0])
-  })
-})
-app.get('/alreadytalkedto/:number', jwt2shard, async (req, res) => {
-  const shard = req.shard
-  const jid = `${req.params.number}@s.whatsapp.net`
-  const alreadytalkedto = await redis.sismember(`zap:${shard}:contacts`, jid)
-  res.status(200).json({
-    type: 'alreadytalkedto',
-    alreadytalkedto: !!alreadytalkedto
-  })
-})
+app.post('/signupconnection', jwt2shard, express.json(), router.signupconnection({ redis, hardid, panoptickey }))
+app.get('/connect', jwt2shard, router.connect({ redis, hardid, panoptickey }))
+app.get('/stats', jwt2shard, router.stats({ redis }))
+app.get('/alreadytalkedto/:number', jwt2shard, router.alreadytalkedto({ redis }))
+app.get('/allcontacts', jwt2shard, router.allcontacts({ redis, mkcontactskey }))
+app.get('/disconnect', jwt2shard, router.disconnect({ redis, hardid, panoptickey }))
 
 https.createServer({
   key: fs.readFileSync(path.join(__dirname, 'sslcert', 'server.key')),
