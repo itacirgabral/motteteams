@@ -51,6 +51,7 @@ app.get('/stats', jwt2shard, router.stats({ redis }))
 app.get('/alreadytalkedto/:number', jwt2shard, router.alreadytalkedto({ redis }))
 app.get('/allcontacts', jwt2shard, router.allcontacts({ redis, mkcontactskey }))
 app.get('/disconnect', jwt2shard, router.disconnect({ redis, hardid, panoptickey }))
+app.get('/queuerestart', jwt2shard, router.queuerestart({ redis, hardid, panoptickey }))
 
 https.createServer({
   key: fs.readFileSync(path.join(__dirname, 'sslcert', 'server.key')),
