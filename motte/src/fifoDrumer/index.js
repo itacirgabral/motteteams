@@ -14,6 +14,7 @@ const mkSendImageMessage = require('./mkSendImageMessage')
 */
 const fifoDrumer = (seed) => {
   const keys = {
+    panoptickey: 'zap:panoptic',
     fifoRawKey: `zap:${seed.shard}:fifo:rawBread`,
     lastRawKey: `zap:${seed.shard}:last:rawBread`,
     statsKey: `zap:${seed.shard}:stats`,
@@ -36,6 +37,7 @@ const fifoDrumer = (seed) => {
     playing: true,
     fifoRawKey: keys.fifoRawKey,
     lastRawKey: keys.lastRawKey
+    // botar aqui um promessa que é a função assync do nexttick
   }
 
   process.nextTick(async () => {

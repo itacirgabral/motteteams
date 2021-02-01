@@ -7,6 +7,7 @@ const mkSendImageMessage = ({
   totalsentmessage,
   lastRawKey,
   markkey,
+  panoptickey,
   lastsentmessagetimestamp,
   totalmediasize
 }) => async ({ crumb, seed, healthcare }) => {
@@ -46,11 +47,27 @@ const mkSendImageMessage = ({
       const messageid = bakedBread.key.id
       const timestampFinish = Date.now()
 
+      const WebMessageInfo = bakedBread.toJSON()
+      const notifysent = {
+        type: 'sendhook',
+        hardid: seed.hardid,
+        shard: seed.shard,
+        json: JSON.stringify({
+          type: 'sent',
+          timestamp: WebMessageInfo.messageTimestamp,
+          to: WebMessageInfo.key.remoteJid.split('@s.whatsapp.net')[0],
+          from: seed.shard,
+          wid: WebMessageInfo.key.id,
+          mark
+        })
+      }
+
       const pipeline = seed.redis.pipeline()
       pipeline.ltrim(lastRawKey, 0, -2)
       pipeline.hset(markkey, messageid, mark)
       pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
       pipeline.hincrby(statsKey, totalmediasize, size)
+      pipeline.publish(panoptickey, JSON.stringify(notifysent))
       await pipeline.exec()
 
       await seed.conn.updatePresence(jid, Presence.available)

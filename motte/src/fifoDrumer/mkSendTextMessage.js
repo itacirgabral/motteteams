@@ -41,13 +41,10 @@ const mkSendTextMessage = ({
       const timestampFinish = Date.now()
       const deltatime = timestampFinish - timestampStart
 
-      // notificar que a mensagem foi enviada
-      // utilizar o serviço do sisifo
-      // publicando um tipo sendhook
       const WebMessageInfo = bakedBread.toJSON()
       const notifysent = {
         type: 'sendhook',
-        hardid: '6W4sbAnV',
+        hardid: seed.hardid,
         shard: seed.shard,
         json: JSON.stringify({
           type: 'sent',

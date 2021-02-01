@@ -7,6 +7,7 @@ const mkSendForwardMessage = ({
   lastRawKey,
   markkey,
   statsKey,
+  panoptickey,
   lastsentmessagetimestamp,
   lastdeltatimemessage,
   totalsentmessage
@@ -39,12 +40,28 @@ const mkSendForwardMessage = ({
       const timestampFinish = Date.now()
       const deltatime = timestampFinish - timestampStart
 
+      const WebMessageInfo = bakedBread.toJSON()
+      const notifysent = {
+        type: 'sendhook',
+        hardid: seed.hardid,
+        shard: seed.shard,
+        json: JSON.stringify({
+          type: 'sent',
+          timestamp: WebMessageInfo.messageTimestamp,
+          to: WebMessageInfo.key.remoteJid.split('@s.whatsapp.net')[0],
+          from: seed.shard,
+          wid: WebMessageInfo.key.id,
+          mark
+        })
+      }
+
       const pipeline = seed.redis.pipeline()
       pipeline.ltrim(lastRawKey, 0, -2)
       pipeline.hset(markkey, messageid, mark)
       pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
       pipeline.hset(statsKey, lastdeltatimemessage, deltatime)
       pipeline.hincrby(statsKey, totalsentmessage, 1)
+      pipeline.publish(panoptickey, JSON.stringify(notifysent))
       await pipeline.exec()
 
       await seed.conn.updatePresence(jid, Presence.available)

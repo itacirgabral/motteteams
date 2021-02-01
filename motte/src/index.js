@@ -4,6 +4,7 @@ const Redis = require('ioredis')
 const zapHandlers = require('./zapHandlers')
 const fifoDrumer = require('./fifoDrumer')
 const zygote = require('./zygote')
+const sendHook = require('./sendHook')
 
 const redisConn = process.env.REDIS_CONN
 const myhardid = process.env.HARDID
@@ -55,6 +56,7 @@ const trafficwand = async () => {
 
                 const seed = {
                   shard: leftover.shard,
+                  hardid,
                   redis: speaker,
                   conn
                 }
@@ -91,6 +93,12 @@ const trafficwand = async () => {
               break
             case 'signupconnection':
               zygote({ leftover })
+              break
+            case 'sendhook':
+              /*
+              leftover = { redis, json, shard }
+              */
+              sendHook({ redis: speaker, json: leftover.json, shard: leftover.shard })
               break
           }
         }

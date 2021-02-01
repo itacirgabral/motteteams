@@ -5,6 +5,7 @@ const fetch = require('node-fetch')
  * on (event: 'message-status-update', listener: (message: WAMessageStatusUpdate) => void): this
  */
 const messageStatusUpdate = (seed) => {
+  const panoptickey = 'zap:panoptic'
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
   const webhookkey = `zap:${seed.shard}:webhook`
@@ -37,6 +38,8 @@ const messageStatusUpdate = (seed) => {
       const from = message.from.split('@s.whatsapp.net')[0]
       const timestamp = new Date(message.timestamp)
 
+      const pipehook = seed.redis.pipeline()
+
       message.ids.forEach((id, idx) => {
         const mark = pipeback[4 + idx][1]
         if (mark) {
@@ -49,15 +52,18 @@ const messageStatusUpdate = (seed) => {
             mark
           }
 
-          fetch(webhook, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(statusUpdate)
-          }).catch(() => {})
+          const notifysent = {
+            type: 'sendhook',
+            hardid: '6W4sbAnV',
+            shard: seed.shard,
+            json: JSON.stringify(statusUpdate)
+          }
+
+          pipehook.publish(panoptickey, JSON.stringify(notifysent))
         }
       })
+
+      await pipehook.exec()
     }
   }
 }
