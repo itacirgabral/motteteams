@@ -72,8 +72,6 @@ const trafficwand = async () => {
 
                   await conn.connect()
 
-                  seed.drummer = fifoDrumer({ ...seed, conn, redisB: listener.duplicate() })
-
                   patchpanel.set(leftover.shard, seed)
 
                   console.log(`connect ${leftover.shard}`)
@@ -85,7 +83,10 @@ const trafficwand = async () => {
                 const seed = patchpanel.get(leftover.shard)
                 patchpanel.delete(leftover.shard)
 
-                seed.drummer.playing = false
+                if (seed?.drummer?.playing) {
+                  seed.drummer.playing = false
+                }
+
                 seed.conn.close()
 
                 console.log(`disconnect ${leftover.shard}`)
@@ -96,6 +97,35 @@ const trafficwand = async () => {
               break
             case 'sendhook':
               sendHook({ redis: speaker, json: leftover.json, file: leftover.file, shard: leftover.shard, params: leftover.params })
+              break
+            case 'queuerestart':
+              if (patchpanel.has(leftover.shard)) {
+                const seed = patchpanel.get(leftover.shard)
+                if (seed.conn.state === 'open') {
+                  // descongestiona
+                  const lastRawKey = `zap:${leftover.shard}:last:rawBread`
+                  const pipeline = seed.redis.pipeline()
+                  pipeline.lrange(lastRawKey, 0, -1)
+                  pipeline.del(lastRawKey)
+                  const pipeback = await pipeline.exec()
+
+                  const peas = pipeback[0][1]
+                  if (peas.length > 0) {
+                    const notifysent = {
+                      type: 'sendhook',
+                      hardid: seed.hardid,
+                      shard: seed.shard,
+                      json: JSON.stringify({
+                        type: 'congested queue',
+                        lost: peas.map(el => JSON.parse(el)).map(el => ({ ...el, jid: undefined, to: el.jid.split('@s.whatsapp.net')[0] }))
+                      })
+                    }
+                    await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
+                  }
+
+                  seed.drummer = fifoDrumer({ ...seed, redisB: listener.duplicate() })
+                }
+              }
               break
           }
         }
