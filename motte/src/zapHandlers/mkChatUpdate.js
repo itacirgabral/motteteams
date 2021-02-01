@@ -1,3 +1,5 @@
+
+
 /**
  *  when a chat is updated (new message, updated message, deleted, pinned, presence updated etc)
  * on (event: 'chat-update', listener: (chat: Partial<WAChat> & { jid: string }) => void): this
@@ -12,7 +14,6 @@ const chatUpdate = (seed) => {
     pipeline.lpush(logKey, json)
     pipeline.ltrim(logKey, 0, 999)
     pipeline.publish(newsKey, json)
-
     await pipeline.exec()
   }
 }

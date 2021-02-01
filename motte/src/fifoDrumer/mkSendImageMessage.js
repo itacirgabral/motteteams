@@ -45,14 +45,16 @@ const mkSendImageMessage = ({
     if (bakedBread) {
       const messageid = bakedBread.key.id
       const timestampFinish = Date.now()
-      await seed.conn.updatePresence(jid, Presence.available)
-      fs.unlinkSync(path)
+
       const pipeline = seed.redis.pipeline()
       pipeline.ltrim(lastRawKey, 0, -2)
       pipeline.hset(markkey, messageid, mark)
       pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
       pipeline.hincrby(statsKey, totalmediasize, size)
       await pipeline.exec()
+
+      await seed.conn.updatePresence(jid, Presence.available)
+      fs.unlinkSync(path)
     } else {
       healthcare.playing = false
     }

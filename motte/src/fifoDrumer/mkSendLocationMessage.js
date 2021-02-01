@@ -38,7 +38,6 @@ const mkSendLocationMessage = ({
   if (bakedBread) {
     const messageid = bakedBread.key.id
     const timestampFinish = Date.now()
-    await seed.conn.updatePresence(jid, Presence.available)
     const deltatime = timestampFinish - timestampStart
 
     const pipeline = seed.redis.pipeline()
@@ -48,6 +47,8 @@ const mkSendLocationMessage = ({
     pipeline.hset(statsKey, lastdeltatimemessage, deltatime)
     pipeline.hincrby(statsKey, totalsentmessage, 1)
     await pipeline.exec()
+
+    await seed.conn.updatePresence(jid, Presence.available)
   }
 }
 

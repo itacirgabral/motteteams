@@ -6,6 +6,7 @@ const mkSendTextMessage = ({
   totalsentmessage,
   lastRawKey,
   markkey,
+  panoptickey,
   lastsentmessagetimestamp,
   lastdeltatimemessage
 }) => async ({ crumb, seed, healthcare }) => {
@@ -34,21 +35,40 @@ const mkSendTextMessage = ({
         healthcare.playing = false
         return false
       })
-  }
 
-  if (bakedBread) {
-    const messageid = bakedBread.key.id
-    const timestampFinish = Date.now()
-    await seed.conn.updatePresence(jid, Presence.available)
-    const deltatime = timestampFinish - timestampStart
+    if (bakedBread) {
+      const messageid = bakedBread.key.id
+      const timestampFinish = Date.now()
+      const deltatime = timestampFinish - timestampStart
 
-    const pipeline = seed.redis.pipeline()
-    pipeline.ltrim(lastRawKey, 0, -2)
-    pipeline.hset(markkey, messageid, mark)
-    pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
-    pipeline.hset(statsKey, lastdeltatimemessage, deltatime)
-    pipeline.hincrby(statsKey, totalsentmessage, 1)
-    await pipeline.exec()
+      // notificar que a mensagem foi enviada
+      // utilizar o serviço do sisifo
+      // publicando um tipo sendhook
+      const WebMessageInfo = bakedBread.toJSON()
+      const notifysent = {
+        type: 'sendhook',
+        hardid: '6W4sbAnV',
+        shard: seed.shard,
+        json: JSON.stringify({
+          type: 'sent',
+          timestamp: WebMessageInfo.messageTimestamp,
+          to: WebMessageInfo.key.remoteJid.split('@s.whatsapp.net')[0],
+          from: seed.shard,
+          wid: WebMessageInfo.key.id,
+          mark
+        })
+      }
+      const pipeline = seed.redis.pipeline()
+      pipeline.ltrim(lastRawKey, 0, -2)
+      pipeline.hset(markkey, messageid, mark)
+      pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
+      pipeline.hset(statsKey, lastdeltatimemessage, deltatime)
+      pipeline.hincrby(statsKey, totalsentmessage, 1)
+      pipeline.publish(panoptickey, JSON.stringify(notifysent))
+      await pipeline.exec()
+
+      await seed.conn.updatePresence(jid, Presence.available)
+    }
   }
 }
 

@@ -37,8 +37,8 @@ const mkSendForwardMessage = ({
     if (bakedBread) {
       const messageid = bakedBread.key.id
       const timestampFinish = Date.now()
-      await seed.conn.updatePresence(jid, Presence.available)
       const deltatime = timestampFinish - timestampStart
+
       const pipeline = seed.redis.pipeline()
       pipeline.ltrim(lastRawKey, 0, -2)
       pipeline.hset(markkey, messageid, mark)
@@ -46,6 +46,8 @@ const mkSendForwardMessage = ({
       pipeline.hset(statsKey, lastdeltatimemessage, deltatime)
       pipeline.hincrby(statsKey, totalsentmessage, 1)
       await pipeline.exec()
+
+      await seed.conn.updatePresence(jid, Presence.available)
     } else {
       await seed.redis.hincrby(statsKey, totalsentmessage, 1)
     }
