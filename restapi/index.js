@@ -17,6 +17,7 @@ const redisConn = process.env.REDIS_CONN
 const hardid = process.env.HARDID
 const panoptickey = 'zap:panoptic'
 const mkwebhookkey = shard => `zap:${shard}:webhook`
+const mkwebhookhistorykey = shard => `zap:${shard}:webhook:history`
 const mkcontactskey = shard => `zap:${shard}:contacts`
 const mkrawbreadkey = shard => `zap:${shard}:fifo:rawBread`
 
@@ -42,6 +43,7 @@ app.post('/webhook', jwt2shard, express.json(), router.webhookpost({ redis, mkwe
 app.get('/webhook', jwt2shard, router.webhookget({ redis, mkwebhookkey }))
 app.put('/webhook', jwt2shard, express.json(), router.webhookput({ redis, mkwebhookkey }))
 app.delete('/webhook', jwt2shard, router.webhookdelete({ redis, mkwebhookkey }))
+app.get('/webhook/history', jwt2shard, router.webhookhistory({ redis, mkwebhookhistorykey }))
 
 app.post('/signupconnection', jwt2shard, express.json(), router.signupconnection({ redis, hardid, panoptickey }))
 app.get('/connect', jwt2shard, router.connect({ redis, hardid, panoptickey }))

@@ -95,10 +95,7 @@ const trafficwand = async () => {
               zygote({ leftover })
               break
             case 'sendhook':
-              /*
-              leftover = { redis, json, shard }
-              */
-              sendHook({ redis: speaker, json: leftover.json, shard: leftover.shard })
+              sendHook({ redis: speaker, json: leftover.json, file: leftover.file, shard: leftover.shard, params: leftover.params })
               break
           }
         }

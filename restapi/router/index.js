@@ -2,6 +2,7 @@
 module.exports = {
   webhookdelete: require('./webhookdelete'),
   webhookget: require('./webhookget'),
+  webhookhistory: require('./webhookhistory'),
   webhookpost: require('./webhookpost'),
   webhookput: require('./webhookput'),
   stats: require('./stats'),
