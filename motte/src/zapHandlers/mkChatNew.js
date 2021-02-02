@@ -1,5 +1,3 @@
-const fetch = require('node-fetch')
-
 /**
  * when a new chat is added
  * on (event: 'chat-new', listener: (chat: WAChat) => void): this
