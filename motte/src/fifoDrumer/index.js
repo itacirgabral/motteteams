@@ -41,6 +41,7 @@ const fifoDrumer = (seed) => {
   }
 
   process.nextTick(async () => {
+    const panoptickey = 'zap:panoptic'
     const pea = await seed.redis.llen(keys.lastRawKey)
     healthcare.playing = healthcare.playing || pea === 0
 
@@ -108,6 +109,17 @@ const fifoDrumer = (seed) => {
         await pipeline.exec()
       }
     }
+
+    // baterista parou :(
+    const notifysent = {
+      type: 'sendhook',
+      hardid: seed.hardid,
+      shard: seed.shard,
+      json: JSON.stringify({
+        type: 'queue stopped'
+      })
+    }
+    await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
   })
 
   return healthcare

@@ -111,9 +111,11 @@ const trafficwand = async () => {
                 if (seed.conn.state === 'open') {
                   // descongestiona
                   const lastRawKey = `zap:${leftover.shard}:last:rawBread`
+                  const lastFifoKey = `zap:${leftover.shard}:fifo:rawBread`
                   const pipeline = seed.redis.pipeline()
-                  pipeline.lrange(lastRawKey, 0, -1)
-                  pipeline.del(lastRawKey)
+                  pipeline.lrange(lastRawKey, 0, -1)// 0
+                  pipeline.del(lastRawKey)// 1
+                  pipeline.llen(lastFifoKey)// 2
                   const pipeback = await pipeline.exec()
 
                   const peas = pipeback[0][1]
@@ -123,8 +125,19 @@ const trafficwand = async () => {
                       hardid: seed.hardid,
                       shard: seed.shard,
                       json: JSON.stringify({
-                        type: 'congested queue',
+                        type: 'queue get uncongested',
                         lost: peas.map(el => JSON.parse(el)).map(el => ({ ...el, jid: undefined, to: el.jid.split('@s.whatsapp.net')[0] }))
+                      })
+                    }
+                    await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
+                  } else {
+                    const notifysent = {
+                      type: 'sendhook',
+                      hardid: seed.hardid,
+                      shard: seed.shard,
+                      json: JSON.stringify({
+                        type: 'queue starting',
+                        queueSize: pipeback[2][1]
                       })
                     }
                     await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
