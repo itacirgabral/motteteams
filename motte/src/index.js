@@ -63,18 +63,25 @@ const trafficwand = async () => {
 
                 const creds = await speaker.get(`zap:${leftover.shard}:creds`)
                 if (creds) {
-                  conn.browserDescription = [description, 'Chrome', version]
                   const authInfo = JSON.parse(creds)
-                  conn.connectOptions.alwaysUseTakeover = true
                   conn.loadAuthInfo(authInfo)
+
+                  conn.browserDescription = [description, 'Chrome', version]
+                  conn.connectOptions.alwaysUseTakeover = true
+                  conn.connectOptions.maxRetries = 3
+                  conn.autoReconnect = 0
 
                   zapHandlers({ conn, seed })
 
-                  await conn.connect()
-
                   patchpanel.set(leftover.shard, seed)
 
-                  console.log(`connect ${leftover.shard}`)
+                  let errcon = false
+                  await conn.connect()
+                    .catch(() => {
+                      patchpanel.delete(leftover.shard)
+                      errcon = true
+                    })
+                  console.log(`${errcon ? 'tried to ' : ''}connect ${leftover.shard}`)
                 }
               }
               break
