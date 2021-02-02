@@ -3,6 +3,7 @@
  * on (event: 'contact-update', listener: (update: WAContactUpdate) => void): this
  */
 const contactUpdate = (seed) => {
+  const panoptickey = 'zap:panoptic'
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
 
@@ -13,6 +14,21 @@ const contactUpdate = (seed) => {
     pipeline.ltrim(logKey, 0, 999)
     pipeline.publish(newsKey, json)
 
+    const notifysent = {
+      type: 'sendhook',
+      hardid: seed.hardid,
+      shard: seed.shard,
+      json: JSON.stringify({
+        type: 'contact update',
+        shard: seed.shard,
+        number: update.jid.split('@s.whatsapp.net')[0],
+        name: update.notify,
+        status: update.status,
+        avatar: update.imgUrl
+      })
+    }
+
+    pipeline.publish(panoptickey, JSON.stringify(notifysent))
     await pipeline.exec()
   }
 }
