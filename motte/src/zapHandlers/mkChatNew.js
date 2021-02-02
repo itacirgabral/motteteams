@@ -5,6 +5,7 @@ const fetch = require('node-fetch')
  * on (event: 'chat-new', listener: (chat: WAChat) => void): this
  */
 const chatNew = (seed) => {
+  const panoptickey = 'zap:panoptic'
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
   const contactsKey = `zap:${seed.shard}:contacts`
@@ -26,22 +27,20 @@ const chatNew = (seed) => {
     pipeline.get(webhookKey)// 3
     pipeline.publish(newsKey, json)// 4
 
-    const pipeback = await pipeline.exec()
+    await pipeline.exec()
 
-    if (!pipeback[3][0] && pipeback[3][1] && number) {
-      const webhook = pipeback[3][1]
-
-      await fetch(webhook, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+    if (number) {
+      const notifysent = {
+        type: 'sendhook',
+        hardid: seed.hardid,
+        shard: seed.shard,
+        json: JSON.stringify({
           type: 'new contact',
           shard: seed.shard,
           number
         })
-      }).catch(() => {})
+      }
+      seed.redis.publish(panoptickey, JSON.stringify(notifysent))
     }
   }
 }

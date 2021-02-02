@@ -5,6 +5,7 @@ const fetch = require('node-fetch')
  * on (event: 'open', listener: (result: WAOpenResult) => void): this
  */
 const open = (seed) => {
+  const panoptickey = 'zap:panoptic'
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
   const webhookKey = `zap:${seed.shard}:webhook`
@@ -17,22 +18,18 @@ const open = (seed) => {
     pipeline.get(webhookKey)// 2
     pipeline.publish(newsKey, json)// 3
 
-    const pipeback = await pipeline.exec()
-
-    if (!pipeback[2][0] && pipeback[2][1]) {
-      const webhook = pipeback[2][1]
-
-      await fetch(webhook, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          type: 'opened',
-          shard: seed.shard
-        })
-      }).catch(() => {})
+    const notifysent = {
+      type: 'sendhook',
+      hardid: seed.hardid,
+      shard: seed.shard,
+      json: JSON.stringify({
+        type: 'opened',
+        shard: seed.shard
+      })
     }
+    pipeline.publish(panoptickey, JSON.stringify(notifysent))
+
+    await pipeline.exec()
   }
 }
 

@@ -1,5 +1,3 @@
-const fetch = require('node-fetch')
-
 /**
  * when a message's status is updated (deleted, delivered, read, sent etc.)
  * on (event: 'message-status-update', listener: (message: WAMessageStatusUpdate) => void): this
