@@ -45,11 +45,13 @@ app.put('/webhook', jwt2shard, express.json(), router.webhookput({ redis, mkwebh
 app.delete('/webhook', jwt2shard, router.webhookdelete({ redis, mkwebhookkey }))
 app.get('/webhook/history', jwt2shard, router.webhookhistory({ redis, mkwebhookhistorykey }))
 
+app.get('/alreadytalkedto/:number', jwt2shard, router.alreadytalkedto({ redis }))
+app.get('/allcontacts', jwt2shard, router.allcontacts({ redis, mkcontactskey }))
+app.post('/contactinfo', jwt2shard, express.json(), router.contactinfo({ redis, mkcontactskey, mkrawbreadkey }))
+
 app.post('/signupconnection', jwt2shard, express.json(), router.signupconnection({ redis, hardid, panoptickey }))
 app.get('/connect', jwt2shard, router.connect({ redis, hardid, panoptickey }))
 app.get('/stats', jwt2shard, router.stats({ redis }))
-app.get('/alreadytalkedto/:number', jwt2shard, router.alreadytalkedto({ redis }))
-app.get('/allcontacts', jwt2shard, router.allcontacts({ redis, mkcontactskey }))
 app.get('/disconnect', jwt2shard, router.disconnect({ redis, hardid, panoptickey }))
 app.get('/queuerestart', jwt2shard, router.queuerestart({ redis, hardid, panoptickey }))
 

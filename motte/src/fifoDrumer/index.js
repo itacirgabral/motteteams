@@ -5,6 +5,7 @@ const mkSendForwardMessage = require('./mkSendForwardMessage')
 const mkSendDocumentMessage = require('./mkSendDocumentMessage')
 const mkSendAudioMessage = require('./mkSendAudioMessage')
 const mkSendImageMessage = require('./mkSendImageMessage')
+const mkContactInfo = require('./mkContactInfo')
 
 /*
 ** Fee-fi-fo-fum,
@@ -32,6 +33,7 @@ const fifoDrumer = (seed) => {
   const sendDocumentMessage = mkSendDocumentMessage(keys)
   const sendAudioMessage = mkSendAudioMessage(keys)
   const sendImageMessage = mkSendImageMessage(keys)
+  const contactInfo = mkContactInfo(keys)
 
   const healthcare = {
     playing: true,
@@ -95,6 +97,13 @@ const fifoDrumer = (seed) => {
             break
           case 'imageMessage_v001':
             await sendImageMessage({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
+                healthcare.playing = false
+              })
+            break
+          case 'contactInfo_v001':
+            await contactInfo({ crumb, seed, healthcare })
               .catch(err => {
                 console.error(err)
                 healthcare.playing = false

@@ -9,6 +9,7 @@ module.exports = {
   queuerestart: require('./queuerestart'),
   signupconnection: require('./signupconnection'),
   connect: require('./connect'),
+  contactinfo: require('./contactinfo'),
   disconnect: require('./disconnect'),
   allcontacts: require('./allcontacts'),
   alreadytalkedto: require('./alreadytalkedto'),
