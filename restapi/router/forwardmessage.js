@@ -7,11 +7,11 @@ const forwardmessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req, 
   const to = req.body.to
   if (
     source &&
-      wid &&
-      typeof wid === 'string' &&
-      Array.isArray(to) &&
-      to.length > 0 &&
-      to.every(el => typeof el === 'string')
+    wid &&
+    typeof wid === 'string' &&
+    Array.isArray(to) &&
+    to.length > 0 &&
+    to.every(el => typeof el === 'string')
   ) {
     const mark = crypto.randomBytes(8).toString('base64')
     const deduplicated = Array.from(new Set(to))
