@@ -11,7 +11,7 @@ const mkSendImageMessage = ({
   lastsentmessagetimestamp,
   totalmediasize
 }) => async ({ crumb, seed, healthcare }) => {
-  const { jid, quote, path, filename, mimetype, size, mark } = crumb
+  const { jid, quote, path, filename, mimetype, size, mark, caption } = crumb
   const waittime = 300
 
   await seed.conn.chatRead(jid)
@@ -36,7 +36,7 @@ const mkSendImageMessage = ({
       bakedBread = false
       await seed.redis.hincrby(statsKey, totalsentmessage, 1)
     } else {
-      bakedBread = await seed.conn.sendMessage(jid, imgfile, MessageType.image, { mimetype, filename, quoted: quotedmessage })
+      bakedBread = await seed.conn.sendMessage(jid, imgfile, MessageType.image, { mimetype, filename, quoted: quotedmessage, caption })
         .catch(() => {
           healthcare.playing = false
           return false

@@ -5,6 +5,7 @@ const sendimagemessage = ({ redis, uploader, mkcontactskey, mkrawbreadkey }) => 
   const shard = req.shard
   const upload = uploader().single('image')
   const quote = req.query.quote
+  const caption = req.query.caption
 
   upload(req, res, async (err) => {
     if (!err) {
@@ -18,6 +19,7 @@ const sendimagemessage = ({ redis, uploader, mkcontactskey, mkrawbreadkey }) => 
           mark,
           jid,
           quote,
+          caption,
           path: req.file.path,
           filename: req.file.originalname,
           mimetype: req.file.mimetype,
@@ -34,6 +36,7 @@ const sendimagemessage = ({ redis, uploader, mkcontactskey, mkrawbreadkey }) => 
               from: shard,
               mark,
               quote,
+              caption,
               to: req.params.to,
               filename: rawBread.filename,
               mimetype: rawBread.mimetype,

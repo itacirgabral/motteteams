@@ -10,6 +10,8 @@ const sendmediamessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req
   const to = req.body.to
   const link = req.body.link
   const quote = req.query.quote
+  const caption = req.query.caption
+
   if (to && link) {
     const alreadytalkedto = await redis.sismember(mkcontactskey(shard), `${to}@s.whatsapp.net`)
     if (alreadytalkedto) {
@@ -37,6 +39,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req
                   mark,
                   jid,
                   quote,
+                  caption,
                   path: pathname,
                   filename,
                   mimetype: extmime.mime,
@@ -51,6 +54,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req
                       from: shard,
                       mark,
                       quote,
+                      caption,
                       to,
                       filename,
                       mimetype: extmime.mime,
