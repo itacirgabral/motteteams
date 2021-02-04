@@ -146,14 +146,13 @@ const messageNew = (seed) => {
           }))
           break
         case 'imageMessage':
-          // file = await seed.conn.downloadAndSaveMediaMessage(wbi, `../uploads/${Date.now()}`)
-          // path.join(process.cwd(), process.env.UPLOADFOLDER, filename)
           file = await seed.conn.downloadAndSaveMediaMessage(wbi, path.join(process.cwd(), process.env.UPLOADFOLDER, String(Date.now())))
           params = {
             type,
             to,
             from,
             wid: id,
+            caption: image.caption,
             forwarded: isForwarded ? true : undefined,
             quoted: isQuoted ? image.contextInfo.stanzaId : undefined,
             mimetype: image.mimetype,
