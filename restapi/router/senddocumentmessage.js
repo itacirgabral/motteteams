@@ -19,6 +19,7 @@ const senddocumentmessage = ({ redis, uploader, mkcontactskey, mkrawbreadkey }) 
           jid,
           quote,
           path: req.file.path,
+          ondiskname: req.file.filename,
           filename: req.file.originalname,
           mimetype: req.file.mimetype,
           size: req.file.size

@@ -41,6 +41,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req
                   quote,
                   caption,
                   path: pathname,
+                  ondiskname: filename,
                   filename,
                   mimetype: extmime.mime,
                   size

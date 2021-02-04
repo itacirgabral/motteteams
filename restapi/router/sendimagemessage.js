@@ -21,6 +21,7 @@ const sendimagemessage = ({ redis, uploader, mkcontactskey, mkrawbreadkey }) => 
           quote,
           caption,
           path: req.file.path,
+          ondiskname: req.file.filename,
           filename: req.file.originalname,
           mimetype: req.file.mimetype,
           size: req.file.size

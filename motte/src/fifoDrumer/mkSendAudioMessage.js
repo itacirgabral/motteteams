@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 const { MessageType, Presence, Mimetype } = require('@adiwajshing/baileys')
 const delay = require('./delay')
 
@@ -11,7 +12,7 @@ const mkSendAudioMessage = ({
   lastsentmessagetimestamp,
   totalmediasize
 }) => async ({ crumb, seed, healthcare }) => {
-  const { jid, quote, path, size, mark } = crumb
+  const { jid, quote, ondiskname, size, mark } = crumb
   const waittime = 300
 
   await seed.conn.chatRead(jid)
@@ -20,7 +21,7 @@ const mkSendAudioMessage = ({
 
   let voicefile
   try {
-    voicefile = fs.readFileSync(path)
+    voicefile = fs.readFileSync(path.join(process.cwd(), process.env.UPLOADFOLDER, ondiskname))
   } catch (error) {
     healthcare.playing = false
     console.error(error)
@@ -72,7 +73,7 @@ const mkSendAudioMessage = ({
       await pipeline.exec()
 
       await seed.conn.updatePresence(jid, Presence.available)
-      fs.unlinkSync(path)
+      fs.unlinkSync(path.join(process.cwd(), process.env.UPLOADFOLDER, ondiskname))
     } else {
       healthcare.playing = false
     }

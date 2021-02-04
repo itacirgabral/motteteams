@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 const { MessageType, Presence } = require('@adiwajshing/baileys')
 const delay = require('./delay')
 
@@ -11,7 +12,7 @@ const mkSendImageMessage = ({
   lastsentmessagetimestamp,
   totalmediasize
 }) => async ({ crumb, seed, healthcare }) => {
-  const { jid, quote, path, filename, mimetype, size, mark, caption } = crumb
+  const { jid, quote, ondiskname, filename, mimetype, size, mark, caption } = crumb
   const waittime = 300
 
   await seed.conn.chatRead(jid)
@@ -20,7 +21,7 @@ const mkSendImageMessage = ({
 
   let imgfile
   try {
-    imgfile = fs.readFileSync(path)
+    imgfile = fs.readFileSync(path.join(process.cwd(), process.env.UPLOADFOLDER, ondiskname))
   } catch (error) {
     healthcare.playing = false
     console.error(error)
@@ -71,7 +72,7 @@ const mkSendImageMessage = ({
       await pipeline.exec()
 
       await seed.conn.updatePresence(jid, Presence.available)
-      fs.unlinkSync(path)
+      fs.unlinkSync(path.join(process.cwd(), process.env.UPLOADFOLDER, ondiskname))
     } else {
       healthcare.playing = false
     }
