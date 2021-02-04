@@ -2,7 +2,6 @@ const path = require('path')
 const multer = require('multer')
 
 const destination = path.join(process.cwd(), process.env.UPLOADFOLDER)
-console.log(`uploads destination=${destination}`)
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

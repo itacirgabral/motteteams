@@ -1,0 +1,11 @@
+version: "3.5"
+services:
+  redis:
+    image: redis
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"
+volumes:
+  redisdata:
+    external: true
