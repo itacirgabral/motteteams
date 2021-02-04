@@ -1,3 +1,5 @@
+const path = require('path')
+
 const messageNew = (seed) => {
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
@@ -144,7 +146,9 @@ const messageNew = (seed) => {
           }))
           break
         case 'imageMessage':
-          file = await seed.conn.downloadAndSaveMediaMessage(wbi, `../uploads/${Date.now()}`)
+          // file = await seed.conn.downloadAndSaveMediaMessage(wbi, `../uploads/${Date.now()}`)
+          // path.join(process.cwd(), process.env.UPLOADFOLDER, filename)
+          file = await seed.conn.downloadAndSaveMediaMessage(wbi, path.join(process.cwd(), process.env.UPLOADFOLDER, String(Date.now())))
           params = {
             type,
             to,
@@ -164,7 +168,7 @@ const messageNew = (seed) => {
           }))
           break
         case 'documentMessage':
-          file = await seed.conn.downloadAndSaveMediaMessage(wbi, `../uploads/${Date.now()}`)
+          file = await seed.conn.downloadAndSaveMediaMessage(wbi, path.join(process.cwd(), process.env.UPLOADFOLDER, String(Date.now())))
           params = {
             type,
             to,
@@ -185,7 +189,7 @@ const messageNew = (seed) => {
           }))
           break
         case 'audioMessage':
-          file = await seed.conn.downloadAndSaveMediaMessage(wbi, `../uploads/${Date.now()}`)
+          file = await seed.conn.downloadAndSaveMediaMessage(wbi, path.join(process.cwd(), process.env.UPLOADFOLDER, String(Date.now())))
           params = {
             type,
             to,

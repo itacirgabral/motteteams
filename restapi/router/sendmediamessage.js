@@ -20,7 +20,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req
         const mark = crypto.randomBytes(8).toString('base64')
         const jid = `${to}@s.whatsapp.net`
         const filename = `${shard}-${Date.now()}.file`
-        const pathname = path.join(process.cwd(), '..', 'uploads', filename)
+        const pathname = path.join(process.cwd(), process.env.UPLOADFOLDER, filename)
 
         stream.pipeline(response.body, fs.createWriteStream(pathname), async (err, data) => {
           if (err) {
