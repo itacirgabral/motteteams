@@ -6,7 +6,10 @@ const mkContactInfo = ({
 }) => async ({ crumb, seed, healthcare }) => {
   if (seed.conn.contacts[crumb.jid]) {
     const { notify, vname } = seed.conn.contacts[crumb.jid]
-    const [avatar, { status }] = await Promise.all([seed.conn.getProfilePicture(crumb.jid), seed.conn.getStatus(crumb.jid)])
+    const [avatar, { status }] = await Promise.all([
+      seed.conn.getProfilePicture(crumb.jid).catch(() => undefined),
+      seed.conn.getStatus(crumb.jid).catch(() => ({ status: undefined }))
+    ])
 
     const notifysent = {
       type: 'sendhook',
