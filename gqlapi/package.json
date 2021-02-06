@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./index.js",
+    "dev": "npx node-dev -r dotenv/config ./src/index.js",
+    "debug": "npx node-dev --inspect=0.0.0.0:9229 -r dotenv/config ./src/index.js",
+    "start": "node ./src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,7 +17,8 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "graphql": "^15.5.0"
+    "graphql": "^15.5.0",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "eslint": "^7.19.0",
