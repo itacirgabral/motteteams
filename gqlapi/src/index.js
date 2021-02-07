@@ -3,6 +3,8 @@ const cors = require('cors')
 const morgan = require('morgan')
 const { ApolloServer, gql } = require('apollo-server-express')
 
+const querySignupconnection = require('./resolvers/querySignupconnection')
+
 const typeDefs = gql`
   input LastQRCodeInput {
     qr: String!
@@ -46,15 +48,26 @@ const typeDefs = gql`
 `
 
 const resolvers = {
+  SignupconnectionResponse: {
+    __resolveType: (obj, context, info) => {
+      switch (obj.type) {
+        case 'qr':
+          return 'QRCode'
+        case 'jwt':
+          return 'JWT'
+      }
+    }
+  },
   Query: {
-    hello: () => 'Hello world!'
+    hello: () => 'Hello world!',
+    signupconnection: querySignupconnection
   }
 }
 
-const server = new ApolloServer({ typeDefs, resolvers, mocks: true })
+const server = new ApolloServer({ typeDefs, resolvers })
 
 const app = express()
-app.use(morgan('tiny'))
+// app.use(morgan('tiny'))
 app.use(cors())
 app.use(express.static('frontend/build'))
 
