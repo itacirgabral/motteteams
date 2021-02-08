@@ -2,7 +2,7 @@ import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
-import Link from "react-router-dom/Link";
+import { Link } from "react-router-dom";
 import ClearIcon from '@material-ui/icons/Clear';
 import CheckIcon from '@material-ui/icons/Check';
 
@@ -27,10 +27,25 @@ const NewInstance = ({ state, dispatch }) => {
             label="Enviar Auto Mensagem"
           />
           <FormControlLabel id="checkboxlembrar"
-            control={<Checkbox checked={state.newinstance.rememberhere} name="lembrar" />}
+            control={<Checkbox
+              checked={state.newinstance.rememberhere}
+              onChange={ev => dispatch({
+                type: 'setNewinstanceRememberhere',
+                rememberhere: ev.target.checked
+              })}
+              name="lembrar"
+            />}
             label="Lembrar da instância"
           />
-          <TextField id="inputwebhook" value={state.newinstance.webhook} label="webhook url" onChange={console.dir}/>
+          <TextField
+            id="inputwebhook"
+            value={state.newinstance.webhook}
+            label="webhook url"
+            onChange={ev => dispatch({
+              type: 'setNewinstanceHebhook',
+              webhook: ev.target.value
+            })}
+          />
         </FormControl>
       </Grid>
     </Grid>

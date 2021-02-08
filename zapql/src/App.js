@@ -25,6 +25,32 @@ const reducer = (state, action) => {
         }
       }
     break
+    case 'setNewinstanceRememberhere':
+      return {
+        ...state,
+        newinstance: {
+          ...state.newinstance,
+          rememberhere: action.rememberhere
+        }
+      }
+    break
+    case 'setNewinstanceQRCode':
+      return {
+        ...state,
+        newinstance: {
+          ...state.newinstance,
+          qr: action.qr
+        }
+      }
+      break
+    case 'setNewinstance':
+      return {
+        ...state,
+        instancies: {
+          ...state.instancies,
+          [action.number]: { }
+        }
+      }
     default:
       throw new Error()
   }
@@ -35,6 +61,10 @@ const datazero = {
     webhook: 'https://1234.ngrok.io/',
     selflog: true,
     rememberhere: true
+  },
+  instancies: {
+    556596910295: {
+    }
   }
 }
 
@@ -48,13 +78,13 @@ const App = () => {
         <BrowserRouter>
           <Switch>
             <Route path="/getqrcode">
-              <GetQRCode />
+              <GetQRCode state={state} dispatch={dispatch}/>
             </Route>
             <Route path="/new">
               <NewInstance state={state} dispatch={dispatch}/>
             </Route>
             <Route path="/">
-              <Instancies />
+              <Instancies state={state} dispatch={dispatch} />
             </Route>
           </Switch>
         </BrowserRouter>

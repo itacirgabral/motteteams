@@ -7,6 +7,7 @@ const typeDefs = gql`
   input SignupconnectionInput {
     webhook: String
     remember: Boolean
+    selflog: Boolean
   }
 
   """
