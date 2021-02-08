@@ -5,25 +5,15 @@ const qr = {
 }
 
 const querySignupconnection = async (parent, args, context, info) => {
-  if (args.input && args.input.qr === qr.qr) {
-    return {
-      type: 'jwt',
-      jwt: 'xxx.yyy.zzz',
-      userinfo: {
-        number: '556599375661',
-        name: 'Itacir Gabral',
-        avatar: 'https://link.com'
-      }
-    }
-  } else {
-    const r = await new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve(qr)
-      }, 2000)
-    })
+  const { webhook, remember } = args.input
 
-    return r
-  }
+  const r = await new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(qr)
+    }, 2000)
+  })
+
+  return r
 }
 
 module.exports = querySignupconnection

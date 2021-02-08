@@ -11,10 +11,9 @@ import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 
-
 import css from './css'
 
-const NewInstance = () => {
+const NewInstance = ({ state, dispatch }) => {
   const stl = css()
   return <Box textAlign="center">
     <Typography component="h1" variant="h4"  className={stl.header}>
@@ -24,14 +23,14 @@ const NewInstance = () => {
       <Grid item xs={12}>
         <FormControl className={stl.form}>
           <FormControlLabel id="checkboxautomensagem"
-            control={<Checkbox checked={true} name="automensagem" />}
+            control={<Checkbox checked={state.newinstance.selflog} name="automensagem" />}
             label="Enviar Auto Mensagem"
           />
           <FormControlLabel id="checkboxlembrar"
-            control={<Checkbox checked={false} name="lembrar" />}
+            control={<Checkbox checked={state.newinstance.rememberhere} name="lembrar" />}
             label="Lembrar da instância"
           />
-          <TextField id="inputwebhook" label="webhook url" />
+          <TextField id="inputwebhook" value={state.newinstance.webhook} label="webhook url" onChange={console.dir}/>
         </FormControl>
       </Grid>
     </Grid>
