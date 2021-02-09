@@ -1,23 +1,18 @@
 const queryLastqrcode = async (parent, args, context, info) => {
   const { qr } = args.input
+  const redis = context.redis.duplicate()
 
-  const jwt = {
-    type: 'jwt',
-    jwt: 'xxx.yyy.zzz',
-    userinfo: {
-      number: '123412341234',
-      name: 'name',
-      avatar: 'https://avatares.com/123412341234'
-    }
+  const tempzapjwtkey = `tempzap:${qr}:jwt`
+
+  const blpop = await redis.blpop(tempzapjwtkey, 20)
+
+  if (blpop) {
+    const bread = JSON.parse(blpop[1])
+
+    return bread
+  } else {
+    return null
   }
-
-  const r = await new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(jwt)
-    }, 2000)
-  })
-
-  return r
 }
 
 module.exports = queryLastqrcode

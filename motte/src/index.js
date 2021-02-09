@@ -4,6 +4,7 @@ const Redis = require('ioredis')
 const zapHandlers = require('./zapHandlers')
 const fifoDrumer = require('./fifoDrumer')
 const zygote = require('./zygote')
+const gqlzygote = require('./gqlzygote')
 const sendHook = require('./sendHook')
 
 const redisConn = process.env.REDIS_CONN
@@ -101,6 +102,11 @@ const trafficwand = async () => {
               break
             case 'signupconnection':
               zygote({ leftover })
+              break
+            case 'gql.signupconnection':
+              console.log('gql.signupconnection')
+              console.dir({ leftover })
+              gqlzygote({ leftover })
               break
             case 'sendhook':
               sendHook({ redis: speaker, json: leftover.json, file: leftover.file, shard: leftover.shard, params: leftover.params })

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npx node-dev -r dotenv/config ./src/index.js",
     "debug": "npx node-dev --inspect=0.0.0.0:9229 -r dotenv/config ./src/index.js",
-    "start": "node ./src/index.js",
+    "start": "node -r dotenv/config  ./src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,7 +15,8 @@
   "dependencies": {
     "apollo-server": "^2.19.2",
     "dotenv": "^8.2.0",
-    "graphql": "^15.5.0"
+    "graphql": "^15.5.0",
+    "ioredis": "^4.22.0"
   },
   "devDependencies": {
     "eslint": "^7.19.0",

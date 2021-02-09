@@ -21,9 +21,9 @@ const SIGNUPCONNECTION = gql`
 `
 
 const LASTQRCODE = gql`
-query {
+query($qrcode: String) {
   lastqrcode(input: {
-    qr: "1@JmcciH4ex8Mi3X3VLm+le+zeWJtTbL2I6HvLReHieByl+VvM2GQvLQm4Wb0OVeMntm7vJGA/7YCGKw==,Z+Bkg8RbkDZ0TA2qugaZervpOJ0k+EgbV27X0ddtYS4=,dySLIPDeon0mvDP+euM32g=="
+    qr: $qrcode
   }) {
       jwt
       userinfo {
@@ -37,7 +37,7 @@ query {
 
 const GetQRCode = ({ state, dispatch }) => {
   const { loading, error, data, refetch } = useQuery(SIGNUPCONNECTION)
-  const [lastQRCodeTrigger, lastQRCodedata ] = useLazyQuery(LASTQRCODE)
+  const [lastQRCodeTrigger, lastQRCodedata ] = useLazyQuery(LASTQRCODE, { variables: { qrcode: state.newinstance.qr }})
   const stl = css()
   // level 'L' 'M' 'Q' 'H'
 
@@ -56,19 +56,26 @@ const GetQRCode = ({ state, dispatch }) => {
   </Box>
   
   if (loading) {
+    /*
+    ** Loading qrcode
+    */
     return mkBox(<CircularProgress color="secondary" size="8rem"/>)
   } else if (error || lastQRCodedata.error) {
-    return  mkBox(<p>{`Error! ${error.message || lastQRCodedata.error}`}</p>)
+    /*
+    ** Error
+    */
+    return  mkBox(<p>{`Error! ${error?.message || lastQRCodedata.error}`}</p>)
   } else if (data && !lastQRCodedata.called) {
 
     console.log(`qr=${data.signupconnection.qr}`)
+    dispatch({ type: 'setNewinstanceQRCode', qr: data.signupconnection.qr })
     lastQRCodeTrigger()
     return mkBox(<QRCode id="QRCODE" level="L" value={data.signupconnection.qr} size={384}/>)
 
   } else if (data && lastQRCodedata.loading) {
     return mkBox(<QRCode id="QRCODE" level="L" value={data.signupconnection.qr} size={384}/>)
   } else if (data && lastQRCodedata.data) {
-    console.log('lastQRCodedata.dat')
+    console.log('lastQRCodedata.data')
     console.dir(lastQRCodedata.data)
     dispatch({ type: 'setNewinstance', number: lastQRCodedata.data.lastqrcode.userinfo.number })
     return <Redirect to="/"/>

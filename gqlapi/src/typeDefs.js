@@ -18,8 +18,7 @@ const typeDefs = gql`
     type is qr
     """
     type: String!
-    qr: String!
-    attempts: Int
+    qr: String
   }
 
   type UserInfo {
