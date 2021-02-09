@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
   },
   footer: {
     marginTop: 'auto'
-  },
+  }
 }))
 
 export default useStyles

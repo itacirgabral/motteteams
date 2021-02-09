@@ -16,8 +16,6 @@ import css from './css'
 const Instancies = ({ state, dispatch }) => {
   const stl = css()
 
-  console.log('state')
-  console.dir(state)
   return <Box textAlign="center">
     <Typography component="h1" variant="h4" className={stl.header}>
       Instâncias
@@ -47,7 +45,7 @@ const Instancies = ({ state, dispatch }) => {
           </ListItem>)
       ]}
     </List>
-    <Button className={stl.add} fullWidth component={Link} to="/new">
+    <Button className={stl.add} fullWidth component={Link} to="/newinstance">
       <AddAPhotoIcon fontSize='large' />
     </Button>
   </Box>
