@@ -1,8 +1,8 @@
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
-  minHeight18: {
-    minHeight: '18rem'
+  header: {
+    padding: theme.spacing(2),
   }
 }))
 

@@ -104,8 +104,6 @@ const trafficwand = async () => {
               zygote({ leftover })
               break
             case 'gql.signupconnection':
-              console.log('gql.signupconnection')
-              console.dir({ leftover })
               gqlzygote({ leftover })
               break
             case 'sendhook':

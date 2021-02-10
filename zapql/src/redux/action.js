@@ -3,17 +3,40 @@ const action = {
     type: 'setNewinstanceHebhook',
     webhook
   }),
-  setNewinstanceRememberhere: ({ rememberhere }) => ({
-    type: 'setNewinstanceRememberhere',
-    rememberhere
+  setNewinstanceRemember: ({ remember }) => ({
+    type: 'setNewinstanceRemember',
+    remember
+  }),
+  setNewinstanceStage: ({ stage }) => ({
+    type: 'setNewinstanceStage',
+    stage
   }),
   setNewinstanceQRCode: ({ qr }) => ({
     type: 'setNewinstanceQRCode',
     qr
   }),
-  setNewinstance: ({ number }) => ({
-    type: 'setNewinstance',
+  setNewinstanceNumber: ({ number }) => ({
+    type: 'setNewinstanceNumber',
     number
+  }),
+  setNewinstanceName: ({ name }) => ({
+    type: 'setNewinstanceName',
+    name
+  }),
+  setNewinstanceAvatar: ({ avatar }) => ({
+    type: 'setNewinstanceAvatar',
+    avatar
+  }),
+  setNewinstanceJwt: ({ jwt }) => ({
+    type: 'setNewinstanceJwt',
+    jwt
+  }),
+  setNewinstance: ({ number, jwt, name, avatar }) => ({
+    type: 'setNewinstance',
+    number,
+    jwt,
+    name,
+    avatar
   })
 }
 

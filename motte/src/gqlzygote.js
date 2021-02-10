@@ -101,6 +101,8 @@ const gqlzygote = async ({ leftover }) => {
 
     setTimeout(async () => {
       WAC.close()
+
+      // setar outro timeout para apagar temp::
     }, 6000)
   })
 
