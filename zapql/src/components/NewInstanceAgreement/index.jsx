@@ -1,7 +1,3 @@
-// import { useLocalStorage, writeStorage } from '@rehooks/local-storage'
-// const [instancies] = useLocalStorage('instancies', {})
-// writeStorage('instancies', {...instancies, [number]: { name, jwt, avatar }})
-
 import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 

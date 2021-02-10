@@ -1,9 +1,10 @@
 import Box from '@material-ui/core/Box'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
-import { Link } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
 import ClearIcon from '@material-ui/icons/Clear'
 import CheckIcon from '@material-ui/icons/Check'
+import ThumbUpIcon from '@material-ui/icons/ThumbUp'
 
 import action from '../../redux/action'
 import css from './css'
@@ -16,12 +17,11 @@ import NewInstanceAgreement from '../../components/NewInstanceAgreement'
 
 const NewInstance = ({ state, dispatch }) => {
   const stl = css()
+  const history = useHistory()
 
-  const actualStage = state.newinstance.stage
-  const switchStage = stage => {
+  const switchStage = (stage) => {
     switch(stage) {
       case 0:
-        // const { remember, webhook, setRemember, setHebhook } = props
         return <NewInstanceForm
           remember={state.newinstance.remember}
           webhook={state.newinstance.webhook}
@@ -54,8 +54,10 @@ const NewInstance = ({ state, dispatch }) => {
           }}
         />
       case 3:
-        return <NewInstanceAgreement store={() => {
-          if(state.newinstance.remember) {
+        return <NewInstanceAgreement
+          store={() => {
+            dispatch(action.setNewinstanceStage({ stage: 0 }))
+            if(state.newinstance.remember) {
             /*
               // store on localstorage
               [state.newinstance.number]: {
@@ -64,10 +66,52 @@ const NewInstance = ({ state, dispatch }) => {
                 jwt: state.newinstance.jwt
               }
             */
-          }
-        }}/>
+            }
+          }}
+        />
       default:
         return <p>Stage 0</p>
+    }
+  }
+  const navStage = (stage) => {
+    switch (stage) {
+      case 0:
+        return <Grid container >
+          <Grid item xs={6}>
+            <Button fullWidth component={Link} to="/" onClick={() => dispatch(action.setNewinstanceStage({ stage: 0 }))}>
+              <ClearIcon fontSize='large' />
+            </Button>
+          </Grid>
+          <Grid item xs={6}>
+            <Button fullWidth onClick={() => {
+              const iim = action.setNewinstanceStage({ stage: 1 })
+              dispatch(iim)
+            }}>
+              <CheckIcon fontSize='large' />
+            </Button>
+          </Grid>
+        </Grid>
+      case 1:
+        return null
+      case 2:
+        return null
+      case 3:
+        return <Grid container className={stl.footer} >
+          <Button
+            className={stl.add}
+            fullWidth
+            variant="contained"
+            color="secondary"
+            onClick={() => {
+              dispatch(action.setNewinstanceStage({ stage: 0 }))
+              history.push('/')
+            }}
+          >
+            <ThumbUpIcon fontSize='large' />
+          </Button>
+        </Grid>
+      default:
+        return <p>stage = default</p>
     }
   }
 
@@ -79,23 +123,11 @@ const NewInstance = ({ state, dispatch }) => {
         switchStage(state.newinstance.stage)
       }
       </Grid>
-    </Grid>
-    <Grid container >
-      <Grid item xs={6}>
-        <Button fullWidth component={Link} to="/" onClick={() => dispatch(action.setNewinstanceStage({ stage: 0 }))}>
-          <ClearIcon fontSize='large' />
-        </Button>
-      </Grid>
-      <Grid item xs={6}>
-        <Button fullWidth onClick={() => {
-          const nextStage = actualStage === 3 ? 0 : actualStage + 1
-          const iim = action.setNewinstanceStage({ stage: nextStage })
-          dispatch(iim)
-        }}>
-          <CheckIcon fontSize='large' />
-        </Button>
-      </Grid>
-    </Grid>
+    </Grid >
+    {
+      navStage(state.newinstance.stage)
+    }
+
   </Box>
 }
 

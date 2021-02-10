@@ -21,29 +21,15 @@ const Instancies = ({ state, dispatch }) => {
       Instâncias
     </Typography>
     <List component="nav" className={stl.list}>
-      {[
-        <ListItem key="556599375661" button>
-          <ListItemIcon>
-            <NetworkCheckIcon />
-          </ListItemIcon>
-          <ListItemText primary="556599375661" />
-        </ListItem>,
-
-        <ListItem key="556593662936" button>
-          <ListItemIcon>
-            <NetworkCheckIcon />
-          </ListItemIcon>
-          <ListItemText primary="556593662936" />
-        </ListItem>,
-
-        ...Object.keys(state.instancies)
+      {
+        Object.keys(state.instancies)
           .map(number => <ListItem key={number} button>
             <ListItemIcon>
               <NightsStayIcon />
             </ListItemIcon>
             <ListItemText primary={ number } />
           </ListItem>)
-      ]}
+      }
     </List>
     <Button className={stl.add} fullWidth component={Link} to="/newinstance">
       <AddAPhotoIcon fontSize='large' />
