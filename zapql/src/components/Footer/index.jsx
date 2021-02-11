@@ -6,7 +6,7 @@ const Footer = () => {
   const stl = css()
 
   return <Box textAlign="center" className={stl.box}>
-    <Typography variant="body1">Preda Petu</Typography>
+    <Typography variant="body1">zapql</Typography>
   </Box>
 }
 
