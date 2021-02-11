@@ -8,6 +8,9 @@ module.exports = {
     lastqrcode: require('./queryLastqrcode'),
     webhook: require('./queryWebhook')
   },
+  Mutation: {
+    webhook: require('./mutationWebhook')
+  },
   Subscription: {
     datenow: require('./subscriptionDatenow')
   }

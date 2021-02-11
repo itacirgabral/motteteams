@@ -45,6 +45,10 @@ const typeDefs = gql`
     webhook: URL
   }
 
+  type Mutation {
+    webhook(input: URL): URL
+  }
+
   type Subscription {
     datenow: String
   }
