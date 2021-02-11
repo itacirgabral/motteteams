@@ -23,6 +23,7 @@ const messageNew = (seed) => {
       const to = seed.shard
       const from = number
       const id = wbi.key.id
+      const timestamp = wbi.messageTimestamp
 
       let msg = wbi.message.conversation
       const location = wbi.message.locationMessage
@@ -95,6 +96,7 @@ const messageNew = (seed) => {
         case 'textMessage':
           jsontosend = {
             type,
+            timestamp,
             to,
             from,
             msg,
@@ -112,6 +114,7 @@ const messageNew = (seed) => {
         case 'locationMessage':
           jsontosend = {
             type,
+            timestamp,
             to,
             from,
             forwarded: isForwarded ? true : undefined,
@@ -131,6 +134,7 @@ const messageNew = (seed) => {
         case 'contactMessage':
           jsontosend = {
             type,
+            timestamp,
             to,
             from,
             forwarded: isForwarded ? true : undefined,
@@ -149,6 +153,7 @@ const messageNew = (seed) => {
           file = await seed.conn.downloadAndSaveMediaMessage(wbi, path.join(process.cwd(), process.env.UPLOADFOLDER, String(Date.now())))
           params = {
             type,
+            timestamp,
             to,
             from,
             wid: id,
@@ -170,6 +175,7 @@ const messageNew = (seed) => {
           file = await seed.conn.downloadAndSaveMediaMessage(wbi, path.join(process.cwd(), process.env.UPLOADFOLDER, String(Date.now())))
           params = {
             type,
+            timestamp,
             to,
             from,
             wid: id,
@@ -191,6 +197,7 @@ const messageNew = (seed) => {
           file = await seed.conn.downloadAndSaveMediaMessage(wbi, path.join(process.cwd(), process.env.UPLOADFOLDER, String(Date.now())))
           params = {
             type,
+            timestamp,
             to,
             from,
             wid: id,
