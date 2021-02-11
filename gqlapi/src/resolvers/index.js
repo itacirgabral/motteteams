@@ -5,6 +5,6 @@ module.exports = {
     lastqrcode: require('./queryLastqrcode')
   },
   Subscription: {
-    datenow: require('./datenow')
+    datenow: require('./subscriptionDatenow')
   }
 }

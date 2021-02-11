@@ -1,26 +1,55 @@
 const { ApolloServer, PubSub } = require('apollo-server')
 const Redis = require('ioredis')
+const jsonwebtoken = require('jsonwebtoken')
 
-const redis = new Redis(process.env.REDIS_CONN)
-const hardid = process.env.HARDID
-const panoptickey = 'zap:panoptic'
+const jwtSecret = process.env.JWT_SECRET
+const defaultContext = {
+  pubsub: new PubSub(),
+  redis: new Redis(process.env.REDIS_CONN),
+  hardid: process.env.HARDID,
+  panoptickey: 'zap:panoptic'
+}
+const Bearer = 'Bearer '
 
 const typeDefs = require('./typeDefs')
 const resolvers = require('./resolvers')
 
-const pubsub = new PubSub()
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: async ({ req, connection }) => {
-    if (connection) {
-    // check connection for metadata
-      return { ...connection.context, pubsub, redis, hardid, panoptickey }
-    } else {
-    // check from req
-      const token = req.headers.authorization || ''
+    const authorization = connection
+      ? connection.context.authorization
+      : req.headers.authorization || Bearer
 
-      return { token, pubsub, redis, hardid, panoptickey }
+    let user
+    try {
+      user = await jsonwebtoken.verify(authorization.split(Bearer)[1], jwtSecret)
+    } catch {
+      user = null
+    }
+
+    return {
+      ...defaultContext,
+      user
+    }
+  },
+  subscriptions: {
+    onConnect: (connectionParams, webSocket, context) => {
+      console.log('onConnect')
+      return {
+        authorization: connectionParams.authorization || Bearer
+      }
+    },
+    onDisconnect: async (webSocket, context) => {
+      console.log('onDisconnect')
+      // const initialContext = await context.initPromise
+    },
+    onOperation: () => {
+      console.log('onOperation')
+    },
+    onOperationComplete: () => {
+      console.log('onOperationComplete')
     }
   }
 })

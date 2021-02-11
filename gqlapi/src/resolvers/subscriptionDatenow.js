@@ -1,7 +1,7 @@
 const DATE_NOW = 'DATE_NOW'
 let subs = 0
 
-module.exports = {
+const subscriptionDatenow = {
   subscribe: (parent, args, context, info) => {
     if (subs === 0) {
       subs = setInterval(() => {
@@ -10,11 +10,7 @@ module.exports = {
     }
 
     return context.pubsub.asyncIterator([DATE_NOW])
-  },
-  onConnect: (connectionParams, webSocket, context) => {
-    // 
-  },
-  onDisconnect: (webSocket, context) => {
-
   }
 }
+
+module.exports = subscriptionDatenow
