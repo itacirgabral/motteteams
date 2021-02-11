@@ -1,6 +1,8 @@
 const { gql } = require('apollo-server-express')
 
 const typeDefs = gql`
+  scalar URL
+
   input LastQRCodeInput {
     qr: String!
   }
@@ -40,6 +42,7 @@ const typeDefs = gql`
     hello: String!
     lastqrcode(input: LastQRCodeInput!): JWT
     signupconnection(input: SignupconnectionInput!): QRCode!
+    webhook: URL
   }
 
   type Subscription {
