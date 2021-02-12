@@ -68,6 +68,8 @@ const forwardmessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey })
             queueSize
           })
         })
+
+      return pipeback
     }
   } else {
     res.status(400).end()

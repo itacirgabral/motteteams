@@ -9,7 +9,8 @@ module.exports = {
     webhook: require('./queryWebhook')
   },
   Mutation: {
-    webhook: require('./mutationWebhook')
+    webhook: require('./mutationWebhook'),
+    disconnect: require('./mutationDisconnect')
   },
   Subscription: {
     datenow: require('./subscriptionDatenow')

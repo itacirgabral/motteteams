@@ -5,10 +5,11 @@ const fs = require('fs')
 const sendHook = async ({ redis, json, shard, params, file }) => {
   const webhookkey = `zap:${shard}:webhook`
   const webhookhistory = `zap:${shard}:webhook:history`
+  const radiohookkey = `zap:${shard}:radiohook`
 
+  let tohookhistory
   if (typeof json === 'string') {
     const webhook = await redis.get(webhookkey)
-
     if (webhook) {
       await fetch(webhook, {
         method: 'POST',
@@ -18,14 +19,9 @@ const sendHook = async ({ redis, json, shard, params, file }) => {
         body: json
       }).catch(() => {})
     }
-
-    const pipeline = redis.pipeline()
-    pipeline.lpush(webhookhistory, json)
-    pipeline.ltrim(webhookhistory, 0, 99)
-    await pipeline.exec()
+    tohookhistory = json
   } else if (typeof file === 'string') {
     const webhook = await redis.get(webhookkey)
-
     if (webhook) {
       const url = new URL(webhook)
       Object.entries(params).forEach(el => {
@@ -38,12 +34,15 @@ const sendHook = async ({ redis, json, shard, params, file }) => {
         method: 'POST', body: form
       }).catch(() => {})
     }
-
     fs.unlinkSync(file)
+    tohookhistory = JSON.stringify(params)
+  }
 
+  if (tohookhistory) {
     const pipeline = redis.pipeline()
-    pipeline.lpush(webhookhistory, JSON.stringify(params))
+    pipeline.lpush(webhookhistory, tohookhistory)
     pipeline.ltrim(webhookhistory, 0, 99)
+    pipeline.publish(radiohookkey, tohookhistory)
     await pipeline.exec()
   }
 }

@@ -44,6 +44,7 @@ const typeDefs = gql`
 
   type Mutation {
     webhook(input: URL): URL
+    disconnect: String
   }
 
   type Subscription {
