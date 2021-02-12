@@ -1,7 +1,6 @@
-const crypto = require('crypto')
 const fs = require('fs')
 
-const sendaudiomessage = ({ redis, uploader, mkcontactskey, mkrawbreadkey }) => async (req, res) => {
+const sendaudiomessage = ({ redis, uploader, mkcontactskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
   const upload = uploader().single('audio')
   const quote = req.query.quote
@@ -9,10 +8,17 @@ const sendaudiomessage = ({ redis, uploader, mkcontactskey, mkrawbreadkey }) => 
   upload(req, res, async (err) => {
     if (!err) {
       const jid = `${req.params.to}@s.whatsapp.net`
-      const alreadyTalkedTo = await redis.sismember(mkcontactskey(shard), jid)
+      const markcountkey = mkmarkcountkey(shard)
+
+      const pipeline = redis.pipeline()
+      pipeline.sismember(mkcontactskey(shard), jid)
+      pipeline.incr(markcountkey)
+      const pipeback = await pipeline.exec()
+
+      const alreadyTalkedTo = pipeback[0][1]
+      const mark = pipeback[1][1]
 
       if (alreadyTalkedTo) {
-        const mark = crypto.randomBytes(8).toString('base64')
         const rawBread = {
           type: 'audioMessage_v001',
           mark,

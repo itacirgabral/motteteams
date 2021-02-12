@@ -1,6 +1,4 @@
-const crypto = require('crypto')
-
-const sendlocationmessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req, res) => {
+const sendlocationmessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
   const quote = req.query.quote
   const description = req.body.description
@@ -9,11 +7,18 @@ const sendlocationmessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (
 
   if (Number.isInteger(Number(req.body.to)) && description && latitude && longitude) {
     const jid = `${req.body.to}@s.whatsapp.net`
-    const alreadyTalkedTo = await redis.sismember(mkcontactskey(shard), jid)
+    const markcountkey = mkmarkcountkey(shard)
+
+    const pipeline = redis.pipeline()
+    pipeline.sismember(mkcontactskey(shard), jid)
+    pipeline.incr(markcountkey)
+    const pipeback = await pipeline.exec()
+
+    const alreadyTalkedTo = pipeback[0][1]
+    const mark = pipeback[1][1]
 
     if (alreadyTalkedTo) {
       const type = 'locationMessage_v001'
-      const mark = crypto.randomBytes(8).toString('base64')
       const queueSize = await redis.lpush(mkrawbreadkey(shard), JSON.stringify({
         type,
         mark,

@@ -1,6 +1,4 @@
-const crypto = require('crypto')
-
-const forwardmessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req, res) => {
+const forwardmessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
   const source = req.body.source
   const wid = req.body.wid
@@ -13,16 +11,21 @@ const forwardmessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req, 
     to.length > 0 &&
     to.every(el => typeof el === 'string')
   ) {
-    const mark = crypto.randomBytes(8).toString('base64')
+    const markcountkey = mkmarkcountkey(shard)
     const deduplicated = Array.from(new Set(to))
     const pipeline = redis.pipeline()
+
+    pipeline.incrby(markcountkey, deduplicated.length)// 0
     for (const el of deduplicated) {
       pipeline.sismember(mkcontactskey(shard), `${el}@s.whatsapp.net`)
     }
-    const alreadytalkedto = await pipeline.exec().catch(() => {
+    const pipeback = await pipeline.exec().catch(() => {
       res.status(500).end()
       return []
     })
+
+    const markend = pipeback[0][1]// 0
+    const alreadytalkedto = pipeback.slice(1)
 
     const messages = alreadytalkedto.map((el, idx) => ({
       to: el[1] === 1 ? deduplicated[idx] : false
@@ -30,13 +33,16 @@ const forwardmessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req, 
       .filter(el => !!el.to)
       .map((el, idx) => ({
         to: el.to,
-        mark: `${mark}${idx}`
+        mark: `${markend - deduplicated.length + idx}`
       }))
 
     if (messages.length > 0) {
       const type = 'forwardMessage_v001'
       const sourceJid = `${source}@s.whatsapp.net`
-      redis.lpush(mkrawbreadkey(shard), messages.map(el => {
+
+      const pipeline = redis.pipeline()
+      pipeline.incrby(markcountkey, messages.length - deduplicated.length)
+      pipeline.lpush(mkrawbreadkey(shard), messages.map(el => {
         const obj = {
           ...el,
           source: sourceJid,
@@ -48,10 +54,11 @@ const forwardmessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req, 
 
         return JSON.stringify(obj)
       }))
-        .catch(() => {
-          res.status(500).end()
-        })
-        .then(queueSize => {
+
+      const pipeback = await pipeline.exec().catch(() => {
+        res.status(500).end()
+      })
+        .then(([, [, queueSize]]) => {
           res.status(200).json({
             type: 'forwardmessage',
             source,

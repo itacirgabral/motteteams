@@ -12,9 +12,6 @@ const typeDefs = gql`
     selflog: Boolean
   }
 
-  """
-  If the attempt fail
-  """
   type QRCode {
     """
     type is qr

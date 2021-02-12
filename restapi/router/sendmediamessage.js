@@ -1,11 +1,10 @@
 const fs = require('fs')
 const path = require('path')
-const crypto = require('crypto')
 const stream = require('stream')
 const fetch = require('node-fetch')
 const FileType = require('file-type')
 
-const sendmediamessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req, res) => {
+const sendmediamessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
   const to = req.body.to
   const link = req.body.link
@@ -13,12 +12,20 @@ const sendmediamessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req
   const caption = req.query.caption
 
   if (to && link) {
-    const alreadytalkedto = await redis.sismember(mkcontactskey(shard), `${to}@s.whatsapp.net`)
-    if (alreadytalkedto) {
+    const jid = `${to}@s.whatsapp.net`
+    const markcountkey = mkmarkcountkey(shard)
+
+    const pipeline = redis.pipeline()
+    pipeline.sismember(mkcontactskey(shard), jid)
+    pipeline.incr(markcountkey)
+    const pipeback = await pipeline.exec()
+
+    const alreadyTalkedTo = pipeback[0][1]
+    const mark = pipeback[1][1]
+
+    if (alreadyTalkedTo) {
       const response = await fetch(link)
       if (response.status === 200) {
-        const mark = crypto.randomBytes(8).toString('base64')
-        const jid = `${to}@s.whatsapp.net`
         const filename = `${shard}-${Date.now()}.file`
         const pathname = path.join(process.cwd(), process.env.UPLOADFOLDER, filename)
 
@@ -30,6 +37,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkrawbreadkey }) => async (req
             const extmime = await FileType.fromFile(pathname)
             const size = fs.statSync(pathname).size
 
+            // Cannot read property 'mime' of undefined
             switch (extmime.mime) {
               case 'image/jpeg':
               case 'image/png':
