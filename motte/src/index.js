@@ -148,7 +148,9 @@ const trafficwand = async () => {
                     await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
                   }
 
-                  seed.drummer = fifoDrumer({ ...seed, redisB: listener.duplicate() })
+                  if (!seed?.drummer?.playing) {
+                    seed.drummer = fifoDrumer({ ...seed, redisB: listener.duplicate() })
+                  }
                 }
               }
               break
