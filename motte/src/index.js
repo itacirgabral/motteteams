@@ -71,6 +71,7 @@ const trafficwand = async () => {
                   conn.connectOptions.alwaysUseTakeover = true
                   conn.connectOptions.maxRetries = 3
                   conn.autoReconnect = 0
+                  // pendingRequestTimeoutMs = 0
 
                   zapHandlers({ conn, seed })
 
@@ -149,6 +150,18 @@ const trafficwand = async () => {
 
                   seed.drummer = fifoDrumer({ ...seed, redisB: listener.duplicate() })
                 }
+              }
+              break
+            case 'connectionstate':
+              if (patchpanel.has(leftover.shard)) {
+                const seed = patchpanel.get(leftover.shard)
+                const state = seed.conn.state
+                const radiohookkey = `zap:${leftover.shard}:radiohook`
+                await speaker.publish(radiohookkey, JSON.stringify({ type: 'connectionstate', state }))
+              } else {
+                const state = 'trashed'
+                const radiohookkey = `zap:${leftover.shard}:radiohook`
+                await speaker.publish(radiohookkey, JSON.stringify({ type: 'connectionstate', state }))
               }
               break
           }

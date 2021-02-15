@@ -1,6 +1,6 @@
 const { AuthenticationError } = require('apollo-server')
 
-const mutationDisconnect = async (parent, args, context, info) => {
+const queryConnectionstate = async (parent, args, context, info) => {
   if (context.user) {
     const redisB = context.redis.duplicate()
     const radiohookkey = `zap:${context.user.shard}:radiohook`
@@ -13,16 +13,16 @@ const mutationDisconnect = async (parent, args, context, info) => {
       }, 20000)
 
       redisB.on('message', (channel, message) => {
-        const { type, reason } = JSON.parse(message)
-        if (type === 'closed' && reason === 'intentional') {
+        const { type, state } = JSON.parse(message)
+        if (type === 'connectionstate') {
           redisB.unsubscribe()
-          resolve('disconected')
+          resolve(state)
         }
       })
     })
 
     await context.redis.publish(context.panoptickey, JSON.stringify({
-      type: 'disconnect',
+      type: 'connectionstate',
       hardid: context.hardid,
       shard: context.user.shard
     }))
@@ -33,4 +33,4 @@ const mutationDisconnect = async (parent, args, context, info) => {
   }
 }
 
-module.exports = mutationDisconnect
+module.exports = queryConnectionstate

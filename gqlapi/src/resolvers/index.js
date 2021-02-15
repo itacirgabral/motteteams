@@ -6,7 +6,8 @@ module.exports = {
     hello: () => 'Hello world!',
     signupconnection: require('./querySignupconnection'),
     lastqrcode: require('./queryLastqrcode'),
-    webhook: require('./queryWebhook')
+    webhook: require('./queryWebhook'),
+    connectionstate: require('./queryConnectionstate')
   },
   Mutation: {
     webhook: require('./mutationWebhook'),

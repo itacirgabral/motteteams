@@ -40,6 +40,7 @@ const typeDefs = gql`
     lastqrcode(input: LastQRCodeInput!): JWT
     signupconnection(input: SignupconnectionInput!): QRCode!
     webhook: URL
+    connectionstate: String
   }
 
   type Mutation {
