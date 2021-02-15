@@ -156,12 +156,29 @@ const trafficwand = async () => {
               if (patchpanel.has(leftover.shard)) {
                 const seed = patchpanel.get(leftover.shard)
                 const state = seed.conn.state
-                const radiohookkey = `zap:${leftover.shard}:radiohook`
-                await speaker.publish(radiohookkey, JSON.stringify({ type: 'connectionstate', state }))
+
+                const notifysent = {
+                  type: 'sendhook',
+                  hardid,
+                  shard: seed.shard,
+                  json: JSON.stringify({
+                    type: 'connectionstate',
+                    state
+                  })
+                }
+
+                await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
               } else {
-                const state = 'trashed'
-                const radiohookkey = `zap:${leftover.shard}:radiohook`
-                await speaker.publish(radiohookkey, JSON.stringify({ type: 'connectionstate', state }))
+                const notifysent = {
+                  type: 'sendhook',
+                  hardid,
+                  shard: leftover.shard,
+                  json: JSON.stringify({
+                    type: 'connectionstate',
+                    state: 'trashed'
+                  })
+                }
+                await speaker.publish(panoptickey, JSON.stringify(notifysent))
               }
               break
           }
