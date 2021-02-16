@@ -1,5 +1,7 @@
 const { AuthenticationError } = require('apollo-server')
 
+const timeout = Number(process.env.TIMEOUT || '5000')
+
 const mutationDisconnect = async (parent, args, context, info) => {
   if (context.user) {
     const redisB = context.redis.duplicate()
@@ -10,7 +12,7 @@ const mutationDisconnect = async (parent, args, context, info) => {
       setTimeout(() => {
         redisB.unsubscribe(radiohookkey)
         resolve('disconnect timeout')
-      }, 20000)
+      }, timeout)
 
       redisB.on('message', (channel, message) => {
         const { type, reason } = JSON.parse(message)
