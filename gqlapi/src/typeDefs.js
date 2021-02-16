@@ -37,8 +37,6 @@ const typeDefs = gql`
 
   type Query {
     hello: String!
-    lastqrcode(input: LastQRCodeInput!): JWT
-    signupconnection(input: SignupconnectionInput!): QRCode!
     webhook: URL
     connectionstate: String
   }
@@ -46,6 +44,8 @@ const typeDefs = gql`
   type Mutation {
     webhook(input: URL): URL
     disconnect: String
+    lastqrcode(input: LastQRCodeInput!): JWT
+    signupconnection(input: SignupconnectionInput!): QRCode!
     queuerestart: String
   }
 

@@ -1,4 +1,4 @@
-const queryLastqrcode = async (parent, args, context, info) => {
+const mutationLastqrcode = async (parent, args, context, info) => {
   const { qr } = args.input
   const redis = context.redis.duplicate()
 
@@ -15,4 +15,4 @@ const queryLastqrcode = async (parent, args, context, info) => {
   }
 }
 
-module.exports = queryLastqrcode
+module.exports = mutationLastqrcode
