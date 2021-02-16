@@ -6,6 +6,7 @@ module.exports = {
   webhookpost: require('./webhookpost'),
   webhookput: require('./webhookput'),
   stats: require('./stats'),
+  connectionstate: require('./connectionstate'),
   queuerestart: require('./queuerestart'),
   signupconnection: require('./signupconnection'),
   connect: require('./connect'),
