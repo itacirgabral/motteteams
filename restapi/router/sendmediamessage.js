@@ -80,6 +80,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey 
                   jid,
                   quote,
                   path: pathname,
+                  ondiskname: filename,
                   filename,
                   mimetype: 'audio/ogg; codecs=opus',
                   size
@@ -108,6 +109,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey 
                   jid,
                   quote,
                   path: pathname,
+                  ondiskname: filename,
                   filename,
                   mimetype: extmime.mime,
                   size
