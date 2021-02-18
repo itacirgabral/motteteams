@@ -72,8 +72,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey 
                     })
                   })
                 break
-              case 'audio/ogg':
-                console.log('audio')
+              case 'audio/opus':
                 await redis.lpush(mkrawbreadkey(shard), JSON.stringify({
                   type: 'audioMessage_v001',
                   mark,
