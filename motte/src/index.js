@@ -154,6 +154,28 @@ const trafficwand = async () => {
                 }
               }
               break
+            case 'spreadrestart':
+              if (patchpanel.has(leftover.shard)) {
+                const seed = patchpanel.get(leftover.shard)
+                if (seed.conn.state === 'open') {
+                  const notifysent = {
+                    type: 'sendhook',
+                    hardid: seed.hardid,
+                    shard: seed.shard,
+                    json: JSON.stringify({
+                      type: 'spread starting'
+                    })
+                  }
+                  await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
+
+                  if (!seed?.trumpeter?.playing) {
+                    seed.trumpeter = {
+                      playing: true
+                    }
+                  }
+                }
+              }
+              break
             case 'connectionstate':
               if (patchpanel.has(leftover.shard)) {
                 const seed = patchpanel.get(leftover.shard)
