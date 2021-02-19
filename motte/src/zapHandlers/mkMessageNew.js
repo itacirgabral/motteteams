@@ -4,6 +4,7 @@ const messageNew = (seed) => {
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
   const webhookkey = `zap:${seed.shard}:webhook`
+  const spreadkey = `zap:${seed.shard}:spread`
   const panoptickey = 'zap:panoptic'
 
   return async (message) => {
@@ -14,9 +15,10 @@ const messageNew = (seed) => {
     pipeline.publish(newsKey, json)// 2
     pipeline.get(webhookkey)// 3
 
+    const wbi = message.toJSON()
+    pipeline.publish(spreadkey, JSON.stringify(wbi))
     const pipeback = await pipeline.exec()
 
-    const wbi = message.toJSON()
     const number = wbi.key.remoteJid.split('@s.whatsapp.net')[0]
     const webhook = pipeback[3][1]
     if (webhook && !wbi.key.fromMe && number.indexOf('-') === -1) {

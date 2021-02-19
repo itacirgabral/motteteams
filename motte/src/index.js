@@ -3,6 +3,7 @@ const Redis = require('ioredis')
 
 const zapHandlers = require('./zapHandlers')
 const fifoDrumer = require('./fifoDrumer')
+const punkDrummer = require('./punkDrummer')
 const zygote = require('./zygote')
 const gqlzygote = require('./gqlzygote')
 const sendHook = require('./sendHook')
@@ -92,8 +93,14 @@ const trafficwand = async () => {
                 const seed = patchpanel.get(leftover.shard)
                 patchpanel.delete(leftover.shard)
 
-                if (seed?.drummer?.playing) {
-                  seed.drummer.playing = false
+                if (seed?.fifoDrummer?.playing) {
+                  seed.fifoDrummer.playing = false
+                }
+                if (seed?.punkDrummer?.playing) {
+                  seed.punkDrummer.playing = false
+                  // manda uma mensagem vazia
+                  // para o punk ver o novo valor
+                  seed.publish(`zap:${seed.shard}:spread`, '{}')
                 }
 
                 seed.conn.close()
@@ -148,8 +155,8 @@ const trafficwand = async () => {
                     await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
                   }
 
-                  if (!seed?.drummer?.playing) {
-                    seed.drummer = fifoDrumer({ ...seed, redisB: listener.duplicate() })
+                  if (!seed?.fifoDrummer?.playing) {
+                    seed.fifoDrummer = fifoDrumer({ ...seed, redisB: listener.duplicate() })
                   }
                 }
               }
@@ -168,10 +175,8 @@ const trafficwand = async () => {
                   }
                   await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
 
-                  if (!seed?.trumpeter?.playing) {
-                    seed.trumpeter = {
-                      playing: true
-                    }
+                  if (!seed?.punkDrummer?.playing) {
+                    seed.punkDrummer = punkDrummer({ ...seed, redisB: listener.duplicate() })
                   }
                 }
               }
