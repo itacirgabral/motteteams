@@ -100,7 +100,7 @@ const trafficwand = async () => {
                   seed.punkDrummer.playing = false
                   // manda uma mensagem vazia
                   // para o punk ver o novo valor
-                  seed.publish(`zap:${seed.shard}:spread`, '{}')
+                  seed.redis.publish(`zap:${seed.shard}:spread`, '{}')
                 }
 
                 seed.conn.close()
