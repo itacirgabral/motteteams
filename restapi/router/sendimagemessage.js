@@ -2,7 +2,7 @@ const fs = require('fs')
 
 const sendimagemessage = ({ redis, uploader, mkcontactskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
-  const upload = uploader().single('image')
+  const upload = uploader().single('file')
   const quote = req.query.quote
   const caption = req.query.caption
 
