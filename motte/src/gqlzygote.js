@@ -87,6 +87,10 @@ const gqlzygote = async ({ leftover }) => {
     pipeline.rpush(local.qr2jwtkwy, body)
     pipeline.set(`zap:${number}:creds`, JSON.stringify(local.creds))
 
+    if (leftover.webhook) {
+      pipeline.set(`zap:${number}:webhook`, leftover.webhook)
+    }
+
     await Promise.all([
       WAC.sendMessage(WAC.user.jid, `*Open the connection:*\nhttps://zapql.com/${number}/dashboard/&jwt=${jwt}`, MessageType.text),
       pipeline.exec(),
