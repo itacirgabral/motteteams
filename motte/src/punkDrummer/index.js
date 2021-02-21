@@ -41,7 +41,7 @@ const punkDrummer = (seed) => {
 
       const timestamp = wbi.messageTimestamp
 
-      if (!(from === 'status@broadcast' || fromMe || isGroup)) {
+      if (!(from === 'status@broadcast' || fromMe)) {
         const conversation = wbi.message.conversation
         const quoteMsg = wbi.message.extendedTextMessage
         const location = wbi.message.locationMessage

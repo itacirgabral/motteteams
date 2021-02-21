@@ -2,7 +2,7 @@ const fs = require('fs')
 
 const sendaudiomessage = ({ redis, uploader, mkcontactskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
-  const upload = uploader().single('audio')
+  const upload = uploader().single('file')
   const quote = req.query.quote
 
   upload(req, res, async (err) => {
