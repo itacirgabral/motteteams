@@ -37,8 +37,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey 
             const extmime = await FileType.fromFile(pathname)
             const size = fs.statSync(pathname).size
 
-            // Cannot read property 'mime' of undefined
-            switch (extmime.mime) {
+            switch (extmime ? extmime.mime : null) {
               case 'image/jpeg':
               case 'image/png':
               case 'image/webp':
@@ -110,7 +109,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey 
                   path: pathname,
                   ondiskname: filename,
                   filename,
-                  mimetype: extmime.mime,
+                  mimetype: extmime ? extmime.mime : 'text/plain',
                   size
                 }))
                   .catch(() => {
@@ -124,7 +123,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey 
                       to,
                       quote,
                       filename,
-                      mimetype: extmime.mime,
+                      mimetype: extmime ? extmime.mime : 'text/plain',
                       size,
                       queueSize
                     })

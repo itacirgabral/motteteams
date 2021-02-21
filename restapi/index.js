@@ -55,6 +55,7 @@ app.post('/signupconnection', jwt2shard, express.json(), router.signupconnection
 app.get('/connect', jwt2shard, router.connect({ redis, hardid, panoptickey }))
 app.get('/stats', jwt2shard, router.stats({ redis }))
 app.get('/connectionstate', jwt2shard, router.connectionstate({ redis, hardid, panoptickey }))
+app.get('/spreadrestart', jwt2shard, router.spreadrestart({ redis, hardid, panoptickey }))
 app.get('/disconnect', jwt2shard, router.disconnect({ redis, hardid, panoptickey }))
 app.get('/queuerestart', jwt2shard, router.queuerestart({ redis, hardid, panoptickey }))
 

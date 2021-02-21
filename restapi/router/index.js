@@ -8,6 +8,7 @@ module.exports = {
   stats: require('./stats'),
   connectionstate: require('./connectionstate'),
   queuerestart: require('./queuerestart'),
+  spreadrestart: require('./spreadrestart'),
   signupconnection: require('./signupconnection'),
   connect: require('./connect'),
   contactinfo: require('./contactinfo'),
