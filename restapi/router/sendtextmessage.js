@@ -1,14 +1,19 @@
-const sendtextmessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+const sendtextmessage = ({ redis, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+  const to = req.body.to
   const shard = req.shard
   const quote = req.query.quote
   const msg = req.body.msg
 
-  if (Number.isInteger(Number(req.body.to)) && msg) {
-    const jid = `${req.body.to}@s.whatsapp.net`
+  if (to && msg) {
+    const jid = to.indexOf('-') === -1
+      ? `${to}@s.whatsapp.net` // se for pessoa
+      : `${to}@g.us` // se for grupo
+
+    const chatsKeys = `zap:${shard}:chats`
     const markcountkey = mkmarkcountkey(shard)
 
     const pipeline = redis.pipeline()
-    pipeline.sismember(mkcontactskey(shard), jid)
+    pipeline.sismember(chatsKeys, to)
     pipeline.incr(markcountkey)
     const pipeback = await pipeline.exec()
 

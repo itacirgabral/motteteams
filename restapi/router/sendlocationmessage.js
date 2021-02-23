@@ -1,16 +1,21 @@
-const sendlocationmessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+const sendlocationmessage = ({ redis, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+  const to = req.body.to
   const shard = req.shard
   const quote = req.query.quote
   const description = req.body.description
   const latitude = req.body.latitude
   const longitude = req.body.longitude
 
-  if (Number.isInteger(Number(req.body.to)) && description && latitude && longitude) {
-    const jid = `${req.body.to}@s.whatsapp.net`
+  if (to && description && latitude && longitude) {
+    const jid = to.indexOf('-') === -1
+      ? `${to}@s.whatsapp.net` // se for pessoa
+      : `${to}@g.us` // se for grupo
+
+    const chatsKeys = `zap:${shard}:chats`
     const markcountkey = mkmarkcountkey(shard)
 
     const pipeline = redis.pipeline()
-    pipeline.sismember(mkcontactskey(shard), jid)
+    pipeline.sismember(chatsKeys, to)
     pipeline.incr(markcountkey)
     const pipeback = await pipeline.exec()
 

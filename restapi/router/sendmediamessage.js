@@ -12,11 +12,15 @@ const sendmediamessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey 
   const caption = req.query.caption
 
   if (to && link) {
-    const jid = `${to}@s.whatsapp.net`
+    const jid = to.indexOf('-') === -1
+      ? `${to}@s.whatsapp.net` // se for pessoa
+      : `${to}@g.us` // se for grupo
+
+    const chatsKeys = `zap:${shard}:chats`
     const markcountkey = mkmarkcountkey(shard)
 
     const pipeline = redis.pipeline()
-    pipeline.sismember(mkcontactskey(shard), jid)
+    pipeline.sismember(chatsKeys, to)
     pipeline.incr(markcountkey)
     const pipeback = await pipeline.exec()
 

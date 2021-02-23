@@ -1,17 +1,22 @@
 const fs = require('fs')
 
-const sendaudiomessage = ({ redis, uploader, mkcontactskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+const sendaudiomessage = ({ redis, uploader, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+  const to = req.params.to
   const shard = req.shard
   const upload = uploader().single('file')
   const quote = req.query.quote
 
   upload(req, res, async (err) => {
     if (!err) {
-      const jid = `${req.params.to}@s.whatsapp.net`
+      const jid = to.indexOf('-') === -1
+        ? `${to}@s.whatsapp.net` // se for pessoa
+        : `${to}@g.us` // se for grupo
+
+      const chatsKeys = `zap:${shard}:chats`
       const markcountkey = mkmarkcountkey(shard)
 
       const pipeline = redis.pipeline()
-      pipeline.sismember(mkcontactskey(shard), jid)
+      pipeline.sismember(chatsKeys, to)
       pipeline.incr(markcountkey)
       const pipeback = await pipeline.exec()
 
@@ -41,7 +46,7 @@ const sendaudiomessage = ({ redis, uploader, mkcontactskey, mkmarkcountkey, mkra
               from: shard,
               mark,
               quote,
-              to: req.params.to,
+              to,
               filename: rawBread.filename,
               mimetype: rawBread.mimetype,
               size: rawBread.size,
