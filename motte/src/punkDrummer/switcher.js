@@ -6,6 +6,7 @@ const switcher = async ({
   to,
   from,
   wid,
+  author,
   isQuoted,
   isForwarded,
   seed,
@@ -23,6 +24,7 @@ const switcher = async ({
     case 'textMessage':
       jsontosend = {
         type,
+        author,
         timestamp,
         to,
         from,
@@ -35,6 +37,7 @@ const switcher = async ({
     case 'locationMessage':
       jsontosend = {
         type,
+        author,
         timestamp,
         to,
         from,
@@ -49,6 +52,7 @@ const switcher = async ({
     case 'contactMessage':
       jsontosend = {
         type,
+        author,
         timestamp,
         to,
         from,
@@ -64,6 +68,7 @@ const switcher = async ({
         type,
         timestamp,
         to,
+        author,
         from,
         wid,
         caption: image.caption,
@@ -79,6 +84,7 @@ const switcher = async ({
         type,
         timestamp,
         to,
+        author,
         from,
         wid,
         forwarded: isForwarded ? true : undefined,
@@ -94,6 +100,7 @@ const switcher = async ({
         type,
         timestamp,
         to,
+        author,
         from,
         wid,
         forwarded: isForwarded ? true : undefined,

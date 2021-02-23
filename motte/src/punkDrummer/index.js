@@ -30,14 +30,18 @@ const punkDrummer = (seed) => {
         : undefined
 
       const to = isGroup
-        ? groupId
+        ? seed.shard
         : fromMe ? remoteJid : seed.shard
 
       const from = fromMe
         ? seed.shard
         : isGroup
-          ? participant
+          ? groupId
           : remoteJid
+
+      const author = isGroup
+        ? participant
+        : undefined
 
       const timestamp = wbi.messageTimestamp
 
@@ -66,6 +70,7 @@ const punkDrummer = (seed) => {
           to,
           from,
           wid,
+          author,
           isQuoted,
           isForwarded,
           seed,
