@@ -72,7 +72,7 @@ const gqlzygote = async ({ leftover }) => {
     local.user = WAC.user
     clearTimeout(timeoutid)
     const number = WAC.user.jid.split('@s.whatsapp.net')[0]
-    const jwt = jsonwebtoken.sign(number, jwtsecret)
+    const jwt = jsonwebtoken.sign({ shard: number }, jwtsecret)
     const body = JSON.stringify({
       type: 'jwt',
       jwt,

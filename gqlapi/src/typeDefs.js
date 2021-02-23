@@ -12,6 +12,22 @@ const typeDefs = gql`
     selflog: Boolean
   }
 
+  input SendtextmessageInput {
+    to: String!
+    msg: String!
+    quoted: ID
+  }
+
+  type SendtextmessageOutput {
+    wid: ID!
+    timestamp: String!
+    to: String!
+    from: String!
+    msg: String!
+    quote: ID
+    forwarded: Boolean
+  }
+
   type QRCode {
     """
     type is qr
@@ -47,6 +63,7 @@ const typeDefs = gql`
     lastqrcode(input: LastQRCodeInput!): JWT
     signupconnection(input: SignupconnectionInput!): QRCode!
     queuerestart: String
+    sendtextmessage(input: SendtextmessageInput!): SendtextmessageOutput
   }
 
   type Subscription {

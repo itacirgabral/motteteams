@@ -26,7 +26,7 @@ const sendimagemessage = ({ redis, uploader, mkcontactskey, mkmarkcountkey, mkra
           jid,
           quote,
           caption,
-          path: req.file.path, // 29 26 Cannot read property 'path' of undefined
+          path: req.file.path,
           ondiskname: req.file.filename,
           filename: req.file.originalname,
           mimetype: req.file.mimetype,

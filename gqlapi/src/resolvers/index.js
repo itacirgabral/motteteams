@@ -12,7 +12,8 @@ module.exports = {
     disconnect: require('./mutationDisconnect'),
     signupconnection: require('./mutationSignupconnection'),
     lastqrcode: require('./mutationLastqrcode'),
-    queuerestart: require('./mutationQueuerestart')
+    queuerestart: require('./mutationQueuerestart'),
+    sendtextmessage: require('./mutationSendtextmessage')
   },
   Subscription: {
     datenow: require('./subscriptionDatenow')
