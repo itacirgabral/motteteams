@@ -51,6 +51,10 @@ const server = new ApolloServer({
     onOperationComplete: () => {
       console.log('onOperationComplete')
     }
+  },
+  cors: {
+    origin: '*',
+    credentials: true
   }
 })
 
