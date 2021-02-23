@@ -44,7 +44,6 @@ const trafficwand = async () => {
       await listener.subscribe(panoptickey)
       listener.on('message', async (channel, message) => {
         const { hardid, type, ...leftover } = JSON.parse(message)
-
         // is it to me?
         if (hardid === myhardid) {
           switch (type) {
@@ -208,6 +207,38 @@ const trafficwand = async () => {
                   })
                 }
                 await speaker.publish(panoptickey, JSON.stringify(notifysent))
+              }
+              break
+            case 'loadmessages':
+              if (patchpanel.has(leftover.shard)) {
+                const spreadkey = `zap:${leftover.shard}:spread`
+                const seed = patchpanel.get(leftover.shard)
+                const { number, count = 1, wid } = leftover
+                const jid = `${number}@s.whatsapp.net`
+                let messages
+
+                if (wid) {
+                  const [wbis1, wbis2] = await Promise.all([
+                    seed.conn.loadMessages(jid, count, { fromMe: false, id: wid }),
+                    seed.conn.loadMessages(jid, count, { fromMe: true, id: wid })
+                  ])
+
+                  messages = wbis1.messages
+                    .concat(wbis2.messages)
+                    .map(message => message.toJSON())
+                } else {
+                  const loaded = await seed.conn.loadMessages(jid, count)
+                  messages = loaded.messages.map(message => message.toJSON())
+                }
+
+                const pipeline = seed.redis.pipeline()
+                messages
+                  .map(JSON.stringify)
+                  .forEach(el => {
+                    pipeline.publish(spreadkey, el)
+                  })
+
+                await pipeline.exec()
               }
               break
           }

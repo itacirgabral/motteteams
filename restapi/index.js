@@ -59,6 +59,8 @@ app.get('/spreadrestart', jwt2shard, router.spreadrestart({ redis, hardid, panop
 app.get('/disconnect', jwt2shard, router.disconnect({ redis, hardid, panoptickey }))
 app.get('/queuerestart', jwt2shard, router.queuerestart({ redis, hardid, panoptickey }))
 
+app.post('/loadmessages', jwt2shard, express.json(), router.loadmessages({ redis, hardid, panoptickey }))
+
 https.createServer({
   key: fs.readFileSync(path.join(__dirname, 'sslcert', 'server.key')),
   cert: fs.readFileSync(path.join(__dirname, 'sslcert', 'server.cert'))

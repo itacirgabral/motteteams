@@ -19,6 +19,7 @@ module.exports = {
   sendlocationmessage: require('./sendlocationmessage'),
   sendcontactmessage: require('./sendcontactmessage'),
   forwardmessage: require('./forwardmessage'),
+  loadmessages: require('./loadmessages'),
   senddocumentmessage: require('./senddocumentmessage'),
   sendaudiomessage: require('./sendaudiomessage'),
   sendimagemessage: require('./sendimagemessage'),
