@@ -6,6 +6,7 @@ const chatsReceived = (seed) => {
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
   const contactsKey = `zap:${seed.shard}:contacts`
+  const chatsKeys = `zap:${seed.shard}:chats`
 
   return async (update) => {
     const json = JSON.stringify({ event: 'chats-received', data: update })
@@ -15,9 +16,12 @@ const chatsReceived = (seed) => {
 
     const knoweds = seed.conn.chats.array
       .filter(({ jid = '' }) => jid.indexOf('-') === -1)
-      .map(({ jid }) => jid)
+      .map(({ jid }) => jid.split('@')[0])
+
+    const knowedsAll = seed.conn.chats.array.map(({ jid }) => jid.split('@')[0])
 
     pipeline.sadd(contactsKey, knoweds)
+    pipeline.sadd(chatsKeys, knowedsAll)
     pipeline.publish(newsKey, json)
 
     await pipeline.exec()
