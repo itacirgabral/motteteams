@@ -68,6 +68,7 @@ const typeDefs = gql`
 
   type Subscription {
     datenow: String
+    subauth: String!
   }
 `
 

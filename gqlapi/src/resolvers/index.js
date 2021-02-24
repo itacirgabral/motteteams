@@ -16,6 +16,7 @@ module.exports = {
     sendtextmessage: require('./mutationSendtextmessage')
   },
   Subscription: {
-    datenow: require('./subscriptionDatenow')
+    datenow: require('./subscriptionDatenow'),
+    subauth: require('./subscriptionSubauth')
   }
 }
