@@ -18,8 +18,6 @@ const close = (seed) => {
     pipeline.get(webhookKey)// 2
     pipeline.publish(newsKey, json)// 3
 
-    // TODO se nao for intensional
-    // GMAPI-92
     const notifysent = {
       type: 'sendhook',
       hardid: seed.hardid,

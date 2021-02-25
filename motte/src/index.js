@@ -148,6 +148,7 @@ const trafficwand = async () => {
                       shard: seed.shard,
                       json: JSON.stringify({
                         type: 'queue starting',
+                        shard: leftover.shard,
                         queueSize: pipeback[2][1]
                       })
                     }
@@ -169,7 +170,8 @@ const trafficwand = async () => {
                     hardid: seed.hardid,
                     shard: seed.shard,
                     json: JSON.stringify({
-                      type: 'spread starting'
+                      type: 'spread starting',
+                      shard: leftover.shard
                     })
                   }
                   await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
