@@ -36,14 +36,14 @@ const server = new ApolloServer({
   },
   subscriptions: {
     onConnect: (connectionParams, webSocket, context) => {
-      console.log('onConnect')
       return {
         authorization: connectionParams.authorization || Bearer
       }
     },
     onDisconnect: async (webSocket, context) => {
       console.log('onDisconnect')
-      // const initialContext = await context.initPromise
+      const initialContext = await context.initPromise
+      console.dir({ initialContext })
     },
     onOperation: () => {
       console.log('onOperation')

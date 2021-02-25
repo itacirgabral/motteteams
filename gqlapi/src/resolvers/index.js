@@ -17,6 +17,6 @@ module.exports = {
   },
   Subscription: {
     datenow: require('./subscriptionDatenow'),
-    subauth: require('./subscriptionSubauth')
+    messages: require('./subscriptionMessages')
   }
 }

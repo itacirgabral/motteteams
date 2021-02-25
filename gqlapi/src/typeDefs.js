@@ -18,10 +18,6 @@ const typeDefs = gql`
     quoted: ID
   }
 
-  input SubauthInput {
-    pubsubkey: String!
-  }
-
   type SendtextmessageOutput {
     wid: ID!
     timestamp: String!
@@ -72,7 +68,7 @@ const typeDefs = gql`
 
   type Subscription {
     datenow: String
-    subauth(input: SubauthInput!): String!
+    messages: String!
   }
 `
 
