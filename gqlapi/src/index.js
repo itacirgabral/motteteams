@@ -2,10 +2,11 @@ const { ApolloServer, PubSub } = require('apollo-server')
 const Redis = require('ioredis')
 const jsonwebtoken = require('jsonwebtoken')
 
+const redis = new Redis(process.env.REDIS_CONN)
 const jwtSecret = process.env.JWT_SECRET
 const defaultContext = {
   pubsub: new PubSub(),
-  redis: new Redis(process.env.REDIS_CONN),
+  redis,
   hardid: process.env.HARDID,
   panoptickey: 'zap:panoptic'
 }
@@ -18,32 +19,48 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: async ({ req, connection }) => {
-    const authorization = connection
-      ? connection.context.authorization
-      : req.headers.authorization || Bearer
-
     let user
-    try {
-      user = await jsonwebtoken.verify(authorization.split(Bearer)[1], jwtSecret)
-    } catch {
-      user = null
+    if (connection) {
+      user = connection.context.user
+    } else {
+      const authorization = req.headers.authorization || Bearer
+      try {
+        user = jsonwebtoken.verify(authorization.split(Bearer)[1], jwtSecret)
+      } catch {
+        user = null
+      }
     }
-
     return {
       ...defaultContext,
-      user
+      user,
+      sid: connection.context.sid
     }
   },
   subscriptions: {
     onConnect: (connectionParams, webSocket, context) => {
+      const authorization = connectionParams.authorization || Bearer
+      const sid = String(Math.random()).slice(2)
+      let user
+      try {
+        user = jsonwebtoken.verify(authorization.split(Bearer)[1], jwtSecret)
+      } catch {
+        user = null
+      }
+
       return {
-        authorization: connectionParams.authorization || Bearer
+        user,
+        sid
       }
     },
     onDisconnect: async (webSocket, context) => {
       console.log('onDisconnect')
       const initialContext = await context.initPromise
-      console.dir({ initialContext })
+
+      const radiohookkey = `zap:${initialContext.user.shard}:radiohook`
+      const type = 'subscriptionTurnoff'
+      const sid = initialContext.sid
+
+      redis.publish(radiohookkey, JSON.stringify({ type, sid }))
     },
     onOperation: () => {
       console.log('onOperation')

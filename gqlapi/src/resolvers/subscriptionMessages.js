@@ -10,15 +10,22 @@ const subscriptionMessages = {
       const rtag = String(Math.random()).slice(2)
       const radiohookkey = `zap:${shard}:radiohook`
 
-      console.log(radiohookkey)
-
-      context.bee = 'boop'
+      console.log(`subscriber ${context.sid}`)
 
       redis.subscribe(radiohookkey).then(() => {
         redis.on('message', async (channel, message) => {
-          const { type, timestamp, to, from, msg, wid } = JSON.parse(message)
-          if (type === 'textMessage' && to === shard) {
-            context.pubsub.publish(rtag, { messages: `${from}: ${msg}\n${timestamp}:${wid}` })
+          const { type, ...leftover } = JSON.parse(message)
+          switch (type) {
+            case 'textMessage':
+              if (leftover.to === shard) {
+                context.pubsub.publish(rtag, { messages: `${leftover.from}: ${leftover.msg}\n${leftover.timestamp}:${leftover.wid}` })
+              }
+              break
+            case 'subscriptionTurnoff':
+              if (leftover.sid === context.sid) {
+                redis.unsubscribe(radiohookkey)
+              }
+              break
           }
         })
       })
