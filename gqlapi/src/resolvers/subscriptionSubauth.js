@@ -12,12 +12,30 @@ const subscriptionSubauth = {
 
       console.log(`pubkey=${pubkey}`)
 
+      // 1 subscribe por shard
+      // se nao tiver sub, cria sub e manda conect
+      // se ja tiver sub, manda connectionstate
+      /*
+          onConnect
+          pubkey=zap:556599375661:opa
+          onConnect
+          pubkey=zap:556599375661:opa
+          onConnect
+          pubkey=zap:556599375661:opa
+          onConnect
+          pubkey=zap:556599375661:opa
+          onConnect
+          pubkey=zap:556599375661:opa
+          onDisconnect
+          onDisconnect
+          onDisconnect
+          onDisconnect
+          onDisconnect
+          // doideira, o playground e' zicado, talvez de pra usar o controle de lifecycle do rgaphql mesmo
+      */
       redis.subscribe(pubkey).then(() => {
         redis.on('message', async (channel, message) => {
-          console.log(`channel=${channel} message=${message}`)
-          context.pubsub.publish('commentAdded', {
-            subauth: message
-          })
+          context.pubsub.publish(rtag, { subauth: message })
         })
       })
 
