@@ -13,7 +13,8 @@ module.exports = {
     signupconnection: require('./mutationSignupconnection'),
     lastqrcode: require('./mutationLastqrcode'),
     queuerestart: require('./mutationQueuerestart'),
-    sendtextmessage: require('./mutationSendtextmessage')
+    sendtextmessage: require('./mutationSendtextmessage'),
+    reconect: require('./mutationReconect')
   },
   Subscription: {
     datenow: require('./subscriptionDatenow'),

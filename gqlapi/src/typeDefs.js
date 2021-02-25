@@ -64,6 +64,7 @@ const typeDefs = gql`
     signupconnection(input: SignupconnectionInput!): QRCode!
     queuerestart: String
     sendtextmessage(input: SendtextmessageInput!): SendtextmessageOutput
+    reconect: String
   }
 
   type Subscription {
