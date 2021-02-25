@@ -18,6 +18,8 @@ const close = (seed) => {
     pipeline.get(webhookKey)// 2
     pipeline.publish(newsKey, json)// 3
 
+    // TODO se nao for intensional
+    // GMAPI-92
     const notifysent = {
       type: 'sendhook',
       hardid: seed.hardid,
@@ -29,6 +31,14 @@ const close = (seed) => {
       })
     }
     pipeline.publish(panoptickey, JSON.stringify(notifysent))
+
+    if (err.reason !== 'intentional') {
+      pipeline.publish(panoptickey, JSON.stringify({
+        type: 'disconnect',
+        hardid: seed.shard,
+        shard: seed.hardid
+      }))
+    }
 
     await pipeline.exec()
   }
