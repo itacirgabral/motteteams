@@ -16,6 +16,7 @@ const ports = 3001
 const redisConn = process.env.REDIS_CONN
 const hardid = process.env.HARDID
 const panoptickey = 'zap:panoptic'
+const mkcredskey = shard => `zap:${shard}:creds`
 const mkwebhookkey = shard => `zap:${shard}:webhook`
 const mkwebhookhistorykey = shard => `zap:${shard}:webhook:history`
 const mkchatskey = shard => `zap:${shard}:chats`
@@ -52,7 +53,7 @@ app.get('/allchats', jwt2shard, router.allchats({ redis, mkchatskey }))
 app.post('/contactinfo', jwt2shard, express.json(), router.contactinfo({ redis, mkchatskey, mkrawbreadkey }))
 
 app.post('/signupconnection', jwt2shard, express.json(), router.signupconnection({ redis, hardid, panoptickey }))
-app.get('/connect', jwt2shard, router.connect({ redis, hardid, panoptickey }))
+app.get('/connect', jwt2shard, router.connect({ redis, mkcredskey, hardid, panoptickey }))
 app.get('/stats', jwt2shard, router.stats({ redis }))
 app.get('/connectionstate', jwt2shard, router.connectionstate({ redis, hardid, panoptickey }))
 app.get('/spreadrestart', jwt2shard, router.spreadrestart({ redis, hardid, panoptickey }))

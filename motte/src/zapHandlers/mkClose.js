@@ -9,6 +9,7 @@ const close = (seed) => {
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
   const webhookKey = `zap:${seed.shard}:webhook`
+  const credsKey = `zap:${seed.shard}:creds`
 
   return async (err) => {
     const json = JSON.stringify({ event: 'close', data: err })
@@ -30,12 +31,14 @@ const close = (seed) => {
     }
     pipeline.publish(panoptickey, JSON.stringify(notifysent))
 
-    if (err.reason !== 'intentional') {
-      pipeline.publish(panoptickey, JSON.stringify({
-        type: 'disconnect',
-        hardid: seed.shard,
-        shard: seed.hardid
-      }))
+    pipeline.publish(panoptickey, JSON.stringify({
+      type: 'disconnect',
+      hardid: seed.shard,
+      shard: seed.hardid
+    }))
+
+    if (err.reason === 'invalid_session') {
+      pipeline.del(credsKey)
     }
 
     await pipeline.exec()
