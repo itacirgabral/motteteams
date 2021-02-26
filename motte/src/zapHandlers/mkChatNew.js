@@ -30,7 +30,10 @@ const chatNew = (seed) => {
     if (number) {
       // buscar quem é esta pessoa
       const { notify } = seed.conn.contacts[jid]
-      const [avatar, { status }] = await Promise.all([seed.conn.getProfilePicture(jid), seed.conn.getStatus(jid)])
+      const [avatar, { status }] = await Promise.all([
+        seed.conn.getProfilePicture(jid).catch(() => undefined),
+        seed.conn.getStatus(jid).catch(() => ({ status: undefined }))
+      ])
 
       const notifysent = {
         type: 'sendhook',
