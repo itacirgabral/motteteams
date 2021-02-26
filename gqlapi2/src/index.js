@@ -1,10 +1,13 @@
 const { ApolloServer, PubSub, gql } = require('apollo-server')
+const { URLResolver } = require('graphql-scalars')
 const jsonwebtoken = require('jsonwebtoken')
 
 const jwtSecret = process.env.JWT_SECRET
 const pubsub = new PubSub()
 
 const helloAuth = require('./helloAuth')({ pubsub })
+const messages = require('./messages')({ pubsub })
+const connection = require('./connection')({ pubsub })
 
 const defaultContext = {
   pubsub,
@@ -14,6 +17,7 @@ const defaultContext = {
 const Bearer = 'Bearer '
 
 const typeDefs = gql`
+  scalar URL
   type Query {
     _: Boolean
   }
@@ -28,22 +32,32 @@ const typeDefs = gql`
 const server = new ApolloServer({
   typeDefs: [
     typeDefs,
-    helloAuth.typeDefs
+    helloAuth.typeDefs,
+    messages.typeDefs,
+    connection.typeDefs
   ],
   resolvers: {
+    URL: URLResolver,
     Query: {
-      _: () => {},
-      ...helloAuth.resolvers.Query
+      // _: () => {},
+      // ...helloAuth.resolvers.Query,
+      // ...messages.resolvers.Query,
+      // ...connection.resolvers.Query,
     },
     Mutation: {
-      _: () => {},
-      ...helloAuth.resolvers.Mutation
+      // _: () => {},
+      // ...helloAuth.resolvers.Mutation,
+      // ...messages.resolvers.Mutation,
+      // ...connection.resolvers.Mutation,
     },
     Subscription: {
-      _: async function * _ () {},
-      ...helloAuth.resolvers.Subscription
+      // _: async function * _ () {},
+      // ...helloAuth.resolvers.Subscription,
+      // ...messages.resolvers.Subscription,
+      // ...connection.resolvers.Subscription,
     }
   },
+  mocks: true,
   cors: {
     origin: '*',
     credentials: true
