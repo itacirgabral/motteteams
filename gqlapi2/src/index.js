@@ -15,13 +15,13 @@ const Bearer = 'Bearer '
 
 const typeDefs = gql`
   type Query {
-    _: String
+    _: Boolean
   }
   type Mutation {
-    _: String
+    _: Boolean
   }
   type Subscription {
-    _: String
+    _: Boolean
   }
 `
 
