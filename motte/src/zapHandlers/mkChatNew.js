@@ -3,11 +3,9 @@
  * on (event: 'chat-new', listener: (chat: WAChat) => void): this
  */
 const chatNew = (seed) => {
-  const panoptickey = 'zap:panoptic'
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
-  const contactsKey = `zap:${seed.shard}:contacts`
-  const webhookKey = `zap:${seed.shard}:webhook`
+  const chatsKeys = `zap:${seed.shard}:chats`
 
   return async (chat) => {
     const json = JSON.stringify({ event: 'chat-new', data: chat })
@@ -15,25 +13,19 @@ const chatNew = (seed) => {
     pipeline.lpush(logKey, json)// 0
     pipeline.ltrim(logKey, 0, 999)// 1
 
-    const jid = chat.jid || ''
-    let number
-    if (jid.indexOf('-') === -1) {
-      pipeline.sadd(contactsKey, chat.jid)// 2
-      number = jid.split('@s.whatsapp.net')[0]
-    }
+    const number = chat.jid.split('@')[0]
 
-    pipeline.get(webhookKey)// 3
-    pipeline.publish(newsKey, json)// 4
+    pipeline.sadd(chatsKeys, number)
+    pipeline.publish(newsKey, json)
 
     await pipeline.exec()
 
+    /*
+    // buscar info de grupo ou de contato
     if (number) {
       // buscar quem é esta pessoa
       const { notify } = seed.conn.contacts[jid]
-      const [avatar, { status }] = await Promise.all([
-        seed.conn.getProfilePicture(jid).catch(() => undefined),
-        seed.conn.getStatus(jid).catch(() => ({ status: undefined }))
-      ])
+      const [avatar, { status }] = await Promise.all([seed.conn.getProfilePicture(jid), seed.conn.getStatus(jid)])
 
       const notifysent = {
         type: 'sendhook',
@@ -50,6 +42,7 @@ const chatNew = (seed) => {
       }
       seed.redis.publish(panoptickey, JSON.stringify(notifysent))
     }
+    */
   }
 }
 
