@@ -4,6 +4,7 @@ const CLOCK = 'CLOCK'
 let tic = true
 let setTimeoutId = 0
 
+// TODO tirar o pubsub daqui
 module.exports = ({ pubsub }) => {
   if (setTimeoutId === 0) {
     pubsub.publish(CLOCK, { isAuthClock: tic ? 'TIC' : 'TAC' })

@@ -5,9 +5,9 @@ const jsonwebtoken = require('jsonwebtoken')
 const jwtSecret = process.env.JWT_SECRET
 const pubsub = new PubSub()
 
-const helloAuth = require('./helloAuth')({ pubsub })
-const messages = require('./messages')({ pubsub })
-const connection = require('./connection')({ pubsub })
+const helloAuth = require('./helloAuth')
+const messages = require('./messages')
+const connection = require('./connection')
 
 const defaultContext = {
   pubsub,
@@ -33,31 +33,30 @@ const server = new ApolloServer({
   typeDefs: [
     typeDefs,
     helloAuth.typeDefs,
-    messages.typeDefs,
     connection.typeDefs
+    // messages.typeDefs
   ],
   resolvers: {
     URL: URLResolver,
     Query: {
       // _: () => {},
-      // ...helloAuth.resolvers.Query,
-      // ...messages.resolvers.Query,
+      ...helloAuth.resolvers.Query
       // ...connection.resolvers.Query,
+      // ...messages.resolvers.Query,
     },
     Mutation: {
       // _: () => {},
-      // ...helloAuth.resolvers.Mutation,
+      ...helloAuth.resolvers.Mutation,
+      ...connection.resolvers.Mutation
       // ...messages.resolvers.Mutation,
-      // ...connection.resolvers.Mutation,
     },
     Subscription: {
       // _: async function * _ () {},
-      // ...helloAuth.resolvers.Subscription,
-      // ...messages.resolvers.Subscription,
+      ...helloAuth.resolvers.Subscription,
       // ...connection.resolvers.Subscription,
+      // ...messages.resolvers.Subscription,
     }
   },
-  mocks: true,
   cors: {
     origin: '*',
     credentials: true
@@ -70,7 +69,8 @@ const server = new ApolloServer({
     } else {
       const authorization = req.headers.authorization || Bearer
       try {
-        user = jsonwebtoken.verify(authorization.split(Bearer)[1], jwtSecret)
+        const jwt = authorization.split(Bearer)[1]
+        user = jsonwebtoken.verify(jwt, jwtSecret)
       } catch {
         user = null
       }
