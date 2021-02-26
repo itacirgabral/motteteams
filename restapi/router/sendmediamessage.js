@@ -4,7 +4,7 @@ const stream = require('stream')
 const fetch = require('node-fetch')
 const FileType = require('file-type')
 
-const sendmediamessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+const sendmediamessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
   const to = req.body.to
   const link = req.body.link
@@ -16,7 +16,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey 
       ? `${to}@s.whatsapp.net` // se for pessoa
       : `${to}@g.us` // se for grupo
 
-    const chatsKeys = `zap:${shard}:chats`
+    const chatsKeys = mkchatskey(shard)
     const markcountkey = mkmarkcountkey(shard)
 
     const pipeline = redis.pipeline()
@@ -27,9 +27,7 @@ const sendmediamessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey 
     const alreadyTalkedTo = pipeback[0][1]
     const mark = pipeback[1][1]
 
-    // GMAPI-96 REMOVER TRAVA
-    // if (alreadyTalkedTo) {
-    if (true) {
+    if (alreadyTalkedTo) {
       const response = await fetch(link)
       if (response.status === 200) {
         const filename = `${shard}-${Date.now()}.file`

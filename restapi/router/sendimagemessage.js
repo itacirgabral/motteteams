@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-const sendimagemessage = ({ redis, uploader, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+const sendimagemessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const to = req.params.to
   const shard = req.shard
   const upload = uploader().single('file')
@@ -13,7 +13,7 @@ const sendimagemessage = ({ redis, uploader, mkmarkcountkey, mkrawbreadkey }) =>
         ? `${to}@s.whatsapp.net` // se for pessoa
         : `${to}@g.us` // se for grupo
 
-      const chatsKeys = `zap:${shard}:chats`
+      const chatsKeys = mkchatskey(shard)
       const markcountkey = mkmarkcountkey(shard)
 
       const pipeline = redis.pipeline()
@@ -24,9 +24,7 @@ const sendimagemessage = ({ redis, uploader, mkmarkcountkey, mkrawbreadkey }) =>
       const alreadyTalkedTo = pipeback[0][1]
       const mark = pipeback[1][1]
 
-      // GMAPI-96 REMOVER TRAVA
-      // if (alreadyTalkedTo) {
-      if (true) {
+      if (alreadyTalkedTo) {
         const rawBread = {
           type: 'imageMessage_v001',
           mark,

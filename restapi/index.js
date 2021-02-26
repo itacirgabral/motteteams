@@ -18,7 +18,7 @@ const hardid = process.env.HARDID
 const panoptickey = 'zap:panoptic'
 const mkwebhookkey = shard => `zap:${shard}:webhook`
 const mkwebhookhistorykey = shard => `zap:${shard}:webhook:history`
-const mkcontactskey = shard => `zap:${shard}:contacts`
+const mkchatskey = shard => `zap:${shard}:chats`
 const mkrawbreadkey = shard => `zap:${shard}:fifo:rawBread`
 const mkmarkcountkey = shard => `zap:${shard}:markcount`
 
@@ -30,16 +30,16 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.post('/sendtextmessage', jwt2shard, express.json(), router.sendtextmessage({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }))
-app.post('/sendlocationmessage', jwt2shard, express.json(), router.sendlocationmessage({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }))
-app.post('/sendcontactmessage', jwt2shard, express.json(), router.sendcontactmessage({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }))
+app.post('/sendtextmessage', jwt2shard, express.json(), router.sendtextmessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
+app.post('/sendlocationmessage', jwt2shard, express.json(), router.sendlocationmessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
+app.post('/sendcontactmessage', jwt2shard, express.json(), router.sendcontactmessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
 
-app.post('/forwardmessage', jwt2shard, express.json(), router.forwardmessage({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }))
+app.post('/forwardmessage', jwt2shard, express.json(), router.forwardmessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
 
-app.post('/senddocumentmessage/:to', jwt2shard, router.senddocumentmessage({ redis, uploader, mkcontactskey, mkmarkcountkey, mkrawbreadkey }))
-app.post('/sendaudiomessage/:to', jwt2shard, router.sendaudiomessage({ redis, uploader, mkcontactskey, mkmarkcountkey, mkrawbreadkey }))
-app.post('/sendimagemessage/:to', jwt2shard, router.sendimagemessage({ redis, uploader, mkcontactskey, mkmarkcountkey, mkrawbreadkey }))
-app.post('/sendmediamessage', jwt2shard, express.json(), router.sendmediamessage({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }))
+app.post('/senddocumentmessage/:to', jwt2shard, router.senddocumentmessage({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
+app.post('/sendaudiomessage/:to', jwt2shard, router.sendaudiomessage({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
+app.post('/sendimagemessage/:to', jwt2shard, router.sendimagemessage({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
+app.post('/sendmediamessage', jwt2shard, express.json(), router.sendmediamessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
 
 app.post('/webhook', jwt2shard, express.json(), router.webhookpost({ redis, mkwebhookkey }))
 app.get('/webhook', jwt2shard, router.webhookget({ redis, mkwebhookkey }))
@@ -48,8 +48,8 @@ app.delete('/webhook', jwt2shard, router.webhookdelete({ redis, mkwebhookkey }))
 app.get('/webhook/history', jwt2shard, router.webhookhistory({ redis, mkwebhookhistorykey }))
 
 app.get('/alreadytalkedto/:number', jwt2shard, router.alreadytalkedto({ redis }))
-app.get('/allcontacts', jwt2shard, router.allcontacts({ redis, mkcontactskey }))
-app.post('/contactinfo', jwt2shard, express.json(), router.contactinfo({ redis, mkcontactskey, mkrawbreadkey }))
+app.get('/allchats', jwt2shard, router.allchats({ redis, mkchatskey }))
+app.post('/contactinfo', jwt2shard, express.json(), router.contactinfo({ redis, mkchatskey, mkrawbreadkey }))
 
 app.post('/signupconnection', jwt2shard, express.json(), router.signupconnection({ redis, hardid, panoptickey }))
 app.get('/connect', jwt2shard, router.connect({ redis, hardid, panoptickey }))

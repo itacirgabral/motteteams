@@ -13,7 +13,7 @@ module.exports = {
   connect: require('./connect'),
   contactinfo: require('./contactinfo'),
   disconnect: require('./disconnect'),
-  allcontacts: require('./allcontacts'),
+  allchats: require('./allchats'),
   alreadytalkedto: require('./alreadytalkedto'),
   sendtextmessage: require('./sendtextmessage'),
   sendlocationmessage: require('./sendlocationmessage'),

@@ -1,4 +1,4 @@
-const sendlocationmessage = ({ redis, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+const sendlocationmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const to = req.body.to
   const shard = req.shard
   const quote = req.query.quote
@@ -11,7 +11,7 @@ const sendlocationmessage = ({ redis, mkmarkcountkey, mkrawbreadkey }) => async 
       ? `${to}@s.whatsapp.net` // se for pessoa
       : `${to}@g.us` // se for grupo
 
-    const chatsKeys = `zap:${shard}:chats`
+    const chatsKeys = mkchatskey(shard)
     const markcountkey = mkmarkcountkey(shard)
 
     const pipeline = redis.pipeline()
@@ -22,9 +22,7 @@ const sendlocationmessage = ({ redis, mkmarkcountkey, mkrawbreadkey }) => async 
     const alreadyTalkedTo = pipeback[0][1]
     const mark = pipeback[1][1]
 
-    // GMAPI-96 REMOVER TRAVA
-    // if (alreadyTalkedTo) {
-    if (true) {
+    if (alreadyTalkedTo) {
       const type = 'locationMessage_v001'
       const queueSize = await redis.lpush(mkrawbreadkey(shard), JSON.stringify({
         type,

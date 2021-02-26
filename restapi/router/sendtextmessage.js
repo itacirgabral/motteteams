@@ -1,4 +1,4 @@
-const sendtextmessage = ({ redis, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+const sendtextmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const to = req.body.to
   const shard = req.shard
   const quote = req.query.quote
@@ -9,7 +9,7 @@ const sendtextmessage = ({ redis, mkmarkcountkey, mkrawbreadkey }) => async (req
       ? `${to}@s.whatsapp.net` // se for pessoa
       : `${to}@g.us` // se for grupo
 
-    const chatsKeys = `zap:${shard}:chats`
+    const chatsKeys = mkchatskey(shard)
     const markcountkey = mkmarkcountkey(shard)
 
     const pipeline = redis.pipeline()
@@ -20,9 +20,7 @@ const sendtextmessage = ({ redis, mkmarkcountkey, mkrawbreadkey }) => async (req
     const alreadyTalkedTo = pipeback[0][1]
     const mark = pipeback[1][1]
 
-    // GMAPI-96 REMOVER TRAVA
-    // if (alreadyTalkedTo) {
-    if (true) {
+    if (alreadyTalkedTo) {
       const type = 'textMessage_v001'
       const queueSize = await redis.lpush(mkrawbreadkey(shard), JSON.stringify({
         type,
