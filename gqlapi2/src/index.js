@@ -1,23 +1,54 @@
-const { ApolloServer, PubSub } = require('apollo-server')
-const Redis = require('ioredis')
+const { ApolloServer, PubSub, gql } = require('apollo-server')
 const jsonwebtoken = require('jsonwebtoken')
 
-const redis = new Redis(process.env.REDIS_CONN)
 const jwtSecret = process.env.JWT_SECRET
+const pubsub = new PubSub()
+
+const helloAuth = require('./helloAuth')({ pubsub })
+
 const defaultContext = {
-  pubsub: new PubSub(),
-  redis,
+  pubsub,
   hardid: process.env.HARDID,
   panoptickey: 'zap:panoptic'
 }
 const Bearer = 'Bearer '
 
-const typeDefs = require('./typeDefs')
-const resolvers = require('./resolvers')
+const typeDefs = gql`
+  type Query {
+    _: String
+  }
+  type Mutation {
+    _: String
+  }
+  type Subscription {
+    _: String
+  }
+`
 
 const server = new ApolloServer({
-  typeDefs,
-  resolvers,
+  typeDefs: [
+    typeDefs,
+    helloAuth.typeDefs
+  ],
+  resolvers: {
+    Query: {
+      _: () => {},
+      ...helloAuth.resolvers.Query
+    },
+    Mutation: {
+      _: () => {},
+      ...helloAuth.resolvers.Mutation
+    },
+    Subscription: {
+      _: async function * _ () {},
+      ...helloAuth.resolvers.Subscription
+    }
+  },
+  cors: {
+    origin: '*',
+    credentials: true
+  },
+  introspection: true,
   context: async ({ req, connection }) => {
     let user
     if (connection) {
@@ -30,15 +61,16 @@ const server = new ApolloServer({
         user = null
       }
     }
+
     return {
       ...defaultContext,
-      user,
-      sid: connection.context.sid
+      user
     }
   },
   subscriptions: {
     onConnect: (connectionParams, webSocket, context) => {
       const authorization = connectionParams.authorization || Bearer
+
       const sid = String(Math.random()).slice(2)
       let user
       try {
@@ -55,28 +87,11 @@ const server = new ApolloServer({
     onDisconnect: async (webSocket, context) => {
       console.log('onDisconnect')
       const initialContext = await context.initPromise
-
-      const radiohookkey = `zap:${initialContext.user.shard}:radiohook`
-      const type = 'subscriptionTurnoff'
-      const sid = initialContext.sid
-
-      redis.publish(radiohookkey, JSON.stringify({ type, sid }))
-    },
-    onOperation: () => {
-      console.log('onOperation')
-    },
-    onOperationComplete: () => {
-      console.log('onOperationComplete')
+      console.dir({ initialContext })
     }
-  },
-  cors: {
-    origin: '*',
-    credentials: true
-  },
-  introspection: true
+  }
 })
 
-// The `listen` method launches a web server.
 server.listen().then(({ url }) => {
   console.log(`🚀  Server ready at ${url}`)
 })
