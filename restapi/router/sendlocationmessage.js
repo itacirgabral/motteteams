@@ -22,7 +22,9 @@ const sendlocationmessage = ({ redis, mkmarkcountkey, mkrawbreadkey }) => async 
     const alreadyTalkedTo = pipeback[0][1]
     const mark = pipeback[1][1]
 
-    if (alreadyTalkedTo) {
+    // GMAPI-96 REMOVER TRAVA
+    // if (alreadyTalkedTo) {
+    if (true) {
       const type = 'locationMessage_v001'
       const queueSize = await redis.lpush(mkrawbreadkey(shard), JSON.stringify({
         type,

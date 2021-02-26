@@ -23,7 +23,9 @@ const sendaudiomessage = ({ redis, uploader, mkmarkcountkey, mkrawbreadkey }) =>
       const alreadyTalkedTo = pipeback[0][1]
       const mark = pipeback[1][1]
 
-      if (alreadyTalkedTo) {
+      // GMAPI-96 REMOVER TRAVA
+      // if (alreadyTalkedTo) {
+      if (true) {
         const rawBread = {
           type: 'audioMessage_v001',
           mark,

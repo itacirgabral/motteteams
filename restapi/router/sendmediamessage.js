@@ -27,7 +27,9 @@ const sendmediamessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey 
     const alreadyTalkedTo = pipeback[0][1]
     const mark = pipeback[1][1]
 
-    if (alreadyTalkedTo) {
+    // GMAPI-96 REMOVER TRAVA
+    // if (alreadyTalkedTo) {
+    if (true) {
       const response = await fetch(link)
       if (response.status === 200) {
         const filename = `${shard}-${Date.now()}.file`
