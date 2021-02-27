@@ -1,11 +1,10 @@
-const { ApolloServer, PubSub, gql } = require('apollo-server')
+const { ApolloServer, PubSub, gql, AuthenticationError } = require('apollo-server')
 const { URLResolver } = require('graphql-scalars')
 const jsonwebtoken = require('jsonwebtoken')
 
 const jwtSecret = process.env.JWT_SECRET
 const pubsub = new PubSub()
 
-const helloAuth = require('./helloAuth')
 const messages = require('./messages')
 const connection = require('./connection')
 
@@ -16,43 +15,62 @@ const defaultContext = {
 }
 const Bearer = 'Bearer '
 
+const CLOCK = 'CLOCK'
+let tic = true
+setInterval(() => {
+  tic = !tic
+  pubsub.publish(CLOCK, {
+    isAuthClock: tic ? 'TIC' : 'TCC'
+  })
+}, 1000)
+
 const typeDefs = gql`
   scalar URL
   type Query {
-    _: Boolean
+    hello: String!
+    isAuth: Boolean!
   }
   type Mutation {
-    _: Boolean
+    toggleTic: Boolean
   }
   type Subscription {
-    _: Boolean
+    isAuthClock: String!
   }
 `
 
 const server = new ApolloServer({
   typeDefs: [
-    typeDefs,
-    helloAuth.typeDefs,
-    connection.typeDefs
+    typeDefs
+    // connection.typeDefs
     // messages.typeDefs
   ],
   resolvers: {
     URL: URLResolver,
     Query: {
-      // _: () => {},
-      ...helloAuth.resolvers.Query
+      hello: () => 'world! 2',
+      isAuth: (parent, args, context, info) => !!context.user
       // ...connection.resolvers.Query,
       // ...messages.resolvers.Query,
     },
     Mutation: {
-      // _: () => {},
-      ...helloAuth.resolvers.Mutation,
-      ...connection.resolvers.Mutation
+      toggleTic: () => {
+        tic = !tic
+        return tic
+      }
+      // ...connection.resolvers.Mutation
       // ...messages.resolvers.Mutation,
     },
     Subscription: {
-      // _: async function * _ () {},
-      ...helloAuth.resolvers.Subscription,
+      isAuthClock: {
+        subscribe: (parent, args, context, info) => {
+          if (context.user) {
+            console.dir({ context })
+            return context.pubsub.asyncIterator(['CLOCK'])
+          } else {
+            throw new AuthenticationError('do auth')
+          }
+        }
+      }
       // ...connection.resolvers.Subscription,
       // ...messages.resolvers.Subscription,
     }
