@@ -165,6 +165,10 @@ const trafficwand = async () => {
                       })
                     }
                     await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
+                  }
+
+                  if (!seed?.fifoDrummer?.playing) {
+                    seed.fifoDrummer = fifoDrumer({ ...seed, redisB: listener.duplicate() })
                   } else {
                     const notifysent = {
                       type: 'sendhook',
@@ -173,14 +177,11 @@ const trafficwand = async () => {
                       json: JSON.stringify({
                         type: 'queue starting',
                         shard: leftover.shard,
+                        reason: 'it was already playing',
                         queueSize: pipeback[2][1]
                       })
                     }
                     await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
-                  }
-
-                  if (!seed?.fifoDrummer?.playing) {
-                    seed.fifoDrummer = fifoDrumer({ ...seed, redisB: listener.duplicate() })
                   }
                 }
               }
@@ -202,6 +203,18 @@ const trafficwand = async () => {
 
                   if (!seed?.punkDrummer?.playing) {
                     seed.punkDrummer = punkDrummer({ ...seed, redisB: listener.duplicate() })
+                  } else {
+                    const notifysent = {
+                      type: 'sendhook',
+                      hardid, // send to myself
+                      shard: leftover.shard,
+                      json: JSON.stringify({
+                        type: 'spread starting',
+                        shard: leftover.shard,
+                        reason: 'it was already playing'
+                      })
+                    }
+                    speaker.publish(panoptickey, JSON.stringify(notifysent))
                   }
                 }
               }
