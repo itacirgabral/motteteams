@@ -85,6 +85,18 @@ const trafficwand = async () => {
                     })
                   console.log(`${errcon ? 'tried to ' : ''}connect ${leftover.shard}`)
                 }
+              } else {
+                const notifysent = {
+                  type: 'sendhook',
+                  hardid, // send to myself
+                  shard: leftover.shard,
+                  json: JSON.stringify({
+                    type: 'opened',
+                    shard: leftover.shard,
+                    reason: 'it was already opened'
+                  })
+                }
+                speaker.publish(panoptickey, JSON.stringify(notifysent))
               }
               break
             case 'disconnect':
