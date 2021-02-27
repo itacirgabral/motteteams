@@ -105,6 +105,18 @@ const trafficwand = async () => {
                 seed.conn.close()
 
                 console.log(`disconnect ${leftover.shard}`)
+              } else {
+                const notifysent = {
+                  type: 'sendhook',
+                  hardid, // send to myself
+                  shard: leftover.shard,
+                  json: JSON.stringify({
+                    type: 'closed',
+                    shard: leftover.shard,
+                    reason: 'it was already closed'
+                  })
+                }
+                speaker.publish(panoptickey, JSON.stringify(notifysent))
               }
               break
             case 'signupconnection':
