@@ -10,6 +10,7 @@ const close = (seed) => {
   const newsKey = `zap:${seed.shard}:news`
   const webhookKey = `zap:${seed.shard}:webhook`
   const credsKey = `zap:${seed.shard}:creds`
+  const closereasonkey = `zap:${seed.shard}:closereason`
 
   return async (err) => {
     const json = JSON.stringify({ event: 'close', data: err })
@@ -36,6 +37,8 @@ const close = (seed) => {
       hardid: seed.shard,
       shard: seed.hardid
     }))
+
+    pipeline.set(closereasonkey, err.reason)
 
     if (err.reason === 'invalid_session') {
       pipeline.del(credsKey)

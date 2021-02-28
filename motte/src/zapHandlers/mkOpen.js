@@ -9,6 +9,7 @@ const open = (seed) => {
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
   const webhookKey = `zap:${seed.shard}:webhook`
+  const closereasonkey = `zap:${seed.shard}:closereason`
 
   return async (result) => {
     const json = JSON.stringify({ event: 'open', data: result })
@@ -17,6 +18,7 @@ const open = (seed) => {
     pipeline.ltrim(logKey, 0, 999)// 1
     pipeline.get(webhookKey)// 2
     pipeline.publish(newsKey, json)// 3
+    pipeline.del(closereasonkey)// 4
 
     const notifysent = {
       type: 'sendhook',
