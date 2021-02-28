@@ -44,13 +44,14 @@ const typeDefs = gql`
 const server = new ApolloServer({
   typeDefs: [
     typeDefs,
-    connection.typeDefs
-    // messages.typeDefs
+    connection.typeDefs,
+    messages.typeDefs
   ],
   resolvers: {
     URL: URLResolver,
+    ...messages.resolvers.Root,
     Query: {
-      hello: () => 'world! 2',
+      hello: () => 'world!',
       isAuth: (parent, args, context, info) => !!context.user,
       ...connection.resolvers.Query
       // ...messages.resolvers.Query,
@@ -73,8 +74,8 @@ const server = new ApolloServer({
           }
         }
       },
-      ...connection.resolvers.Subscription
-      // ...messages.resolvers.Subscription,
+      // ...connection.resolvers.Subscription,
+      ...messages.resolvers.Subscription
     }
   },
   cors: {
@@ -84,8 +85,10 @@ const server = new ApolloServer({
   introspection: true,
   context: async ({ req, connection }) => {
     let user
+    let sid
     if (connection) {
       user = connection.context.user
+      sid = connection.context.sid
     } else {
       const authorization = req.headers.authorization || Bearer
       try {
@@ -96,10 +99,15 @@ const server = new ApolloServer({
       }
     }
 
-    return {
-      ...defaultContext,
-      user
+    const context = {
+      ...defaultContext
     }
+    context.user = user
+    if (sid) {
+      context.sid = sid
+    }
+
+    return context
   },
   subscriptions: {
     onConnect: (connectionParams, webSocket, context) => {
@@ -113,15 +121,24 @@ const server = new ApolloServer({
         user = null
       }
 
+      if (user) {
+        console.log(`onConnect ${user.shard}`)
+      }
+
       return {
         user,
         sid
       }
     },
     onDisconnect: async (webSocket, context) => {
-      console.log('onDisconnect')
       const initialContext = await context.initPromise
-      console.dir({ initialContext })
+      console.log(`onDisconnect ${initialContext.user.shard}`)
+
+      const radiohookkey = `zap:${initialContext.user.shard}:radiohook`
+      const type = 'subscriptionTurnoff'
+      const sid = initialContext.sid
+
+      redis.publish(radiohookkey, JSON.stringify({ type, sid }))
     }
   }
 })

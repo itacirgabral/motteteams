@@ -1,4 +1,4 @@
-const { gql, AuthenticationError } = require('apollo-server')
+const { gql } = require('apollo-server')
 
 const connectionstate = require('./connectionstate')
 const reconect = require('./reconect')
