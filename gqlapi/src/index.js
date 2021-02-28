@@ -9,6 +9,7 @@ const pubsub = new PubSub()
 
 const messages = require('./messages')
 const connection = require('./connection')
+const signup = require('./signup')
 
 const defaultContext = {
   pubsub,
@@ -45,7 +46,8 @@ const server = new ApolloServer({
   typeDefs: [
     typeDefs,
     connection.typeDefs,
-    messages.typeDefs
+    messages.typeDefs,
+    signup.typeDefs
   ],
   resolvers: {
     URL: URLResolver,
@@ -55,6 +57,7 @@ const server = new ApolloServer({
       isAuth: (parent, args, context, info) => !!context.user,
       ...connection.resolvers.Query
       // ...messages.resolvers.Query,
+      // ...signup.resolvers.Query,
     },
     Mutation: {
       toggleTic: () => {
@@ -62,7 +65,8 @@ const server = new ApolloServer({
         return tic
       },
       ...connection.resolvers.Mutation,
-      ...messages.resolvers.Mutation
+      ...messages.resolvers.Mutation,
+      ...signup.resolvers.Mutation
     },
     Subscription: {
       isAuthClock: {
@@ -76,6 +80,7 @@ const server = new ApolloServer({
       },
       // ...connection.resolvers.Subscription,
       ...messages.resolvers.Subscription
+      // ...signup.resolvers.Subscription
     }
   },
   cors: {
