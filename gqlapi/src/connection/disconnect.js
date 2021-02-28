@@ -1,4 +1,4 @@
-const { AuthenticationError } = require('apollo-server')
+const { AuthenticationError } = require('apollo-server-express')
 
 const timeout = Number(process.env.TIMEOUT || '5000')
 

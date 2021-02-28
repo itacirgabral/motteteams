@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server')
+const { gql } = require('apollo-server-express')
 
 const connectionstate = require('./connectionstate')
 const reconect = require('./reconect')
