@@ -61,8 +61,8 @@ const server = new ApolloServer({
         tic = !tic
         return tic
       },
-      ...connection.resolvers.Mutation
-      // ...messages.resolvers.Mutation,
+      ...connection.resolvers.Mutation,
+      ...messages.resolvers.Mutation
     },
     Subscription: {
       isAuthClock: {

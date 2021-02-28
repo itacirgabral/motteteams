@@ -1,11 +1,12 @@
 const { gql } = require('apollo-server')
 const messages = require('./messages')
+const sendtextmessage = require('./sendtextmessage')
 
 const typeDefs = gql`
   input SendtextmessageInput {
     to: String!
     msg: String!
-    quoted: ID
+    quote: ID
   }
 
   type TextMesage {
@@ -56,7 +57,9 @@ const resolvers = {
     }
   },
   Query: {},
-  Mutation: {},
+  Mutation: {
+    sendtextmessage
+  },
   Subscription: {
     messages
   }
