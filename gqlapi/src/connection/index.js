@@ -1,7 +1,7 @@
 const { gql } = require('apollo-server-express')
 
 const connectionstate = require('./connectionstate')
-const reconect = require('./reconect')
+const reconnect = require('./reconnect')
 const disconnect = require('./disconnect')
 const drumerrestart = require('./drumerrestart')
 
@@ -11,7 +11,7 @@ module.exports = {
       connectionstate: String
     }
     extend type Mutation {
-      reconect: String
+      reconnect: String
       disconnect: String
       drumerrestart: String
     }
@@ -21,7 +21,7 @@ module.exports = {
       connectionstate
     },
     Mutation: {
-      reconect,
+      reconnect,
       disconnect,
       drumerrestart
     },

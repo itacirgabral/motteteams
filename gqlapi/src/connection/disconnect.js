@@ -21,7 +21,7 @@ const disconnect = async (parent, args, context, info) => {
         if (type === 'closed') {
           redisB.unsubscribe()
           clearTimeout(timeoutId)
-          resolve('disconected')
+          resolve('disconnected')
         }
       })
     })

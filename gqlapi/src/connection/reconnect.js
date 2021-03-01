@@ -2,7 +2,7 @@ const { AuthenticationError } = require('apollo-server-express')
 
 const timeout = Number(process.env.TIMEOUT || '5000')
 
-const reconect = async (parent, args, context, info) => {
+const reconnect = async (parent, args, context, info) => {
   if (context.user) {
     const redisB = context.redis.duplicate()
     const radiohookkey = `zap:${context.user.shard}:radiohook`
@@ -21,7 +21,7 @@ const reconect = async (parent, args, context, info) => {
         if (type === 'opened') {
           redisB.unsubscribe()
           clearTimeout(timeoutId)
-          resolve('conected')
+          resolve('connected')
         }
       })
     })
@@ -38,4 +38,4 @@ const reconect = async (parent, args, context, info) => {
   }
 }
 
-module.exports = reconect
+module.exports = reconnect
