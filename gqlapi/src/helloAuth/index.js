@@ -23,6 +23,7 @@ module.exports = ({ pubsub }) => {
       }
       extend type Subscription {
         isAuthClock: String!
+        clock: String!
       }
     `,
     resolvers: {
@@ -41,6 +42,9 @@ module.exports = ({ pubsub }) => {
               throw new AuthenticationError('do auth')
             }
           }
+        },
+        clock: {
+          subscribe: (parent, args, context, info) => context.pubsub.asyncIterator(['CLOCK'])
         }
       }
     }
