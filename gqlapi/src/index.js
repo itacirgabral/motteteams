@@ -10,6 +10,7 @@ const pubsub = new PubSub()
 const messages = require('./messages')
 const connection = require('./connection')
 const signup = require('./signup')
+const chats = require('./chats')
 
 const defaultContext = {
   pubsub,
@@ -47,7 +48,8 @@ const apollo = new ApolloServer({
     typeDefs,
     connection.typeDefs,
     messages.typeDefs,
-    signup.typeDefs
+    signup.typeDefs,
+    chats.typeDefs
   ],
   resolvers: {
     URL: URLResolver,
@@ -55,9 +57,10 @@ const apollo = new ApolloServer({
     Query: {
       hello: () => 'world!',
       isAuth: (parent, args, context, info) => !!context.user,
-      ...connection.resolvers.Query
+      ...connection.resolvers.Query,
       // ...messages.resolvers.Query,
       // ...signup.resolvers.Query,
+      ...chats.resolvers.Query
     },
     Mutation: {
       toggleTic: () => {
@@ -67,6 +70,7 @@ const apollo = new ApolloServer({
       ...connection.resolvers.Mutation,
       ...messages.resolvers.Mutation,
       ...signup.resolvers.Mutation
+      // ...chats.resolvers.Mutation
     },
     Subscription: {
       isAuthClock: {
@@ -80,7 +84,8 @@ const apollo = new ApolloServer({
       },
       // ...connection.resolvers.Subscription,
       ...messages.resolvers.Subscription
-      // ...signup.resolvers.Subscription
+      // ...signup.resolvers.Subscription,
+      // ...chats.resolvers.Mutation
     }
   },
   introspection: true,
