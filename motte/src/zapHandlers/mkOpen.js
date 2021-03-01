@@ -10,6 +10,8 @@ const open = (seed) => {
   const newsKey = `zap:${seed.shard}:news`
   const webhookKey = `zap:${seed.shard}:webhook`
   const closereasonkey = `zap:${seed.shard}:closereason`
+  const breadQueue = JSON.stringify({ hardid: seed.hardid, type: 'queuerestart', shard: seed.shard })
+  const breadSpread = JSON.stringify({ hardid: seed.hardid, type: 'spreadrestart', shard: seed.shard })
 
   return async (result) => {
     const json = JSON.stringify({ event: 'open', data: result })
@@ -19,6 +21,9 @@ const open = (seed) => {
     pipeline.get(webhookKey)// 2
     pipeline.publish(newsKey, json)// 3
     pipeline.del(closereasonkey)// 4
+    pipeline.publish(panoptickey, breadQueue)
+    pipeline.publish(panoptickey, breadSpread)
+
 
     const notifysent = {
       type: 'sendhook',
