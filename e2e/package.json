@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "npx node-dev -r dotenv/config ./src/index.js",
+    "debug": "npx node-dev --inspect=0.0.0.0:9229 -r dotenv/config ./src/index.js",
+    "start": "node -r dotenv/config  ./src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,8 +16,11 @@
     "apollo-link": "^1.2.14",
     "apollo-link-http": "^1.5.17",
     "apollo-link-ws": "^1.0.20",
+    "dotenv": "^8.2.0",
     "graphql": "^15.5.0",
     "graphql-tag": "^2.11.0",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "subscriptions-transport-ws": "^0.9.18",
+    "ws": "^7.4.3"
   }
 }

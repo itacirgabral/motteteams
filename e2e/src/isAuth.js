@@ -3,18 +3,22 @@ const fetch = require('node-fetch')
 const gql = require('graphql-tag')
 const { execute, makePromise } = require('apollo-link')
 
-const uri = 'http://127.0.0.1:4000/graphql';
-const link = new HttpLink({ uri, fetch: fetch });
+const authorization = process.env.AUTHORIZATION
+
+const link = new HttpLink({
+  uri: 'http://127.0.0.1:4000/graphql',
+  fetch: fetch,
+  headers: {
+    authorization
+  }
+});
 
 const operation = {
   query: gql`
     query {
       isAuth
     }
-  `,
-  context: {
-    "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaGFyZCI6IjU1NjU5OTM3NTY2MSIsImlhdCI6MTYxNDI2NTgyMH0.q__Zov_tTDUXNhcSPSii3UL_hwaAEVf1C-qGvAWRq8c"
-  }
+  `
 };
 
 /*
