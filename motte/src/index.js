@@ -66,12 +66,7 @@ const trafficwand = async () => {
                 if (creds) {
                   const authInfo = JSON.parse(creds)
                   conn.loadAuthInfo(authInfo)
-
                   conn.browserDescription = [description, 'Chrome', version]
-                  conn.connectOptions.alwaysUseTakeover = true
-                  conn.connectOptions.maxRetries = 3
-                  conn.autoReconnect = 0
-                  // pendingRequestTimeoutMs = 0
 
                   zapHandlers({ conn, seed })
 
