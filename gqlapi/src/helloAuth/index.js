@@ -1,4 +1,4 @@
-const { gql, AuthenticationError } = require('apollo-server-express')
+const { gql, AuthenticationError } = require('apollo-server')
 
 const CLOCK = 'CLOCK'
 let tic = true

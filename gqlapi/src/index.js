@@ -1,14 +1,7 @@
-const { ApolloServer, PubSub, gql, AuthenticationError } = require('apollo-server-express')
+const { ApolloServer, PubSub, gql, AuthenticationError } = require('apollo-server')
 const Redis = require('ioredis')
 const { URLResolver } = require('graphql-scalars')
 const jsonwebtoken = require('jsonwebtoken')
-const express = require('express')
-const cors = require('cors')
-const compression = require('compression')
-const https = require('https')
-const fs = require('fs')
-const path = require('path')
-const http = require('http')
 
 const redis = new Redis(process.env.REDIS_CONN)
 const jwtSecret = process.env.JWT_SECRET
@@ -31,7 +24,7 @@ let tic = true
 setInterval(() => {
   tic = !tic
   pubsub.publish(CLOCK, {
-    isAuthClock: tic ? 'TIC' : 'TCC'
+    isAuthClock: tic ? 'TIC' : 'TOC'
   })
 }, 1000)
 
@@ -151,27 +144,6 @@ const apollo = new ApolloServer({
   }
 })
 
-const ssl = process.env.SSL === 'yes'
-
-const app = express()
-app.use(cors())
-app.use(compression())
-
-apollo.applyMiddleware({ app })
-
-if (ssl) {
-  const server = https.createServer({
-    key: fs.readFileSync(path.join(__dirname, 'sslcert', 'privkey.pem')),
-    cert: fs.readFileSync(path.join(__dirname, 'sslcert', 'cert.pem')),
-    ca: fs.readFileSync(path.join(__dirname, 'sslcert', 'chain.pem'))
-  }, app)
-
-  server.listen({ port: 4443 }, () =>
-    console.log(`🚀 Server ready at http://zapql.com:4443${apollo.graphqlPath}`)
-  )
-} else {
-  const server = http.createServer(app)
-  server.listen({ port: 4000 }, () =>
-    console.log(`🚀 Server ready at http://127.0.0.1:4000${apollo.graphqlPath}`)
-  )
-}
+apollo.listen().then(({ url }) => {
+  console.log(`🚀  Server ready at ${url}`)
+})
