@@ -16,17 +16,10 @@ const operation = {
 }
 
 test('# QUERY HELLO', async t => {
-  t.plan(1)
-
-  makePromise(execute(link, operation))
-    .then(data => {
-      t.deepEqual(data, {
-        data: {
-          hello: 'world!'
-        }
-      })
-    })
+  const { data } = await makePromise(execute(link, operation))
     .catch(error => {
       t.fail()
     })
+  
+    t.deepEqual(data, { hello: 'world!' })
 })

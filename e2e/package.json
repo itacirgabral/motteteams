@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx tape -r dotenv/config ./src/**/*.spec.js"
+    "start": "npx tape -r dotenv/config ./src/**/*.spec.js",
+    "test:00": "npx tape -r dotenv/config ./src/00_tape_testing/**/*.spec.js"
   },
   "keywords": [],
   "author": "",
