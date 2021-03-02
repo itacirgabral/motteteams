@@ -162,22 +162,26 @@ const trafficwand = async () => {
                     await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
                   }
 
+                  let alreadyPlaying = true
                   if (!seed?.fifoDrummer?.playing) {
                     seed.fifoDrummer = fifoDrumer({ ...seed, redisB: listener.duplicate() })
-                  } else {
-                    const notifysent = {
-                      type: 'sendhook',
-                      hardid: seed.hardid,
-                      shard: seed.shard,
-                      json: JSON.stringify({
-                        type: 'queue starting',
-                        shard: leftover.shard,
-                        reason: 'it was already playing',
-                        queueSize: pipeback[2][1]
-                      })
-                    }
-                    await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
+                    alreadyPlaying = false
                   }
+
+                  const notifysent = {
+                    type: 'sendhook',
+                    hardid: seed.hardid,
+                    shard: seed.shard,
+                    json: JSON.stringify({
+                      type: 'queue starting',
+                      shard: leftover.shard,
+                      reason: alreadyPlaying
+                        ? 'it was already playing'
+                        : undefined,
+                      queueSize: pipeback[2][1]
+                    })
+                  }
+                  await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
                 }
               }
               break
