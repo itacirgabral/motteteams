@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx tape -r dotenv/config ./src/**/*.spec.js",
-    "test:00": "npx tape -r dotenv/config ./src/00_tape_testing/**/*.spec.js"
+    "start": "npx tape -r dotenv/config ./src/**/*.spec.js | npx tap-spec",
+    "test:00": "npx tape -r dotenv/config ./src/00_tape_testing/**/*.spec.js | npx tap-spec"
   },
   "keywords": [],
   "author": "",
@@ -21,5 +21,8 @@
     "subscriptions-transport-ws": "^0.9.18",
     "tape": "^5.2.1",
     "ws": "^7.4.3"
+  },
+  "devDependencies": {
+    "tap-spec": "^5.0.0"
   }
 }
