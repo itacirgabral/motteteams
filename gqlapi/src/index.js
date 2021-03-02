@@ -40,6 +40,7 @@ const typeDefs = gql`
   }
   type Subscription {
     isAuthClock: String!
+    clock: String!
   }
 `
 
@@ -81,6 +82,9 @@ const apollo = new ApolloServer({
             throw new AuthenticationError('do auth')
           }
         }
+      },
+      clock: {
+        subscribe: (parent, args, context, info) => context.pubsub.asyncIterator(['CLOCK'])
       },
       // ...connection.resolvers.Subscription,
       ...messages.resolvers.Subscription
