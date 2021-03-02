@@ -24,8 +24,10 @@ const CLOCK = 'CLOCK'
 let tic = true
 setInterval(() => {
   tic = !tic
+  const slug = tic ? 'TIC' : 'TOC'
   pubsub.publish(CLOCK, {
-    isAuthClock: tic ? 'TIC' : 'TOC'
+    isAuthClock: slug,
+    clock: slug
   })
 }, 1000)
 
