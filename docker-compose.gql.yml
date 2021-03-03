@@ -1,0 +1,23 @@
+version: "3.5"
+services:
+  motte:
+    build: ./motte
+    restart: unless-stopped
+    volumes:
+      - ./uploads:/usr/src/uploads
+  restapi:
+    build: ./restapi
+    restart: unless-stopped
+    volumes:
+      - ./uploads:/usr/src/uploads
+    ports:
+      - "3000:3000"
+  nginx:
+    image: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./etc/nginx/conf.d:/etc/nginx/conf.d
+      - ./etc/nginx/ssl:/etc/nginx/ssl
