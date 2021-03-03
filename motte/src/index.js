@@ -48,6 +48,12 @@ const trafficwand = async () => {
         if (hardid === myhardid) {
           switch (type) {
             case 'gracefuldown':
+              console.log(`gracefuldown ${hardid}`)
+
+              await speaker.sadd(
+                `zap:${hardid}:upuntilreboot`,
+                ...Array.from(patchpanel.keys())
+              )
               clearInterval(healthreportintervalid)
               gracefuldownresolver()
               break
@@ -124,6 +130,22 @@ const trafficwand = async () => {
                   })
                 }
                 speaker.publish(panoptickey, JSON.stringify(notifysent))
+              }
+              break
+            case 'disconnectsilent':
+              if (patchpanel.has(leftover.shard)) {
+                const seed = patchpanel.get(leftover.shard)
+                patchpanel.delete(leftover.shard)
+
+                if (seed?.fifoDrummer?.playing) {
+                  seed.fifoDrummer.playing = false
+                }
+                if (seed?.punkDrummer?.playing) {
+                  seed.punkDrummer.playing = false
+                  seed.redis.publish(`zap:${seed.shard}:spread`, '{}')
+                }
+
+                seed.conn.close()
               }
               break
             case 'signupconnection':

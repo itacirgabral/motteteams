@@ -17,7 +17,7 @@ const sendtextmessage = async (parent, args, context, info) => {
     const pipeback = await pipeline.exec()
 
     const alreadyTalkedTo = pipeback[0][1]
-    const mark0 = pipeback[1][1]
+    const mark0 = String(pipeback[1][1])
 
     if (alreadyTalkedTo) {
       const type = 'textMessage_v001'

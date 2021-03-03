@@ -1,6 +1,6 @@
 const connect = ({ redis, mkcredskey, hardid, panoptickey }) => async (req, res) => {
   const shard = req.shard
-  const typeDisconnect = 'disconnect'
+  const typeDisconnect = 'disconnectsilent'
   const bread = JSON.stringify({ hardid, type: typeDisconnect, shard })
 
   const credsExists = await redis.exists(mkcredskey(shard))
