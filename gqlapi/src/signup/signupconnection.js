@@ -2,12 +2,12 @@ const crypto = require('crypto')
 
 const signupconnection = async (parent, args, context, info) => {
   const { webhook, remember } = args.input
-  const mark = crypto.randomBytes(8).toString('base64')
+  const randomBytes = crypto.randomBytes(8).toString('base64')
 
   const redis = context.redis.duplicate()
   const hardid = context.hardid
 
-  const queueback = `tempzap:${mark}:qr`
+  const queueback = `tempzap:${randomBytes}:qr`
   const blpopP = redis.blpop(queueback, 20)
 
   const type = 'gql.signupconnection'
