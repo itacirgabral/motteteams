@@ -1,25 +1,21 @@
 version: "3.5"
 services:
-  redis:
-    image: redis
-    volumes:
-      - redisdata:/data
-    ports:
-      - "6379:6379"
   motte:
     build: ./motte
     volumes:
       - ./uploads:/usr/src/uploads
-    depends_on:
-      - redis
   restapi:
     build: ./restapi
     volumes:
       - ./uploads:/usr/src/uploads
     ports:
       - "3000:3000"
-    depends_on:
-      - redis
-volumes:
-  redisdata:
-    external: true
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./etc/nginx/conf.d:/etc/nginx/conf.d
+      - ./etc/nginx/ssl:/etc/nginx/ssl
+# /etc/nginx/conf.d/default.conf
