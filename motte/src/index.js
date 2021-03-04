@@ -52,7 +52,7 @@ const trafficwand = async () => {
 
               await speaker.sadd(
                 `zap:${hardid}:upuntilreboot`,
-                ...Array.from(patchpanel.keys())
+                ...Array.from(patchpanel.keys()).map(shard => `county:${hardid}:zap:${shard}`)
               )
               clearInterval(healthreportintervalid)
               gracefuldownresolver()
