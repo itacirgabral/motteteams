@@ -5,13 +5,11 @@ services:
     restart: unless-stopped
     volumes:
       - ./uploads:/usr/src/uploads
-  restapi:
-    build: ./restapi
+  gqlapi:
+    build: ./gqlapi
     restart: unless-stopped
-    volumes:
-      - ./uploads:/usr/src/uploads
     ports:
-      - "3000:3000"
+      - "4000:4000"
   nginx:
     image: nginx
     restart: unless-stopped
