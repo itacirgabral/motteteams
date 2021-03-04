@@ -8,10 +8,11 @@ const redisConn = process.env.REDIS_CONN
 
 const mkcredskey = shard => `zap:${shard}:creds`
 const mkwebhookkey = shard => `zap:${shard}:webhook`
+const bornskey = 'borns'
 const redis = new Redis(redisConn)
 const zigotopanel = new Map()
 
-const zygote = ({ leftover }) => {
+const zygote = ({ leftover, hardid }) => {
   if (!zigotopanel.has(leftover.shard)) {
     let attempts = 0
     const WA = new WAConnection()
@@ -47,7 +48,17 @@ const zygote = ({ leftover }) => {
         macKey: auth.macKey.toString('base64')
       })
 
-      redis.set(mkcredskey(leftover.shard), creds)
+      const birthcert = JSON.stringify({
+        hardid,
+        mitochondria: leftover.mitochondria,
+        shard: leftover.shard,
+        timestamp: Date.now()
+      })
+
+      const pipeline = redis.pipeline()
+      pipeline.set(mkcredskey(leftover.shard), creds)
+      pipeline.sadd(bornskey, birthcert)
+      await pipeline.exec()
       console.log(`${leftover.shard} creds=${creds}`)
     })
 

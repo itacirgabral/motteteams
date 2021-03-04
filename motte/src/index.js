@@ -149,7 +149,7 @@ const trafficwand = async () => {
               }
               break
             case 'signupconnection':
-              zygote({ leftover })
+              zygote({ leftover, hardid })
               break
             case 'gql.signupconnection':
               gqlzygote({ leftover })
