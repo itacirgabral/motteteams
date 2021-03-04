@@ -5,13 +5,9 @@ services:
     restart: unless-stopped
     volumes:
       - ./uploads:/usr/src/uploads
-  restapi:
-    build: ./restapi
+  gqlapi:
+    build: ./gqlapi
     restart: unless-stopped
-    volumes:
-      - ./uploads:/usr/src/uploads
-    ports:
-      - "3000:3000"
   nginx:
     image: nginx
     restart: unless-stopped
@@ -19,5 +15,6 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./etc/nginx/conf.d:/etc/nginx/conf.d
+      - ./zapql/build:/usr/share/nginx/html
+      - ./etc/nginxGql/conf.d:/etc/nginx/conf.d
       - ./etc/nginx/ssl:/etc/nginx/ssl
