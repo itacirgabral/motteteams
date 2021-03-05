@@ -10,8 +10,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./uploads:/usr/src/uploads
-    ports:
-      - "3000:3000"
   nginx:
     image: nginx
     restart: unless-stopped
