@@ -145,9 +145,9 @@ const apollo = new ApolloServer({
     },
     onDisconnect: async (webSocket, context) => {
       const initialContext = await context.initPromise
-      console.log(`onDisconnect ${initialContext.user.shard}`)
+      console.log(`onDisconnect ${initialContext?.user?.shard}`)
 
-      const radiohookkey = `zap:${initialContext.user.shard}:radiohook`
+      const radiohookkey = `zap:${initialContext?.user?.shard}:radiohook`
       const type = 'subscriptionTurnoff'
       const sid = initialContext.sid
 
