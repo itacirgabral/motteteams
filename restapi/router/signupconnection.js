@@ -1,7 +1,14 @@
 const signupconnection = ({ redis, hardid, panoptickey }) => (req, res) => {
   if (req.body.url) {
+    const mitochondria = req.shard
     const type = 'signupconnection'
-    const bread = JSON.stringify({ hardid, type, url: req.body.url, shard: req.body.shard })
+    const bread = JSON.stringify({
+      hardid,
+      type,
+      url: req.body.url,
+      shard: req.body.shard,
+      mitochondria
+    })
 
     redis.publish(panoptickey, bread)
       .catch(() => {

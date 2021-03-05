@@ -52,7 +52,7 @@ const trafficwand = async () => {
 
               await speaker.sadd(
                 `zap:${hardid}:upuntilreboot`,
-                ...Array.from(patchpanel.keys())
+                ...Array.from(patchpanel.keys()).map(shard => `county:${hardid}:zap:${shard}`)
               )
               clearInterval(healthreportintervalid)
               gracefuldownresolver()
@@ -149,7 +149,7 @@ const trafficwand = async () => {
               }
               break
             case 'signupconnection':
-              zygote({ leftover })
+              zygote({ leftover, hardid })
               break
             case 'gql.signupconnection':
               gqlzygote({ leftover })
