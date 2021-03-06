@@ -1,0 +1,102 @@
+/* stylelint-disable docusaurus/copyright-header */
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #00a758;
+  --ifm-color-primary-dark: #00964f;
+  --ifm-color-primary-darker: #008e4b;
+  --ifm-color-primary-darkest: #00753e;
+  --ifm-color-primary-light: #00b861;
+  --ifm-color-primary-lighter: #00c065;
+  --ifm-color-primary-lightest: #00d972;
+
+
+  --ifm-color-secondary: #e434aa;
+  --ifm-color-secondary-darkest: #ad177c;
+  --ifm-color-secondary-lightest: #ee7ec9;
+
+  --ifm-color-white: #e434aa;
+
+  --ifm-background-color: #ff0000;
+  --ifm-background-surface-color: #ff0000;
+
+  /*
+
+
+  --ifm-container-width
+--ifm-global-border-width
+--ifm-global-radius
+--ifm-global-spacing
+--ifm-leading
+--ifm-leading-desktop
+--ifm-pre-line-height
+--ifm-pre-padding
+--ifm-spacing-horizontal
+--ifm-transition-fast
+--ifm-transition-timing-default
+--ifm-z-index-fixed
+
+--ifm-color-black
+--ifm-color-white
+
+--ifm-color-primary
+--ifm-color-primary-dark
+--ifm-color-primary-darker
+--ifm-color-primary-darkest
+--ifm-color-primary-light
+--ifm-color-primary-lighter
+--ifm-color-primary-lightest
+
+--ifm-color-secondary
+--ifm-color-secondary-darkest
+--ifm-color-secondary-lighter
+
+--ifm-background-color
+--ifm-background-surface-color
+--ifm-button-background-color
+--ifm-footer-background-color
+
+--ifm-color-content
+--ifm-color-content-inverse
+--ifm-color-content-secondary
+
+--ifm-color-emphasis-100
+--ifm-color-emphasis-200
+--ifm-color-emphasis-400
+--ifm-color-emphasis-600
+--ifm-color-emphasis-900
+
+--ifm-tabs-color-active
+
+--ifm-toc-border-color
+--ifm-toc-link-color
+
+--ifm-font-color-base
+--ifm-font-color-base-inverse
+--ifm-font-color-secondary
+
+--ifm-font-family-base
+--ifm-font-family-monospace
+
+--ifm-font-size-base
+--ifm-font-weight-bold
+--ifm-h2-font-size
+--ifm-h3-font-size
+--ifm-code-font-size
+
+--ifm-navbar-height
+--ifm-navbar-padding-horizontal
+  */
+}
+
+.docusaurus-highlight-code-line {
+  background-color: rgb(17, 2b, 3a);
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+}
