@@ -3,7 +3,7 @@ module.exports = {
   tagline: 'WhatsApp + GraphQL',
   url: 'https://zapql.com',
   baseUrl: '/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'Orgamec', // Usually your GitHub org/user name.
@@ -37,7 +37,7 @@ module.exports = {
           position: 'right'
         },
         {
-          href: '/playground',
+          href: '/graphql',
           label: 'Playground',
           position: 'right'
         },

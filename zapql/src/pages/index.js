@@ -63,9 +63,7 @@ function Home() {
       description="WhatsApp over GraphL">
       <header className={clsx('hero hero--primary', styles.heroBanner)}>
         <div className="container">
-          <a href="/garphql">
-            <img src="img/zapqlbarrabarra.jpg" />
-          </a>
+          <img src="img/zapqlbarrabarra.jpg" />
         </div>
       </header>
       <main>
