@@ -26,7 +26,21 @@ module.exports = {
           label: 'Docs',
           position: 'left',
         },
-        {to: 'blog', label: 'Blog', position: 'left'},
+        {
+          to: 'blog',
+          label: 'Blog',
+          position: 'left'
+        },
+        {
+          href: '/demochat',
+          label: 'Demo Chat',
+          position: 'right'
+        },
+        {
+          href: '/playground',
+          label: 'Playground',
+          position: 'right'
+        },
       ],
     },
     footer: {

@@ -41,8 +41,8 @@
   width: 100%;
 }
 
-.red {
-  background-color: red;
+.vspace {
+  min-height: 600px;
 }
 
 .featureImage {

@@ -9,7 +9,7 @@ import styles from './styles.module.css';
 const features = [
   {
     title: 'WhatsApp',
-    imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    imageUrl: 'img/whatsapp.png',
     description: (
       <>
         Lider no segmento, WhatsApp é a principal forma de atendimento 
@@ -20,7 +20,7 @@ const features = [
   },
   {
     title: 'GraphQL',
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    imageUrl: 'img/graphql.png',
     description: (
       <>
         Seja expressivo e preciso nas suas requisições, receba notificações
@@ -29,8 +29,8 @@ const features = [
     ),
   },
   {
-    title: 'Acompanha sobremesa',
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    title: 'Pilhas incluídas',
+    imageUrl: 'img/battery.png',
     description: (
       <>
         Prototipe rápido, escale fácil. Você pode testar mesmo sem nenhum cadastro,
@@ -83,33 +83,7 @@ function Home() {
         <section className={styles.plans}>
           <div className="container">
             <div className="row">
-              <div className={clsx('col col--4', styles.red)}>
-                <p>4</p>
-              </div>
-              <div className="col col--8">
-                <p>8</p>
-              </div>
-              <div className="col col--8">
-                <p>8</p>
-              </div>
-              <div className={clsx('col col--4', styles.red)}>
-                <p>4</p>
-              </div>
-
-              <div className={clsx('col col--4', styles.red)}>
-                <p>4</p>
-              </div>
-              <div className="col col--8">
-                <p>8</p>
-              </div>
-              <div className="col col--8">
-                <p>8</p>
-              </div>
-              <div className={clsx('col col--4', styles.red)}>
-                <p>4</p>
-              </div>
-
-
+              <div className={styles.vspace}></div>
             </div>
           </div>
         </section>
