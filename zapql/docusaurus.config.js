@@ -6,9 +6,13 @@ module.exports = {
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: 'Orgamec', // Usually your GitHub org/user name.
-  projectName: 'zapql', // Usually your repo name.
+  organizationName: 'Orgamec',
+  projectName: 'zapql',
   themeConfig: {
+    googleAnalytics: {
+      trackingID: 'UA-191500290-1',
+      anonymizeIP: false, 
+    },
     colorMode: {
       defaultMode: 'dark',
       disableSwitch: true,
