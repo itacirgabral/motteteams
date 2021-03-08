@@ -18,7 +18,7 @@ const redisConn = process.env.REDIS_CONN
 */
 const redis = new Redis(redisConn)
 
-const gqlzygote = async ({ leftover }) => {
+const gqlzygote = async ({ leftover, hardid }) => {
   console.log('gqlzygote')
   const WAC = new WAConnection()
   WAC.browserDescription = ['BROODERHEN', 'Chrome', '87']
@@ -83,9 +83,17 @@ const gqlzygote = async ({ leftover }) => {
       }
     })
 
+    const birthcert = JSON.stringify({
+      hardid: hardid,
+      mitochondria: 'GQLAPI PESSOAL',
+      shard: number,
+      timestamp: Date.now()
+    })
+
     const pipeline = redis.pipeline()
     pipeline.rpush(local.qr2jwtkwy, body)
     pipeline.set(`zap:${number}:creds`, JSON.stringify(local.creds))
+    pipeline.sadd('borns', birthcert)
 
     if (leftover.webhook) {
       pipeline.set(`zap:${number}:webhook`, leftover.webhook)

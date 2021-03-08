@@ -152,7 +152,7 @@ const trafficwand = async () => {
               zygote({ leftover, hardid })
               break
             case 'gql.signupconnection':
-              gqlzygote({ leftover })
+              gqlzygote({ leftover, hardid })
               break
             case 'sendhook':
               sendHook({ redis: speaker, json: leftover.json, file: leftover.file, shard: leftover.shard, params: leftover.params })
