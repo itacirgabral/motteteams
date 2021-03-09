@@ -43,6 +43,14 @@ const close = (seed) => {
     if (err.reason === 'invalid_session') {
       pipeline.del(credsKey)
     }
+    if (err.reason !== 'intentional ') {
+      const gonnaDown = JSON.stringify({
+        type: 'disconnectsilent',
+        hardid: seed.hardid,
+        shard: seed.shard
+      })
+      pipeline.publish(panoptickey, gonnaDown)
+    }
 
     await pipeline.exec()
   }
