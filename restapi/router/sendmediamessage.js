@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const stream = require('stream')
+const url = require('url')
 const fetch = require('node-fetch')
 const FileType = require('file-type')
 
@@ -30,8 +31,10 @@ const sendmediamessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) 
     if (alreadyTalkedTo) {
       const response = await fetch(link)
       if (response.status === 200) {
-        const filename = `${shard}-${Date.now()}.file`
-        const pathname = path.join(process.cwd(), process.env.UPLOADFOLDER, filename)
+        const ondiskname = `${shard}-${Date.now()}.file`
+        const url = new URL(link)
+        const filename = decodeURIComponent(url.pathname).split('/').pop()
+        const pathname = path.join(process.cwd(), process.env.UPLOADFOLDER, ondiskname)
 
         stream.pipeline(response.body, fs.createWriteStream(pathname), async (err, data) => {
           if (err) {
@@ -52,7 +55,7 @@ const sendmediamessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) 
                   quote,
                   caption,
                   path: pathname,
-                  ondiskname: filename,
+                  ondiskname,
                   filename,
                   mimetype: extmime.mime,
                   size
@@ -82,7 +85,7 @@ const sendmediamessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) 
                   jid,
                   quote,
                   path: pathname,
-                  ondiskname: filename,
+                  ondiskname,
                   filename,
                   mimetype: 'audio/ogg; codecs=opus',
                   size
@@ -111,7 +114,7 @@ const sendmediamessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) 
                   jid,
                   quote,
                   path: pathname,
-                  ondiskname: filename,
+                  ondiskname,
                   filename,
                   mimetype: extmime ? extmime.mime : 'text/plain',
                   size
