@@ -1,0 +1,15 @@
+version: "3.5"
+services:
+  minio:
+    image: minio/minio
+    volumes:
+      - miniodata:/data
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin
+    ports:
+      - "9000:9000"
+    command: server /data
+volumes:
+  miniodata:
+    external: true
