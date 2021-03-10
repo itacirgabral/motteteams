@@ -49,6 +49,7 @@ app.delete('/webhook', jwt2shard, router.webhookdelete({ redis, mkwebhookkey }))
 app.get('/webhook/history', jwt2shard, router.webhookhistory({ redis, mkwebhookhistorykey }))
 
 app.get('/alreadytalkedto/:number', jwt2shard, router.alreadytalkedto({ redis }))
+app.post('/startnewchat', jwt2shard, express.json(), router.startnewchat({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
 app.get('/allchats', jwt2shard, router.allchats({ redis, mkchatskey }))
 app.post('/contactinfo', jwt2shard, express.json(), router.contactinfo({ redis, mkchatskey, mkrawbreadkey }))
 

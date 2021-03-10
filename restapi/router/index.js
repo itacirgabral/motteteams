@@ -15,6 +15,7 @@ module.exports = {
   disconnect: require('./disconnect'),
   allchats: require('./allchats'),
   alreadytalkedto: require('./alreadytalkedto'),
+  startnewchat: require('./startnewchat'),
   sendtextmessage: require('./sendtextmessage'),
   sendlocationmessage: require('./sendlocationmessage'),
   sendcontactmessage: require('./sendcontactmessage'),

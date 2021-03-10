@@ -1,3 +1,4 @@
+const mkStartTextMessage = require('./mkStartTextMessage')
 const mkSendTextMessage = require('./mkSendTextMessage')
 const mkSendContactMessage = require('./mkSendContactMessage')
 const mkSendLocationMessage = require('./mkSendLocationMessage')
@@ -26,6 +27,7 @@ const fifoDrumer = (seed) => {
     totalmediasize: 'totalmediasize'
   }
 
+  const startTextMessage = mkStartTextMessage(keys)
   const sendTextMessage = mkSendTextMessage(keys)
   const sendContactMessage = mkSendContactMessage(keys)
   const sendLocationMessage = mkSendLocationMessage(keys)
@@ -52,6 +54,13 @@ const fifoDrumer = (seed) => {
         const { type, ...crumb } = JSON.parse(rawBread)
 
         switch (type) {
+          case 'startTextMessage_v001':
+            await startTextMessage({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
+                healthcare.playing = false
+              })
+            break
           case 'textMessage_v001':
             await sendTextMessage({ crumb, seed, healthcare })
               .catch(err => {
