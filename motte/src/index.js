@@ -76,6 +76,8 @@ const trafficwand = async () => {
 
                   zapHandlers({ conn, seed })
 
+                  // conn.logger.level = 'trace'
+
                   patchpanel.set(leftover.shard, seed)
 
                   let errcon = false

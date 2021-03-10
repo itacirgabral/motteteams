@@ -14,7 +14,7 @@ const mkSendTextMessage = ({
   const delta = msg.length
   const waittime = delta > 50 ? 6000 : delta * 100 + 100
 
-  await seed.conn.chatRead(jid)
+  await seed.conn.chatRead(jid).catch(() => {})
   await seed.conn.updatePresence(jid, Presence.composing)
   await delay(waittime)
 
