@@ -5,7 +5,8 @@ const sortingMessages = ({
   contact,
   image,
   document,
-  audio
+  audio,
+  video
 }) => {
   let type
   let isQuoted = false
@@ -62,6 +63,14 @@ const sortingMessages = ({
       isForwarded = true
     }
     if (audio?.contextInfo?.stanzaId) {
+      isQuoted = true
+    }
+  } else if (video) {
+    type = 'videoMessage'
+    if (video?.contextInfo?.isForwarded) {
+      isForwarded = true
+    }
+    if (video?.contextInfo?.stanzaId) {
       isQuoted = true
     }
   }

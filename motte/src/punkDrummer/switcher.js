@@ -17,7 +17,8 @@ const switcher = async ({
   contact,
   document,
   image,
-  audio
+  audio,
+  video
 }) => {
   let file, params, jsontosend
   switch (type) {
@@ -108,6 +109,24 @@ const switcher = async ({
         seconds: audio.seconds,
         mimetype: audio.mimetype,
         size: audio.fileLength
+      }
+      break
+    case 'videoMessage':
+      file = await seed.conn.downloadAndSaveMediaMessage(wbi, path.join(process.cwd(), process.env.UPLOADFOLDER, String(Date.now())))
+      params = {
+        type,
+        timestamp,
+        to,
+        author,
+        from,
+        wid,
+        caption: video.caption,
+        forwarded: isForwarded ? true : undefined,
+        quoted: isQuoted ? video.contextInfo.stanzaId : undefined,
+        seconds: video.seconds,
+        loop: !!video.gifPlayback,
+        mimetype: video.mimetype,
+        size: video.fileLength
       }
       break
   }

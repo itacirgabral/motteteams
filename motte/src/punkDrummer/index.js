@@ -53,6 +53,7 @@ const punkDrummer = (seed) => {
         const image = wbi.message.imageMessage
         const document = wbi.message.documentMessage
         const audio = wbi.message.audioMessage
+        const video = wbi.message.videoMessage
 
         const { type, isForwarded, isQuoted, msg } = sortingMessages({
           conversation,
@@ -61,7 +62,8 @@ const punkDrummer = (seed) => {
           contact,
           image,
           document,
-          audio
+          audio,
+          video
         })
 
         const { file, params, jsontosend } = await switcher({
@@ -81,7 +83,8 @@ const punkDrummer = (seed) => {
           contact,
           document,
           image,
-          audio
+          audio,
+          video
         })
 
         const hook = {
