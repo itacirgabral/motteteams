@@ -106,6 +106,38 @@ const sendmediamessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) 
                     })
                   })
                 break
+              case 'video/mp4':
+                await redis.lpush(mkrawbreadkey(shard), JSON.stringify({
+                  type: 'videoMessage_v001',
+                  mark,
+                  jid,
+                  quote,
+                  caption,
+                  path: pathname,
+                  ondiskname,
+                  filename,
+                  mimetype: extmime.mime,
+                  size
+                }))
+                  .catch(() => {
+                    res.status(500).end()
+                  })
+                  .then(queueSize => {
+                    res.status(200).json({
+                      type: 'sendaudiomessage',
+                      from: shard,
+                      mark,
+                      quote,
+                      caption,
+                      to,
+                      filename,
+                      mimetype: extmime.mime,
+                      size,
+                      queueSize
+                    })
+                  })
+
+                break
               default:
                 await redis.lpush(mkrawbreadkey(shard), JSON.stringify({
                   type: 'documentMessage_v001',
