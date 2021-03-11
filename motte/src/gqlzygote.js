@@ -100,7 +100,7 @@ const gqlzygote = async ({ leftover, hardid }) => {
     }
 
     await Promise.all([
-      WAC.sendMessage(WAC.user.jid, `*Open the connection:*\nhttps://zapql.com/${number}/dashboard/&jwt=${jwt}`, MessageType.text),
+      WAC.sendMessage(WAC.user.jid, `*CHAT DEMO:*\nhttps://zapql.com/open/${jwt}/`, MessageType.text),
       pipeline.exec(),
       fetch(leftover.webhook, {
         method: 'POST',
