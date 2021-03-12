@@ -1,0 +1,27 @@
+services:
+  regis:
+    image: registry:2
+    restart: unless-stopped
+    ports:
+    - "5000:5000"
+    environment:
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
+    volumes:
+      - regisdata:/data
+  nginx:
+    image: nginx
+    restart: unless-stopped
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/registry.password
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./auth:/auth
+      - ./etc/nginxRegis/conf.d:/etc/nginx/conf.d
+      - ./etc/nginxRegis/ssl:/etc/nginx/ssl
+volumes:
+  regisdata:
+    external: true
