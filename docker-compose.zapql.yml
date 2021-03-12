@@ -1,3 +1,4 @@
+version: "3.5"
 services:
   regis:
     image: registry:2
@@ -14,7 +15,24 @@ services:
     volumes:
       - regisdata:/data
       - ./etc/regis/ssl:/ssl
-      - ./etc/regis/auth:/auth
+  motte:
+    build: ./motte
+    restart: unless-stopped
+    volumes:
+      - ./uploads:/usr/src/uploads
+  gqlapi:
+    build: ./gqlapi
+    restart: unless-stopped
+  nginx:
+    image: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./zapql/build:/usr/share/nginx/html
+      - ./etc/nginxGql/conf.d:/etc/nginx/conf.d
+      - ./etc/nginx/ssl:/etc/nginx/ssl
 volumes:
   regisdata:
     external: true
