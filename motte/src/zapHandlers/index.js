@@ -49,8 +49,8 @@ const appendHalders = ({ conn, seed }) => {
   conn.on('contact-update', mkContactUpdate(seed))
   conn.on('message-new', mkMessageNew(seed))
   conn.on('user-presence-update', mkUserPresenceUpdate(seed))
-  conn.on('CB:action,,call', mkCall(seed))
-  conn.on('CB:action,,battery', mkBattery(seed))
+  conn.on(['action', null, 'call'], mkCall(seed))
+  conn.on(['action', null, 'battery'], mkBattery(seed))
 }
 
 module.exports = appendHalders
