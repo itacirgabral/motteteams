@@ -48,6 +48,8 @@ const typeDefs = gql`
 
 const apollo = new ApolloServer({
   cors: true,
+  introspection: true,
+  playground: true,
   typeDefs: [
     typeDefs,
     connection.typeDefs,
@@ -95,7 +97,6 @@ const apollo = new ApolloServer({
       // ...chats.resolvers.Mutation
     }
   },
-  introspection: true,
   context: async ({ req, connection }) => {
     let user
     let sid
