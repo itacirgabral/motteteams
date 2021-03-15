@@ -22,6 +22,8 @@ const mkUserPresenceUpdate = require('./mkUserPresenceUpdate')
 const mkUserStatusUpdate = require('./mkUserStatusUpdate')
 const mkWsClose = require('./mkWsClose')
 
+const mkCall = require('./mkCall')
+
 const appendHalders = ({ conn, seed }) => {
   conn.on('open', mkOpen(seed))
   conn.on('connecting', mkConnecting(seed))
@@ -46,6 +48,7 @@ const appendHalders = ({ conn, seed }) => {
   conn.on('contact-update', mkContactUpdate(seed))
   conn.on('message-new', mkMessageNew(seed))
   conn.on('user-presence-update', mkUserPresenceUpdate(seed))
+  conn.on('CB:action,,call', mkCall(seed))
 }
 
 module.exports = appendHalders
