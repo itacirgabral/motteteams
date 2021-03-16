@@ -70,6 +70,16 @@ const switcher = async ({
         from
       }
       break
+    case 'messageDeleted':
+      jsontosend = {
+        type,
+        author,
+        timestamp,
+        to,
+        from,
+        wid
+      }
+      break
     case 'imageMessage':
       file = await seed.conn.downloadAndSaveMediaMessage(wbi, path.join(process.cwd(), process.env.UPLOADFOLDER, String(Date.now())))
       params = {

@@ -31,6 +31,13 @@ const punkDrummer = (seed) => {
         }
       }
 
+      const isMessageDeleted = wbi.messageStubType === 'REVOKE'
+      if (isMessageDeleted) {
+        wbi.message = {
+          appNotification: 'messageDeleted'
+        }
+      }
+
       const isGroup = remoteJid.indexOf('-') !== -1
       const groupId = isGroup
         ? remoteJid.split('@g.us')[0]
