@@ -67,7 +67,8 @@ const switcher = async ({
       jsontosend = {
         type,
         timestamp,
-        from
+        from,
+        to
       }
       break
     case 'messageDeleted':
