@@ -3,6 +3,7 @@
  * on (event: 'contacts-received', listener: () => void): this
  */
 const contactsReceived = (seed) => {
+  const panoptickey = 'zap:panoptic'
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
 
@@ -31,8 +32,17 @@ const contactsReceived = (seed) => {
       })
         .filter(el => !!el.wid)
 
-      const checkinString = JSON.stringify(checkin)
-      console.log(checkinString)
+      const notifysent = {
+        type: 'sendhook',
+        hardid: seed.hardid,
+        shard: seed.shard,
+        json: JSON.stringify({
+          type: 'checkin',
+          shard: seed.shard,
+          checkin
+        })
+      }
+      seed.redis.publish(panoptickey, JSON.stringify(notifysent))
     }, 5_000)
   }
 }
