@@ -61,6 +61,7 @@ app.get('/connectionstate', jwt2shard, router.connectionstate({ redis, hardid, p
 app.get('/spreadrestart', jwt2shard, router.spreadrestart({ redis, hardid, panoptickey }))
 app.get('/disconnect', jwt2shard, router.disconnect({ redis, hardid, panoptickey }))
 app.get('/queuerestart', jwt2shard, router.queuerestart({ redis, hardid, panoptickey }))
+app.get('/queuesize', jwt2shard, router.queuesize({ redis, mkrawbreadkey }))
 
 app.post('/loadmessages', jwt2shard, express.json(), router.loadmessages({ redis, hardid, panoptickey }))
 
