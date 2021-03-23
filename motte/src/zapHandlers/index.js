@@ -22,7 +22,6 @@ const mkUserPresenceUpdate = require('./mkUserPresenceUpdate')
 const mkUserStatusUpdate = require('./mkUserStatusUpdate')
 const mkWsClose = require('./mkWsClose')
 
-const mkCall = require('./mkCall')
 const mkBattery = require('./mkBattery')
 
 const appendHalders = ({ conn, seed }) => {
@@ -49,8 +48,7 @@ const appendHalders = ({ conn, seed }) => {
   conn.on('contact-update', mkContactUpdate(seed))
   conn.on('message-new', mkMessageNew(seed))
   conn.on('user-presence-update', mkUserPresenceUpdate(seed))
-  conn.on(['action', null, 'call'], mkCall(seed))
-  conn.on(['action', null, 'battery'], mkBattery(seed))
+  // conn.on(['action', null, 'battery'], mkBattery(seed))
 }
 
 module.exports = appendHalders

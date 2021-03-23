@@ -1,5 +1,3 @@
-const path = require('path')
-
 const messageNew = (seed) => {
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`

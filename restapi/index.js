@@ -10,8 +10,7 @@ const jwt2shard = require('./jwt2shard')
 const router = require('./router')
 
 const app = express()
-const port = 3000
-const ports = 3001
+const ports = 4443
 
 const redisConn = process.env.REDIS_CONN
 const hardid = process.env.HARDID
@@ -71,8 +70,4 @@ https.createServer({
   ca: fs.readFileSync(path.join(__dirname, 'sslcert', 'chain.pem'))
 }, app).listen(ports, () => {
   console.log(`Example app listening at https://localhost:${ports}`)
-})
-
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
 })

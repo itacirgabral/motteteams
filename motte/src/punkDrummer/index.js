@@ -24,6 +24,20 @@ const punkDrummer = (seed) => {
         ? wbi.participant.split('@s.whatsapp.net')[0]
         : undefined
 
+      const isCallMissed = wbi.messageStubType === 'CALL_MISSED_VOICE'
+      if (isCallMissed) {
+        wbi.message = {
+          appNotification: 'callMissed'
+        }
+      }
+
+      const isMessageDeleted = wbi.messageStubType === 'REVOKE'
+      if (isMessageDeleted) {
+        wbi.message = {
+          appNotification: 'messageDeleted'
+        }
+      }
+
       const isGroup = remoteJid.indexOf('-') !== -1
       const groupId = isGroup
         ? remoteJid.split('@g.us')[0]
@@ -54,8 +68,9 @@ const punkDrummer = (seed) => {
         const document = wbi.message.documentMessage
         const audio = wbi.message.audioMessage
         const video = wbi.message.videoMessage
+        const appNotification = wbi.message.appNotification
 
-        const { type, isForwarded, isQuoted, msg } = sortingMessages({
+        const { type, isForwarded, isQuoted, msg, notification } = sortingMessages({
           conversation,
           quoteMsg,
           location,
@@ -63,7 +78,8 @@ const punkDrummer = (seed) => {
           image,
           document,
           audio,
-          video
+          video,
+          appNotification
         })
 
         const { file, params, jsontosend } = await switcher({
@@ -84,7 +100,8 @@ const punkDrummer = (seed) => {
           document,
           image,
           audio,
-          video
+          video,
+          notification
         })
 
         const hook = {

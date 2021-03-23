@@ -45,7 +45,7 @@ const close = (seed) => {
     }
     if (err.reason !== 'intentional ') {
       const gonnaDown = JSON.stringify({
-        type: 'disconnectsilent',
+        type: 'disconnectsilent', // skip "already" log
         hardid: seed.hardid,
         shard: seed.shard
       })

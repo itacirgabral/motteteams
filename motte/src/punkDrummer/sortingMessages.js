@@ -6,7 +6,8 @@ const sortingMessages = ({
   image,
   document,
   audio,
-  video
+  video,
+  appNotification
 }) => {
   let type
   let isQuoted = false
@@ -73,6 +74,8 @@ const sortingMessages = ({
     if (video?.contextInfo?.stanzaId) {
       isQuoted = true
     }
+  } else if (appNotification) {
+    type = appNotification
   }
 
   return { type, isForwarded, isQuoted, msg }
