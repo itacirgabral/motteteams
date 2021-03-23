@@ -8,6 +8,7 @@ const mkSendAudioMessage = require('./mkSendAudioMessage')
 const mkSendImageMessage = require('./mkSendImageMessage')
 const mkSendVideoMessage = require('./mkSendVideoMessage')
 const mkContactInfo = require('./mkContactInfo')
+const mkGroupInfo = require('./mkGroupInfo')
 
 /*
 ** Fee-fi-fo-fum,
@@ -38,6 +39,7 @@ const fifoDrumer = (seed) => {
   const sendImageMessage = mkSendImageMessage(keys)
   const sendVideoMessage = mkSendVideoMessage(keys)
   const contactInfo = mkContactInfo(keys)
+  const groupInfo = mkGroupInfo(keys)
 
   const healthcare = {
     playing: true,
@@ -54,6 +56,8 @@ const fifoDrumer = (seed) => {
       const rawBread = await seed.redisB.brpoplpush(keys.fifoRawKey, keys.lastRawKey, 0)
       if (healthcare.playing) {
         const { type, ...crumb } = JSON.parse(rawBread)
+
+        console.log(rawBread)
 
         switch (type) {
           case 'startTextMessage_v001':
@@ -121,6 +125,13 @@ const fifoDrumer = (seed) => {
             break
           case 'contactInfo_v001':
             await contactInfo({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
+                healthcare.playing = false
+              })
+            break
+          case 'groupInfo_v001':
+            await groupInfo({ crumb, seed, healthcare })
               .catch(err => {
                 console.error(err)
                 healthcare.playing = false
