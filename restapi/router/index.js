@@ -9,6 +9,7 @@ module.exports = {
   connectionstate: require('./connectionstate'),
   queuerestart: require('./queuerestart'),
   queuesize: require('./queuesize'),
+  cleanqueue: require('./cleanqueue'),
   spreadrestart: require('./spreadrestart'),
   signupconnection: require('./signupconnection'),
   connect: require('./connect'),
