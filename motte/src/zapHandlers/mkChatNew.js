@@ -1,3 +1,4 @@
+const interestingupdates = ['s.whatsapp.net', 'g.us']
 /**
  * when a new chat is added
  * on (event: 'chat-new', listener: (chat: WAChat) => void): this
@@ -13,9 +14,10 @@ const chatNew = (seed) => {
     pipeline.lpush(logKey, json)// 0
     pipeline.ltrim(logKey, 0, 999)// 1
 
-    const number = chat.jid.split('@')[0]
-
-    pipeline.sadd(chatsKeys, number)
+    const [number, host] = chat.jid.split('@')[0]
+    if (interestingupdates.includes(host)) {
+      pipeline.sadd(chatsKeys, number)
+    }
     pipeline.publish(newsKey, json)
 
     await pipeline.exec()
