@@ -7,16 +7,22 @@ const mkGroupInfo = ({
   if (seed.conn.contacts[crumb.jid]) {
     const info = await seed.conn.groupMetadataMinimal(crumb.jid).catch(() => false)
 
-    console.log(JSON.stringify(info, null, 2))
-
     const notifysent = {
       type: 'sendhook',
       hardid: seed.hardid,
       shard: seed.shard,
       json: JSON.stringify({
-        type: 'group',
+        type: 'groupinfo',
         from: seed.shard,
-        number: crumb.jid.split('@s.whatsapp.net')[0]
+        number: (crumb.jid || '@').split('@')[0],
+        owner: (info.owner || '@').split('@')[0],
+        creator: (info.creator || '@').split('@')[0],
+        creation: String(info.creation),
+        participants: info.participants.map(el => ({
+          ...el,
+          jid: undefined,
+          number: el.jid.split('@')[0]
+        }))
       })
     }
 

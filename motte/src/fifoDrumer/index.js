@@ -57,8 +57,6 @@ const fifoDrumer = (seed) => {
       if (healthcare.playing) {
         const { type, ...crumb } = JSON.parse(rawBread)
 
-        console.log(rawBread)
-
         switch (type) {
           case 'startTextMessage_v001':
             await startTextMessage({ crumb, seed, healthcare })
