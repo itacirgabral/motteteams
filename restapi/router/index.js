@@ -13,7 +13,7 @@ module.exports = {
   spreadrestart: require('./spreadrestart'),
   signupconnection: require('./signupconnection'),
   connect: require('./connect'),
-  contactinfo: require('./contactinfo'),
+  chatinfo: require('./chatinfo'),
   disconnect: require('./disconnect'),
   allchats: require('./allchats'),
   alreadytalkedto: require('./alreadytalkedto'),

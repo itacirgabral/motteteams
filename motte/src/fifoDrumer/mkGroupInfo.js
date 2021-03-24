@@ -12,7 +12,7 @@ const mkGroupInfo = ({
       hardid: seed.hardid,
       shard: seed.shard,
       json: JSON.stringify({
-        type: 'groupinfo',
+        type: 'group',
         from: seed.shard,
         number: (crumb.jid || '@').split('@')[0],
         owner: (info.owner || '@').split('@')[0],

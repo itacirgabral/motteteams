@@ -1,9 +1,8 @@
-const contactinfo = ({ redis, mkchatskey, mkrawbreadkey }) => async (req, res) => {
+const chatinfo = ({ redis, mkchatskey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
   const id = req.body.id
   if ((Array.isArray(id) && id.length > 0)) {
-    const contacts = id.map(el => String(el)).filter(el => el.indexOf('-') === -1)
-    const deduplicated = Array.from(new Set(contacts))
+    const deduplicated = Array.from(new Set(id))
     const pipeline = redis.pipeline()
     for (const el of deduplicated) {
       pipeline.sismember(mkchatskey(shard), el)
@@ -20,13 +19,22 @@ const contactinfo = ({ redis, mkchatskey, mkrawbreadkey }) => async (req, res) =
       id: prebreads
     })
 
-    await redis.lpush(mkrawbreadkey(shard), prebreads.map(id => ({
-      type: 'contactInfo_v001',
-      jid: `${id}@s.whatsapp.net`
-    })).map(el => JSON.stringify(el)))
+    await redis.lpush(mkrawbreadkey(shard), prebreads.map(id => {
+      if (id.indexOf('-') === -1) {
+        return {
+          type: 'contactInfo_v001',
+          jid: `${id}@s.whatsapp.net`
+        }
+      } else {
+        return {
+          type: 'groupInfo_v001',
+          jid: `${id}@g.us`
+        }
+      }
+    }).map(el => JSON.stringify(el)))
   } else {
     res.status(400).end()
   }
 }
 
-module.exports = contactinfo
+module.exports = chatinfo
