@@ -277,24 +277,14 @@ const trafficwand = async () => {
                 const seed = patchpanel.get(leftover.shard)
                 const { number, count = 1, wid } = leftover
                 const jid = `${number}@s.whatsapp.net`
-                let messages
 
-                if (wid) {
-                  const [wbis1, wbis2] = await Promise.all([
-                    seed.conn.loadMessages(jid, count, { fromMe: false, id: wid }),
-                    seed.conn.loadMessages(jid, count, { fromMe: true, id: wid })
-                  ])
-
-                  messages = wbis1.messages
-                    .concat(wbis2.messages)
-                    .map(message => message.toJSON())
-                } else {
-                  const loaded = await seed.conn.loadMessages(jid, count)
-                  messages = loaded.messages.map(message => message.toJSON())
-                }
+                const wids = await seed.conn.loadMessages(jid, count, { fromMe: false, id: wid })
 
                 const pipeline = seed.redis.pipeline()
-                messages
+
+                wids
+                  .messages
+                  .map(m => m.toJSON())
                   .map(JSON.stringify)
                   .forEach(el => {
                     pipeline.publish(spreadkey, el)
