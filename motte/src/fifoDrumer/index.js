@@ -9,6 +9,7 @@ const mkSendImageMessage = require('./mkSendImageMessage')
 const mkSendVideoMessage = require('./mkSendVideoMessage')
 const mkContactInfo = require('./mkContactInfo')
 const mkGroupInfo = require('./mkGroupInfo')
+const mkEraseMessage = require('./mkEraseMessage')
 
 /*
 ** Fee-fi-fo-fum,
@@ -40,6 +41,7 @@ const fifoDrumer = (seed) => {
   const sendVideoMessage = mkSendVideoMessage(keys)
   const contactInfo = mkContactInfo(keys)
   const groupInfo = mkGroupInfo(keys)
+  const eraseMessage = mkEraseMessage(keys)
 
   const healthcare = {
     playing: true,
@@ -130,6 +132,13 @@ const fifoDrumer = (seed) => {
             break
           case 'groupInfo_v001':
             await groupInfo({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
+                healthcare.playing = false
+              })
+            break
+          case 'eraseMessage_v001':
+            await eraseMessage({ crumb, seed, healthcare })
               .catch(err => {
                 console.error(err)
                 healthcare.playing = false
