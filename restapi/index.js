@@ -73,3 +73,7 @@ https.createServer({
 }, app).listen(ports, () => {
   console.log(`Example app listening at https://localhost:${ports}`)
 })
+
+app.listen(3000, () => {
+  console.log(`Example app listening at http://localhost:${3000}`)
+})
