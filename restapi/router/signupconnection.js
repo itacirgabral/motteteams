@@ -1,4 +1,6 @@
 const signupconnection = ({ redis, hardid, panoptickey }) => (req, res) => {
+  console.log(`${(new Date()).toLocaleTimeString()},000000000000,signupconnection`)
+
   if (req.body.url) {
     const mitochondria = req.shard
     const type = 'signupconnection'

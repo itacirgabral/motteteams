@@ -1,5 +1,8 @@
 const queuesize = ({ redis, hardid, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},queuesize`)
+
   const fifokey = mkrawbreadkey(shard)
 
   const queuesize = await redis.llen(fifokey)

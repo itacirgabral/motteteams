@@ -1,8 +1,11 @@
 const fs = require('fs')
 
 const sendimagemessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
-  const to = req.params.to
   const shard = req.shard
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},sendimagemessage`)
+
+  const to = req.params.to
   const upload = uploader().single('file')
   const quote = req.query.quote
   const caption = req.query.caption

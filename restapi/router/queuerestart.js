@@ -1,5 +1,8 @@
 const queuerestart = ({ redis, hardid, panoptickey }) => (req, res) => {
   const shard = req.shard
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},queuerestart`)
+
   const bread = JSON.stringify({ hardid, type: 'queuerestart', shard })
 
   redis.publish(panoptickey, bread)

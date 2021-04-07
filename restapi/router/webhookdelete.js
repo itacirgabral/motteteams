@@ -1,5 +1,8 @@
 const webhookdelete = ({ redis, mkwebhookkey }) => (req, res) => {
   const shard = req.shard
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookdelete`)
+
   const key = mkwebhookkey(shard)
 
   const pipeline = redis.pipeline()

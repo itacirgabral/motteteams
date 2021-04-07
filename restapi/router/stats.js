@@ -1,5 +1,8 @@
 const stats = ({ redis }) => async (req, res) => {
   const shard = req.shard
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},stats`)
+
   const pipeline = redis.pipeline()
   pipeline.get(`zap:${shard}:pong`) // 0
   pipeline.hget(`zap:${shard}:stats`, 'lastsentmessagetimestamp') // 1

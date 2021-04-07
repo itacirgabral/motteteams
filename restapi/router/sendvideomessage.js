@@ -1,8 +1,11 @@
 const fs = require('fs')
 
 const sendvideomessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
-  const to = req.params.to
   const shard = req.shard
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},sendvideomessage`)
+
+  const to = req.params.to
   const loop = req.query.loop === 'true'
   const upload = uploader().single('file')
   const quote = req.query.quote

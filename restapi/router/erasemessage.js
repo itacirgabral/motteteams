@@ -1,5 +1,8 @@
 const erasemessage = ({ redis, mkchatskey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},erasemessage`)
+
   const to = String(req.body.to)
   const wid = req.body.wid
 

@@ -1,6 +1,9 @@
 const sendlocationmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
-  const to = req.body.to
   const shard = req.shard
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},sendlocationmessage`)
+
+  const to = req.body.to
   const quote = req.query.quote
   const description = req.body.description
   const latitude = req.body.latitude

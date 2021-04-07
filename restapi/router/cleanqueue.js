@@ -1,5 +1,8 @@
 const cleanqueue = ({ redis, hardid, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},cleanqueue`)
+
   const fifokey = mkrawbreadkey(shard)
 
   const posfix = 'posfixname__c43887towv5t879pm5y4w67'

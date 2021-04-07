@@ -1,6 +1,9 @@
 const startnewchat = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
-  const to = req.body.to
   const shard = req.shard
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},startnewchat`)
+
+  const to = req.body.to
   const msg = req.body.msg
 
   if (to && msg && to.indexOf('-') === -1 && !Number.isNaN(Number(to))) {

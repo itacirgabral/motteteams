@@ -1,5 +1,8 @@
 const spreadrestart = ({ redis, hardid, panoptickey }) => (req, res) => {
   const shard = req.shard
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},spreadrestart`)
+
   const bread = JSON.stringify({ hardid, type: 'spreadrestart', shard })
 
   redis.publish(panoptickey, bread)
