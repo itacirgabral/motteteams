@@ -1,7 +1,7 @@
 const alreadytalkedto = ({ redis }) => (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},alreadytalkedto`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},alreadytalkedto,destinho,tamanho`)
 
   if (req.params.number) {
     const number = req.params.number

@@ -1,5 +1,5 @@
 const signupconnection = ({ redis, hardid, panoptickey }) => (req, res) => {
-  console.log(`${(new Date()).toLocaleTimeString()},000000000000,signupconnection`)
+  console.log(`${(new Date()).toLocaleTimeString()},000000000000,signupconnection,destinho,tamanho`)
 
   if (req.body.url) {
     const mitochondria = req.shard

@@ -1,7 +1,7 @@
 const webhookdelete = ({ redis, mkwebhookkey }) => (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookdelete`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookdelete,destinho,tamanho`)
 
   const key = mkwebhookkey(shard)
 

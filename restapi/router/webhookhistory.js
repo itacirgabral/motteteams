@@ -1,7 +1,7 @@
 const webhookhistory = ({ redis, mkwebhookhistorykey }) => (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookhistory`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookhistory,destinho,tamanho`)
 
   redis.lrange(mkwebhookhistorykey(shard), 0, -1)
     .catch(() => {

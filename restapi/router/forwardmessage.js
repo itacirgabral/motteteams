@@ -1,7 +1,7 @@
 const forwardmessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},forwardmessage`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},forwardmessage,destinho,tamanho`)
 
   const source = req.body.source
   const wid = req.body.wid

@@ -1,7 +1,7 @@
 const stats = ({ redis }) => async (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},stats`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},stats,destinho,tamanho`)
 
   const pipeline = redis.pipeline()
   pipeline.get(`zap:${shard}:pong`) // 0

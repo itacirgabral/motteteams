@@ -2,7 +2,7 @@ const webhookput = ({ redis, mkwebhookkey }) => (req, res) => {
   const webhook = req.body.webhook
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookput`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookput,destinho,tamanho`)
 
   redis.getset(mkwebhookkey(shard), webhook)
     .catch(() => {
