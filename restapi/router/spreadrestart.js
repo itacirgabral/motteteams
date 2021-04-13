@@ -1,7 +1,7 @@
 const spreadrestart = ({ redis, hardid, panoptickey }) => (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},spreadrestart,destinho,tamanho`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},spreadrestart,to`)
 
   const bread = JSON.stringify({ hardid, type: 'spreadrestart', shard })
 
