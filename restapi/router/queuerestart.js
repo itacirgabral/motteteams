@@ -1,7 +1,7 @@
 const queuerestart = ({ redis, hardid, panoptickey }) => (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},queuerestart,destinho,tamanho`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},queuerestart,to`)
 
   const bread = JSON.stringify({ hardid, type: 'queuerestart', shard })
 

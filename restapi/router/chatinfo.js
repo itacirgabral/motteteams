@@ -1,7 +1,7 @@
 const chatinfo = ({ redis, mkchatskey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},chatinfo,destinho,tamanho`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},chatinfo,to`)
 
   const id = req.body.id
   if ((Array.isArray(id) && id.length > 0)) {

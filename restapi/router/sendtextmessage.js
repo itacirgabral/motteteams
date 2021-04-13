@@ -1,11 +1,10 @@
 const sendtextmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
-
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},sendtextmessage`)
-
   const to = req.body.to
   const quote = req.query.quote
   const msg = req.body.msg
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},sendtextmessage,${to}`)
 
   if (to && msg) {
     const jid = to.indexOf('-') === -1

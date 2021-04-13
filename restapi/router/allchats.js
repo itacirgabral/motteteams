@@ -1,7 +1,7 @@
 const allchats = ({ redis, mkchatskey }) => (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},allchats,destinho,tamanho`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},allchats,to`)
 
   redis.smembers(mkchatskey(shard))
     .catch(() => {

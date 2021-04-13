@@ -1,7 +1,7 @@
 const disconnect = ({ redis, hardid, panoptickey }) => (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},disconnect,destinho,tamanho`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},disconnect,to`)
 
   const type = 'disconnect'
   const bread = JSON.stringify({ hardid, type, shard })

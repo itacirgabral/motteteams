@@ -2,7 +2,7 @@ const webhookpost = ({ redis, mkwebhookkey }) => (req, res) => {
   const webhook = req.body.webhook
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookpost,destinho,tamanho`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookpost,to`)
 
   if (webhook) {
     redis.set(mkwebhookkey(shard), webhook)

@@ -1,7 +1,7 @@
 const connect = ({ redis, mkcredskey, hardid, panoptickey }) => async (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},connect,destinho,tamanho`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},connect,to`)
 
   const typeDisconnect = 'disconnectsilent'
   const bread = JSON.stringify({ hardid, type: typeDisconnect, shard })

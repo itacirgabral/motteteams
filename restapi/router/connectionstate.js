@@ -1,7 +1,7 @@
 const connectionstate = ({ redis, hardid, panoptickey }) => (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},connectionstate,destinho,tamanho`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},connectionstate,to`)
 
   const bread = JSON.stringify({ hardid, type: 'connectionstate', shard })
 

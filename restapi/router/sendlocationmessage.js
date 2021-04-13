@@ -1,13 +1,12 @@
 const sendlocationmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
-
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},sendlocationmessage`)
-
   const to = req.body.to
   const quote = req.query.quote
   const description = req.body.description
   const latitude = req.body.latitude
   const longitude = req.body.longitude
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},sendlocationmessage,${to}`)
 
   if (to && description && latitude && longitude) {
     const jid = to.indexOf('-') === -1

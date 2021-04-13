@@ -6,13 +6,12 @@ const FileType = require('file-type')
 
 const sendmediamessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
-
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},sendmediamessage`)
-
   const to = req.body.to
   const link = req.body.link
   const quote = req.query.quote
   const caption = req.query.caption
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},sendmediamessage,${to}`)
 
   if (to && link) {
     const jid = to.indexOf('-') === -1

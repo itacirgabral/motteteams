@@ -2,12 +2,11 @@ const fs = require('fs')
 
 const senddocumentmessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
-
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},senddocumentmessage`)
-
   const to = req.params.to
   const upload = uploader().single('file')
   const quote = req.query.quote
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},senddocumentmessage,${to}`)
 
   upload(req, res, async (err) => {
     if (!err) {

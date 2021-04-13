@@ -1,7 +1,7 @@
 const loadmessages = ({ redis, hardid, panoptickey }) => (req, res) => {
   const shard = req.shard
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},loadmessages,destinho,tamanho`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},loadmessages,to`)
 
   const number = req.body.number
   const count = req.body.count
