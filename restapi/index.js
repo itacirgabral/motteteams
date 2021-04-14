@@ -66,13 +66,18 @@ app.get('/cleanqueue', jwt2shard, router.cleanqueue({ redis, mkrawbreadkey }))
 
 app.post('/loadmessages', jwt2shard, express.json(), router.loadmessages({ redis, hardid, panoptickey }))
 
-https.createServer({
-  key: fs.readFileSync(path.join(__dirname, 'sslcert', 'privkey.pem')),
-  cert: fs.readFileSync(path.join(__dirname, 'sslcert', 'cert.pem')),
-  ca: fs.readFileSync(path.join(__dirname, 'sslcert', 'chain.pem'))
-}, app).listen(ports, () => {
-  console.log(`Example app listening at https://localhost:${ports}`)
-})
+const key = fs.readFileSync(path.join(__dirname, 'sslcert', 'privkey.pem'))
+const cert = fs.readFileSync(path.join(__dirname, 'sslcert', 'cert.pem'))
+const ca = fs.readFileSync(path.join(__dirname, 'sslcert', 'chain.pem'))
+if (key && cert && ca) {
+  https.createServer({
+    key,
+    cert,
+    ca
+  }, app).listen(ports, () => {
+    console.log(`Example app listening at https://localhost:${ports}`)
+  })
+}
 
 app.listen(3000, () => {
   console.log(`Example app listening at http://localhost:${3000}`)
