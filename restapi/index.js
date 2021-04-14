@@ -10,7 +10,6 @@ const jwt2shard = require('./jwt2shard')
 const router = require('./router')
 
 const app = express()
-const ports = 4443
 
 const redisConn = process.env.REDIS_CONN
 const hardid = process.env.HARDID
@@ -71,8 +70,8 @@ try {
     key: fs.readFileSync(path.join(__dirname, 'sslcert', 'privkey.pem')),
     cert: fs.readFileSync(path.join(__dirname, 'sslcert', 'cert.pem')),
     ca: fs.readFileSync(path.join(__dirname, 'sslcert', 'chain.pem'))
-  }, app).listen(ports, () => {
-    console.log(`Example app listening at https://localhost:${ports}`)
+  }, app).listen(4443, () => {
+    console.log(`Example app listening at https://localhost:${4443}`)
   })
 } catch (error) {
   console.error(error)
