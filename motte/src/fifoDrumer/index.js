@@ -24,6 +24,7 @@ const fifoDrumer = (seed) => {
     lastRawKey: `zap:${seed.shard}:last:rawBread`,
     statsKey: `zap:${seed.shard}:stats`,
     markkey: `zap:${seed.shard}:mark`,
+    maxtkey: `zap:${seed.shard}:maxt`,
     lastsentmessagetimestamp: 'lastsentmessagetimestamp',
     lastdeltatimemessage: 'lastdeltatimemessage',
     totalsentmessage: 'totalsentmessage',

@@ -1,11 +1,14 @@
 const { MessageType, Presence } = require('@adiwajshing/baileys')
 const delay = require('./delay')
 
+const defaultMaxt = Number(process.env.MAXT) || 500
+
 const mkSendTextMessage = ({
   statsKey,
   totalsentmessage,
   lastRawKey,
   markkey,
+  maxtkey,
   panoptickey,
   lastsentmessagetimestamp,
   lastdeltatimemessage
@@ -16,7 +19,11 @@ const mkSendTextMessage = ({
 
   await seed.conn.chatRead(jid).catch(() => {})
   await seed.conn.updatePresence(jid, Presence.composing)
-  await delay(waittime)
+  // botar junto do delay a busca no redis pelo tempo minimo
+  const [maxt] = await Promise.all([
+    seed.redis.get(maxtkey),
+    delay(waittime)
+  ])
 
   const timestampStart = Date.now()
 
@@ -52,14 +59,35 @@ const mkSendTextMessage = ({
           to: WebMessageInfo.key.remoteJid.split('@s.whatsapp.net')[0],
           from: seed.shard,
           wid: WebMessageInfo.key.id,
-          mark
+          mark,
+          deltatime: String(deltatime)
         })
       }
+
       const pipeline = seed.redis.pipeline()
       pipeline.ltrim(lastRawKey, 0, -2)
       pipeline.hset(markkey, messageid, mark)
       pipeline.hset(statsKey, lastsentmessagetimestamp, timestampFinish)
       pipeline.hset(statsKey, lastdeltatimemessage, deltatime)
+
+      const maxDeltatime = Number(maxt) > 0 ? Number(maxt) : defaultMaxt
+      if (deltatime > maxDeltatime) {
+        const notifysentSlowNetwork = {
+          type: 'sendhook',
+          hardid: seed.hardid,
+          shard: seed.shard,
+          json: JSON.stringify({
+            type: 'slow-network',
+            timestamp: WebMessageInfo.messageTimestamp,
+            to: WebMessageInfo.key.remoteJid.split('@s.whatsapp.net')[0],
+            from: seed.shard,
+            deltatime: String(deltatime)
+          })
+        }
+
+        pipeline.publish(panoptickey, JSON.stringify(notifysentSlowNetwork))
+      }
+
       pipeline.hincrby(statsKey, totalsentmessage, 1)
       pipeline.publish(panoptickey, JSON.stringify(notifysent))
       await pipeline.exec()
