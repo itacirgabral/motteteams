@@ -28,5 +28,7 @@ module.exports = {
   sendaudiomessage: require('./sendaudiomessage'),
   sendimagemessage: require('./sendimagemessage'),
   sendmediamessage: require('./sendmediamessage'),
-  sendvideomessage: require('./sendvideomessage')
+  sendvideomessage: require('./sendvideomessage'),
+  maxtdelete: require('./maxtdelete'),
+  maxtpost: require('./maxtpost')
 }

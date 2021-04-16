@@ -20,6 +20,7 @@ const mkwebhookhistorykey = shard => `zap:${shard}:webhook:history`
 const mkchatskey = shard => `zap:${shard}:chats`
 const mkrawbreadkey = shard => `zap:${shard}:fifo:rawBread`
 const mkmarkcountkey = shard => `zap:${shard}:markcount`
+const mkmaxtkey = shard => `zap:${shard}:maxt`
 
 const redis = new Redis(redisConn)
 
@@ -47,6 +48,9 @@ app.get('/webhook', jwt2shard, router.webhookget({ redis, mkwebhookkey }))
 app.put('/webhook', jwt2shard, express.json(), router.webhookput({ redis, mkwebhookkey }))
 app.delete('/webhook', jwt2shard, router.webhookdelete({ redis, mkwebhookkey }))
 app.get('/webhook/history', jwt2shard, router.webhookhistory({ redis, mkwebhookhistorykey }))
+
+app.post('/maxt', jwt2shard, express.json(), router.maxtpost({ redis, mkmaxtkey }))
+app.delete('/maxt', jwt2shard, router.maxtdelete({ redis, mkmaxtkey }))
 
 app.get('/alreadytalkedto/:number', jwt2shard, router.alreadytalkedto({ redis }))
 app.post('/startnewchat', jwt2shard, express.json(), router.startnewchat({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
