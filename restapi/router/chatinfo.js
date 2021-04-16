@@ -1,9 +1,9 @@
 const chatinfo = ({ redis, mkchatskey, mkrawbreadkey }) => async (req, res) => {
   const shard = req.shard
-
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},chatinfo,to`)
-
   const id = req.body.id
+
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},chatinfo,${id}`)
+
   if ((Array.isArray(id) && id.length > 0)) {
     const deduplicated = Array.from(new Set(id))
     const pipeline = redis.pipeline()
