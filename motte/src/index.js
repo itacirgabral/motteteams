@@ -278,7 +278,7 @@ const trafficwand = async () => {
                 const { number, count = 1, wid } = leftover
                 const jid = `${number}@s.whatsapp.net`
 
-                const wids = await seed.conn.loadMessages(jid, count, { fromMe: false, id: wid })
+                const wids = await seed.conn.loadMessages(jid, count, { id: wid })
 
                 const pipeline = seed.redis.pipeline()
 
