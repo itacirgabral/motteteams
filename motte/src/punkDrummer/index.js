@@ -19,6 +19,7 @@ const punkDrummer = (seed) => {
       const wbi = JSON.parse(message)
       const wid = wbi.key.id
       const fromMe = wbi.key.fromMe
+      const isFromHistory = wbi.isFromHistory
       const remoteJid = wbi.key.remoteJid.split('@s.whatsapp.net')[0]
       const participant = wbi.participant
         ? wbi.participant.split('@s.whatsapp.net')[0]
@@ -59,7 +60,7 @@ const punkDrummer = (seed) => {
 
       const timestamp = wbi.messageTimestamp
 
-      if (!(from === 'status@broadcast' || fromMe)) {
+      if (from !== 'status@broadcast') {
         const conversation = wbi.message.conversation
         const quoteMsg = wbi.message.extendedTextMessage
         const location = wbi.message.locationMessage
@@ -91,6 +92,7 @@ const punkDrummer = (seed) => {
           author,
           isQuoted,
           isForwarded,
+          isFromHistory,
           seed,
           wbi,
           msg,

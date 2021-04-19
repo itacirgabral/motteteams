@@ -9,6 +9,7 @@ const switcher = async ({
   author,
   isQuoted,
   isForwarded,
+  isFromHistory,
   seed,
   wbi,
   msg,
@@ -32,6 +33,7 @@ const switcher = async ({
         msg,
         forwarded: isForwarded ? true : undefined,
         quoted: isQuoted ? quoteMsg.contextInfo.stanzaId : undefined,
+        isFromHistory,
         wid
       }
       break
@@ -44,6 +46,7 @@ const switcher = async ({
         from,
         forwarded: isForwarded ? true : undefined,
         quoted: isQuoted ? location.contextInfo.stanzaId : undefined,
+        isFromHistory,
         wid,
         description: location.address,
         latitude: location.degreesLatitude,
@@ -58,6 +61,7 @@ const switcher = async ({
         to,
         from,
         forwarded: isForwarded ? true : undefined,
+        isFromHistory,
         quoted: isQuoted ? contact.contextInfo.stanzaId : undefined,
         vcard: contact.vcard,
         wid
@@ -68,6 +72,7 @@ const switcher = async ({
         type,
         timestamp,
         from,
+        isFromHistory,
         to
       }
       break
@@ -78,6 +83,7 @@ const switcher = async ({
         timestamp,
         to,
         from,
+        isFromHistory,
         wid
       }
       break
@@ -93,6 +99,7 @@ const switcher = async ({
         caption: image.caption,
         forwarded: isForwarded ? true : undefined,
         quoted: isQuoted ? image.contextInfo.stanzaId : undefined,
+        isFromHistory,
         mimetype: image.mimetype,
         size: image.fileLength
       }
@@ -108,6 +115,7 @@ const switcher = async ({
         wid,
         forwarded: isForwarded ? true : undefined,
         quoted: isQuoted ? document.contextInfo.stanzaId : undefined,
+        isFromHistory,
         filename: document.fileName,
         mimetype: document.mimetype,
         size: document.fileLength
@@ -124,6 +132,7 @@ const switcher = async ({
         wid,
         forwarded: isForwarded ? true : undefined,
         quoted: isQuoted ? audio.contextInfo.stanzaId : undefined,
+        isFromHistory,
         seconds: audio.seconds,
         mimetype: audio.mimetype,
         size: audio.fileLength
@@ -140,6 +149,7 @@ const switcher = async ({
         wid,
         caption: video.caption,
         forwarded: isForwarded ? true : undefined,
+        isFromHistory,
         quoted: isQuoted ? video.contextInfo.stanzaId : undefined,
         seconds: video.seconds,
         loop: !!video.gifPlayback,

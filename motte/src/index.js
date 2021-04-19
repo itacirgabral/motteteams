@@ -285,6 +285,7 @@ const trafficwand = async () => {
                 wids
                   .messages
                   .map(m => m.toJSON())
+                  .map(m => ({ ...m, isFromHistory: true }))
                   .map(JSON.stringify)
                   .forEach(el => {
                     pipeline.publish(spreadkey, el)
