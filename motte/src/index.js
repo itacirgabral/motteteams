@@ -278,13 +278,21 @@ const trafficwand = async () => {
                 const { number, count = 1, wid } = leftover
                 const jid = `${number}@s.whatsapp.net`
 
-                const wids = await seed.conn.loadMessages(jid, count, { id: wid })
+                let messages
+                if (wid) {
+                  const wbis1 = await seed.conn.loadMessages(jid, count, { fromMe: false, id: wid })
+                  const wbis2 = await seed.conn.loadMessages(jid, count, { fromMe: true, id: wid })
+
+                  messages = wbis1.messages
+                    .concat(wbis2.messages)
+                    .map(message => message.toJSON())
+                } else {
+                  const loaded = await seed.conn.loadMessages(jid, count)
+                  messages = loaded.messages.map(message => message.toJSON())
+                }
 
                 const pipeline = seed.redis.pipeline()
-
-                wids
-                  .messages
-                  .map(m => m.toJSON())
+                messages
                   .map(m => ({ ...m, isFromHistory: true }))
                   .map(JSON.stringify)
                   .forEach(el => {
