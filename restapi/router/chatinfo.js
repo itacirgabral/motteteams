@@ -22,19 +22,21 @@ const chatinfo = ({ redis, mkchatskey, mkrawbreadkey }) => async (req, res) => {
       id: prebreads
     })
 
-    await redis.lpush(mkrawbreadkey(shard), prebreads.map(id => {
+    const pipeline2 = redis.pipeline()
+    prebreads.forEach(id => {
       if (id.indexOf('-') === -1) {
-        return {
+        pipeline2.lpush(mkrawbreadkey(shard), JSON.stringify({
           type: 'contactInfo_v001',
           jid: `${id}@s.whatsapp.net`
-        }
+        }))
       } else {
-        return {
+        pipeline2.lpush(mkrawbreadkey(shard), JSON.stringify({
           type: 'groupInfo_v001',
           jid: `${id}@g.us`
-        }
+        }))
       }
-    }).map(el => JSON.stringify(el)))
+    })
+    pipeline2.exec()
   } else {
     res.status(400).end()
   }
