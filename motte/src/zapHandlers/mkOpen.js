@@ -1,5 +1,3 @@
-const fetch = require('node-fetch')
-
 /**
  * when the connection has opened successfully
  * on (event: 'open', listener: (result: WAOpenResult) => void): this
@@ -23,7 +21,6 @@ const open = (seed) => {
     pipeline.del(closereasonkey)// 4
     pipeline.publish(panoptickey, breadQueue)
     pipeline.publish(panoptickey, breadSpread)
-
 
     const notifysent = {
       type: 'sendhook',

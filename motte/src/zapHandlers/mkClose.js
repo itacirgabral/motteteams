@@ -1,5 +1,3 @@
-const fetch = require('node-fetch')
-
 /**
  * when the connection has closed
  * on (event: 'close', listener: (err: {reason?: DisconnectReason | string, isReconnecting: boolean}) => void): this
@@ -20,6 +18,8 @@ const close = (seed) => {
     pipeline.get(webhookKey)// 2
     pipeline.publish(newsKey, json)// 3
 
+    const d = new Date()
+
     const notifysent = {
       type: 'sendhook',
       hardid: seed.hardid,
@@ -27,7 +27,8 @@ const close = (seed) => {
       json: JSON.stringify({
         type: 'closed',
         shard: seed.shard,
-        reason: err.reason
+        reason: err.reason,
+        time: d.toLocaleTimeString()
       })
     }
     pipeline.publish(panoptickey, JSON.stringify(notifysent))
