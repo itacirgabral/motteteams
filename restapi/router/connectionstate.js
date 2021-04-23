@@ -1,6 +1,6 @@
 const connectionstate = ({ redis, hardid, panoptickey }) => (req, res) => {
   const shard = req.shard
-
+  const blockingRedis = redis.duplicate()
   console.log(`${(new Date()).toLocaleTimeString()},${shard},connectionstate,to`)
 
   const cacapa = `zap:${shard}:cacapa_${Math.random()}`
@@ -11,13 +11,21 @@ const connectionstate = ({ redis, hardid, panoptickey }) => (req, res) => {
     cacapa
   })
 
-  redis.publish(panoptickey, bread)
-    .catch(() => {
+  blockingRedis.blpop(cacapa, 20)
+    .catch(err => {
+      console.error(err)
       res.status(500).end()
+
+      return false
     })
-    .then(() => {
-      res.status(200).json({ type: 'connectionstate' })
+    .then(el => {
+      if (el) {
+        const connectionstate = JSON.parse(el[1])
+        res.status(200).json(connectionstate)
+      }
     })
+
+  redis.publish(panoptickey, bread)
 }
 
 module.exports = connectionstate
