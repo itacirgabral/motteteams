@@ -3,7 +3,7 @@ const connectionstate = ({ redis, hardid, panoptickey }) => (req, res) => {
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},connectionstate,to`)
 
-  const cacapa = `zap:shard:cacapa_${Math.random()}`
+  const cacapa = `zap:${shard}:cacapa_${Math.random()}`
   const bread = JSON.stringify({
     hardid,
     type: 'connectionstate',
