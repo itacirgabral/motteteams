@@ -257,7 +257,13 @@ const trafficwand = async () => {
                   })
                 }
 
-                await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
+                const pipeline = speaker.pipeline()
+                pipeline.publish(panoptickey, JSON.stringify(notifysent))
+                pipeline.rpush(leftover.cacapa, JSON.stringify({
+                  type: 'connectionstate',
+                  state
+                }))
+                await pipeline.exec()
               } else {
                 const notifysent = {
                   type: 'sendhook',
@@ -268,7 +274,14 @@ const trafficwand = async () => {
                     state: 'trashed'
                   })
                 }
-                await speaker.publish(panoptickey, JSON.stringify(notifysent))
+
+                const pipeline = speaker.pipeline()
+                pipeline.publish(panoptickey, JSON.stringify(notifysent))
+                pipeline.rpush(leftover.cacapa, JSON.stringify({
+                  type: 'connectionstate',
+                  state: 'trashed'
+                }))
+                await pipeline.exec()
               }
               break
             case 'loadmessages':
