@@ -4,7 +4,7 @@ const sendtextmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) =
   const quote = req.query.quote
   const msg = req.body.msg
 
-  console.log(`${(new Date()).toLocaleTimeString()},${shard},sendtextmessage,${to}`)
+  console.log(`${(new Date()).toLocaleTimeString()},${shard},sendtextmessage,${to},${msg}`)
 
   if (to && msg) {
     const jid = to.indexOf('-') === -1
