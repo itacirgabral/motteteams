@@ -14,7 +14,7 @@ const chatNew = (seed) => {
     pipeline.lpush(logKey, json)// 0
     pipeline.ltrim(logKey, 0, 999)// 1
 
-    const [number, host] = chat.jid.split('@')[0]
+    const [number, host] = chat.jid.split('@')
     if (interestingupdates.includes(host)) {
       pipeline.sadd(chatsKeys, number)
     }
