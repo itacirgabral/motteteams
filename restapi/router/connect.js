@@ -1,33 +1,49 @@
-const connect = ({ redis, mkcredskey, hardid, panoptickey }) => async (req, res) => {
+const stunttl = 60
+
+const connect = ({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey }) => async (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},connect,to`)
 
   const typeDisconnect = 'disconnectsilent'
+  const connstunkey = mkconnstunkey(shard)
   const bread = JSON.stringify({ hardid, type: typeDisconnect, shard })
 
-  const credsExists = await redis.exists(mkcredskey(shard))
+  const pipeline = redis.pipeline()
+  pipeline.exists(mkcredskey(shard)) // 0
+  pipeline.exists(connstunkey) // 1
 
-  if (credsExists) {
+  const [[, credsExists], [, connstun]] = await pipeline.exec()
+
+  if (credsExists && !connstun) {
+    // disconnect
     redis.publish(panoptickey, bread)
       .catch(() => {
         res.status(500).end()
       })
       .then(() => {
-        setTimeout(() => {
-          const typeConnect = 'connect'
-          const bread = JSON.stringify({ hardid, type: typeConnect, shard })
-          redis.publish(panoptickey, bread)
-            .catch(() => {
-              res.status(500).end()
-            })
-            .then(() => {
-              res.status(200).json({ type: typeConnect, shard })
-            })
-        }, 500)
+        const typeConnect = 'connect'
+        const bread = JSON.stringify({ hardid, type: typeConnect, shard })
+
+        const pipeline2 = redis.pipeline()
+        pipeline2.set(connstunkey, true, 'EX', stunttl)
+        pipeline2.publish(panoptickey, bread)
+
+        // connect && stun
+        pipeline2.exec()
+          .catch(() => {
+            res.status(500).end()
+          })
+          .then(() => {
+            res.status(200).json({ type: typeConnect, shard })
+          })
       })
   } else {
-    res.status(400).json({ type: 'connect', shard, reason: 'invalid_session' })
+    res.status(400).json({
+      type: 'connect',
+      shard,
+      reason: connstun ? 'stunning' : 'invalid_session'
+    })
   }
 }
 
