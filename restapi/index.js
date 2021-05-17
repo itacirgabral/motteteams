@@ -67,8 +67,7 @@ app.get('/disconnect', jwt2shard, router.disconnect({ redis, hardid, panoptickey
 app.get('/queuerestart', jwt2shard, router.queuerestart({ redis, hardid, panoptickey }))
 app.get('/queuesize', jwt2shard, router.queuesize({ redis, mkrawbreadkey }))
 app.get('/cleanqueue', jwt2shard, router.cleanqueue({ redis, mkrawbreadkey }))
-
-app.post('/loadmessages', jwt2shard, express.json(), router.loadmessages({ redis, hardid, panoptickey }))
+app.post('/loadmessages', jwt2shard, express.json(), router.loadmessages({ redis, mkchatskey, mkrawbreadkey }))
 
 try {
   https.createServer({
