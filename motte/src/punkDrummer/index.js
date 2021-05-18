@@ -20,6 +20,7 @@ const punkDrummer = (seed) => {
       const wid = wbi.key.id
       const fromMe = wbi.key.fromMe
       const isFromHistory = wbi.isFromHistory
+      const isFromCheckin = wbi.isFromCheckin
       const remoteJid = wbi.key.remoteJid.split('@s.whatsapp.net')[0]
       const participant = wbi.participant
         ? wbi.participant.split('@s.whatsapp.net')[0]
@@ -93,6 +94,7 @@ const punkDrummer = (seed) => {
           isQuoted,
           isForwarded,
           isFromHistory,
+          isFromCheckin,
           seed,
           wbi,
           msg,
