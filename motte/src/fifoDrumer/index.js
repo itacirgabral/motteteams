@@ -10,6 +10,8 @@ const mkSendVideoMessage = require('./mkSendVideoMessage')
 const mkContactInfo = require('./mkContactInfo')
 const mkGroupInfo = require('./mkGroupInfo')
 const mkEraseMessage = require('./mkEraseMessage')
+const mkLoadMessages = require('./mkLoadMessages')
+const mkCheckIn = require('./mkCheckIn')
 
 /*
 ** Fee-fi-fo-fum,
@@ -25,6 +27,8 @@ const fifoDrumer = (seed) => {
     statsKey: `zap:${seed.shard}:stats`,
     markkey: `zap:${seed.shard}:mark`,
     maxtkey: `zap:${seed.shard}:maxt`,
+    spreadkey: `zap:${seed.shard}:spread`,
+    checkinkey: `zap:${seed.shard}:checkin`,
     lastsentmessagetimestamp: 'lastsentmessagetimestamp',
     lastdeltatimemessage: 'lastdeltatimemessage',
     totalsentmessage: 'totalsentmessage',
@@ -43,6 +47,8 @@ const fifoDrumer = (seed) => {
   const contactInfo = mkContactInfo(keys)
   const groupInfo = mkGroupInfo(keys)
   const eraseMessage = mkEraseMessage(keys)
+  const loadMessages = mkLoadMessages(keys)
+  const checkIn = mkCheckIn(keys)
 
   const healthcare = {
     playing: true,
@@ -140,6 +146,20 @@ const fifoDrumer = (seed) => {
             break
           case 'eraseMessage_v001':
             await eraseMessage({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
+                healthcare.playing = false
+              })
+            break
+          case 'loadMessages_v001':
+            await loadMessages({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
+                healthcare.playing = false
+              })
+            break
+          case 'checkin_v001':
+            await checkIn({ crumb, seed, healthcare })
               .catch(err => {
                 console.error(err)
                 healthcare.playing = false

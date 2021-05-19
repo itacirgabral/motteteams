@@ -6,8 +6,7 @@ const contactsReceived = (seed) => {
   const panoptickey = 'zap:panoptic'
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
-
-  const n = 0
+  const checkinkey = `zap:${seed.shard}:checkin`
 
   return async () => {
     const json = JSON.stringify({ event: 'contacts-received', data: null })
@@ -17,33 +16,32 @@ const contactsReceived = (seed) => {
     pipeline.publish(newsKey, json)
     await pipeline.exec()
 
-    setTimeout(() => {
-      const checkin = seed.conn.chats.array.map((el, idx) => {
-        const r = {}
-        r.chat = el.jid.split('@')[0]
-        r.name = el.name
+    const checkinloop = () => {
+      if (seed.conn.chats.array.length !== 0) {
+        const pipeline = seed.redis.pipeline()
+        const checkin = seed.conn.chats.array
+          .filter(el => el.count)
+          .map(({ jid, count }) => ({
+            jid,
+            count
+          }))
 
-        if (el.messages.array[0]?.key?.id) {
-          const wid = el.messages.array[0].key.id
-          r.wid = wid
-        }
+        pipeline.set(checkinkey, JSON.stringify(checkin))
 
-        return r
-      })
-        .filter(el => !!el.wid)
+        // libera o punk drummer
+        const breadSpread = JSON.stringify({ hardid: seed.hardid, type: 'spreadrestart', shard: seed.shard })
+        pipeline.publish(panoptickey, breadSpread)
 
-      const notifysent = {
-        type: 'sendhook',
-        hardid: seed.hardid,
-        shard: seed.shard,
-        json: JSON.stringify({
-          type: 'checkin',
-          shard: seed.shard,
-          checkin
-        })
+        // liga o baterista
+        const breadQueue = JSON.stringify({ hardid: seed.hardid, type: 'queuerestart', shard: seed.shard })
+        pipeline.publish(panoptickey, breadQueue)
+
+        pipeline.exec()
+      } else {
+        setTimeout(checkinloop, 100)
       }
-      seed.redis.publish(panoptickey, JSON.stringify(notifysent))
-    }, 5_000)
+    }
+    checkinloop()
   }
 }
 

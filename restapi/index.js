@@ -62,13 +62,12 @@ app.post('/signupconnection', jwt2shard, express.json(), router.signupconnection
 app.get('/connect', jwt2shard, router.connect({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey }))
 app.get('/stats', jwt2shard, router.stats({ redis }))
 app.get('/connectionstate', jwt2shard, router.connectionstate({ redis, hardid, panoptickey }))
-app.get('/spreadrestart', jwt2shard, router.spreadrestart({ redis, hardid, panoptickey }))
+app.get('/spreadrestart', jwt2shard, router.spreadrestart({ redis, hardid, mkconnstunkey, panoptickey }))
 app.get('/disconnect', jwt2shard, router.disconnect({ redis, hardid, panoptickey }))
-app.get('/queuerestart', jwt2shard, router.queuerestart({ redis, hardid, panoptickey }))
+app.get('/queuerestart', jwt2shard, router.queuerestart({ redis, hardid, mkconnstunkey, panoptickey }))
 app.get('/queuesize', jwt2shard, router.queuesize({ redis, mkrawbreadkey }))
 app.get('/cleanqueue', jwt2shard, router.cleanqueue({ redis, mkrawbreadkey }))
-
-app.post('/loadmessages', jwt2shard, express.json(), router.loadmessages({ redis, hardid, panoptickey }))
+app.post('/loadmessages', jwt2shard, express.json(), router.loadmessages({ redis, mkchatskey, mkrawbreadkey }))
 
 try {
   https.createServer({

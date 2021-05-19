@@ -1,17 +1,27 @@
-const queuerestart = ({ redis, hardid, panoptickey }) => (req, res) => {
+const queuerestart = ({ redis, hardid, mkconnstunkey, panoptickey }) => async (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},queuerestart,to`)
 
-  const bread = JSON.stringify({ hardid, type: 'queuerestart', shard })
+  const connstunkey = mkconnstunkey(shard)
+  const connstun = await redis.exists(connstunkey)
 
-  redis.publish(panoptickey, bread)
-    .catch(() => {
-      res.status(500).end()
+  if (!connstun) {
+    const bread = JSON.stringify({ hardid, type: 'queuerestart', shard })
+    redis.publish(panoptickey, bread)
+      .catch(() => {
+        res.status(500).end()
+      })
+      .then(() => {
+        res.status(200).json({ type: 'queuerestart' })
+      })
+  } else {
+    res.status(200).json({
+      type: 'queuerestart',
+      shard,
+      reason: 'stunning'
     })
-    .then(() => {
-      res.status(200).json({ type: 'queuerestart' })
-    })
+  }
 }
 
 module.exports = queuerestart

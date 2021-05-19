@@ -1,17 +1,28 @@
-const spreadrestart = ({ redis, hardid, panoptickey }) => (req, res) => {
+const spreadrestart = ({ redis, hardid, mkconnstunkey, panoptickey }) => async (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},spreadrestart,to`)
 
-  const bread = JSON.stringify({ hardid, type: 'spreadrestart', shard })
+  const connstunkey = mkconnstunkey(shard)
+  const connstun = await redis.exists(connstunkey)
 
-  redis.publish(panoptickey, bread)
-    .catch(() => {
-      res.status(500).end()
+  if (!connstun) {
+    const bread = JSON.stringify({ hardid, type: 'spreadrestart', shard })
+
+    redis.publish(panoptickey, bread)
+      .catch(() => {
+        res.status(500).end()
+      })
+      .then(() => {
+        res.status(200).json({ type: 'spreadrestart' })
+      })
+  } else {
+    res.status(200).json({
+      type: 'spreadrestart',
+      shard,
+      reason: 'stunning'
     })
-    .then(() => {
-      res.status(200).json({ type: 'spreadrestart' })
-    })
+  }
 }
 
 module.exports = spreadrestart
