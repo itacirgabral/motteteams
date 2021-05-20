@@ -15,7 +15,7 @@ const mkSendTextMessage = ({
 }) => async ({ crumb, seed, healthcare }) => {
   const { jid, quote, msg, mark } = crumb
   const delta = msg.length
-  const waittime = delta > 50 ? 6000 : delta * 100 + 100
+  const waittime = delta > 20 ? 2100 : delta * 100 + 100
 
   await seed.conn.chatRead(jid).catch(() => {})
   await seed.conn.updatePresence(jid, Presence.composing)
