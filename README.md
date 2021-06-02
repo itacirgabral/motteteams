@@ -29,3 +29,5 @@ docker-compose up -d --build --force-recreate
 - [x] rota contatos info
 
 // conn.sendMessage(petzap, imagejpg, MessageType.image, { mimetype: Mimetype.jpeg, caption: `The fifo's drummer` })
+
+- https://github.com/JaniAnttonen/winston-loki/
