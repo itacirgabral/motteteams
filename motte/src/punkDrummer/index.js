@@ -4,7 +4,9 @@ const switcher = require('./switcher')
 const punkDrummer = (seed) => {
   const keys = {
     panoptickey: 'zap:panoptic',
-    spreadKey: `zap:${seed.shard}:spread`
+    spreadKey: `zap:${seed.shard}:spread`,
+    messageKey: `zap:${seed.shard}:message`,
+    messageAscKey: `zap:${seed.shard}:messageAsc`
   }
   const healthcare = {
     playing: true,
@@ -108,6 +110,16 @@ const punkDrummer = (seed) => {
           notification
         })
 
+        const pipeline =  await seed.redis.pipeline()
+
+        // hset zap:shard:message:wid ttl
+        // zset timestamp
+        if (file) {
+          console.dir(params)
+        } else {
+          console.dir(jsontosend)
+        }
+
         const hook = {
           type: 'sendhook',
           hardid: seed.hardid,
@@ -117,7 +129,9 @@ const punkDrummer = (seed) => {
           json: JSON.stringify(jsontosend)
         }
 
-        await seed.redis.publish(keys.panoptickey, JSON.stringify(hook))
+        pipeline.publish(keys.panoptickey, JSON.stringify(hook))
+
+        await pipeline.exec()
       }
     } else {
       seed.redisB.unsubscribe(keys.spreadKey)
