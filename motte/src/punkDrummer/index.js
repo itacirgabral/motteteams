@@ -1,6 +1,9 @@
 const sortingMessages = require('./sortingMessages')
 const switcher = require('./switcher')
 
+const second = 1
+const oneday = 24 * 60 * 60 * second
+
 const punkDrummer = (seed) => {
   const keys = {
     panoptickey: 'zap:panoptic',
@@ -110,14 +113,18 @@ const punkDrummer = (seed) => {
           notification
         })
 
-        const pipeline =  await seed.redis.pipeline()
+        const pipeline = await seed.redis.pipeline()
 
-        // hset zap:shard:message:wid ttl
-        // zset timestamp
         if (file) {
-          console.dir(params)
+          const msgid = `${keys.messageKey}:${params.wid}`
+          pipeline.setnx(msgid, JSON.stringify(params))
+          pipeline.expire(msgid, oneday)
+          pipeline.zadd(keys.messageAscKey, 'NX', params.timestamp, params.wid)
         } else {
-          console.dir(jsontosend)
+          const msgid = `${keys.messageKey}:${jsontosend.wid}`
+          pipeline.setnx(msgid, JSON.stringify(jsontosend))
+          pipeline.expire(msgid, oneday)
+          pipeline.zadd(keys.messageAscKey, 'NX', jsontosend.timestamp, jsontosend.wid)
         }
 
         const hook = {
