@@ -1,10 +1,15 @@
 const sortingMessages = require('./sortingMessages')
 const switcher = require('./switcher')
 
+const second = 1
+const oneday = 24 * 60 * 60 * second
+
 const punkDrummer = (seed) => {
   const keys = {
     panoptickey: 'zap:panoptic',
-    spreadKey: `zap:${seed.shard}:spread`
+    spreadKey: `zap:${seed.shard}:spread`,
+    messageKey: `zap:${seed.shard}:message`,
+    messageAscKey: `zap:${seed.shard}:messageAsc`
   }
   const healthcare = {
     playing: true,
@@ -108,6 +113,20 @@ const punkDrummer = (seed) => {
           notification
         })
 
+        const pipeline = await seed.redis.pipeline()
+
+        if (file) {
+          const msgid = `${keys.messageKey}:${params.wid}`
+          pipeline.setnx(msgid, JSON.stringify(params))
+          pipeline.expire(msgid, oneday)
+          pipeline.zadd(keys.messageAscKey, 'NX', params.timestamp, params.wid)
+        } else {
+          const msgid = `${keys.messageKey}:${jsontosend.wid}`
+          pipeline.setnx(msgid, JSON.stringify(jsontosend))
+          pipeline.expire(msgid, oneday)
+          pipeline.zadd(keys.messageAscKey, 'NX', jsontosend.timestamp, jsontosend.wid)
+        }
+
         const hook = {
           type: 'sendhook',
           hardid: seed.hardid,
@@ -117,7 +136,9 @@ const punkDrummer = (seed) => {
           json: JSON.stringify(jsontosend)
         }
 
-        await seed.redis.publish(keys.panoptickey, JSON.stringify(hook))
+        pipeline.publish(keys.panoptickey, JSON.stringify(hook))
+
+        await pipeline.exec()
       }
     } else {
       seed.redisB.unsubscribe(keys.spreadKey)
