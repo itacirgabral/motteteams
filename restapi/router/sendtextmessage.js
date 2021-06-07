@@ -3,6 +3,7 @@ const sendtextmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mkt
   const to = req.body.to
   const quote = req.query.quote
   const msg = req.body.msg
+  const tskey = mktskey({ shard, route: 'allchats'})
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendtextmessage,${to}`)
 

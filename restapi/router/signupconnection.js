@@ -1,4 +1,5 @@
 const signupconnection = ({ redis, hardid, panoptickey, mktskey }) => (req, res) => {
+  const tskey = mktskey({ shard: '000000000000', route: 'allchats'})
   console.log(`${(new Date()).toLocaleTimeString()},000000000000,signupconnection,to`)
 
   if (req.body.url) {

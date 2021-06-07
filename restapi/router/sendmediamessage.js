@@ -10,6 +10,7 @@ const sendmediamessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mk
   const link = req.body.link
   const quote = req.query.quote
   const caption = req.query.caption
+  const tskey = mktskey({ shard, route: 'allchats'})
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendmediamessage,${to}`)
 

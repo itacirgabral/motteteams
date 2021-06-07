@@ -1,6 +1,8 @@
 const connectionstate = ({ redis, hardid, panoptickey, mktskey }) => (req, res) => {
   const shard = req.shard
   const blockingRedis = redis.duplicate()
+  const tskey = mktskey({ shard, route: 'allchats'})
+
   console.log(`${(new Date()).toLocaleTimeString()},${shard},connectionstate,to`)
 
   const cacapa = `zap:${shard}:cacapa_${Math.random()}`

@@ -1,5 +1,6 @@
 const queuesize = ({ redis, hardid, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
+  const tskey = mktskey({ shard, route: 'allchats'})
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},queuesize,to`)
 

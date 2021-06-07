@@ -1,5 +1,6 @@
 const chatinfo = ({ redis, mkchatskey, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
+  const tskey = mktskey({ shard, route: 'allchats'})
   const id = req.body.id
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},chatinfo,${id}`)

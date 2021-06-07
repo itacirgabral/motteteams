@@ -2,6 +2,7 @@ const fs = require('fs')
 
 const sendaudiomessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
+  const tskey = mktskey({ shard, route: 'allchats'})
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendaudiomessage,to`)
 

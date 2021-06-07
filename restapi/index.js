@@ -22,7 +22,7 @@ const mkchatskey = shard => `zap:${shard}:chats`
 const mkrawbreadkey = shard => `zap:${shard}:fifo:rawBread`
 const mkmarkcountkey = shard => `zap:${shard}:markcount`
 const mkmaxtkey = shard => `zap:${shard}:maxt`
-const mktskey = ({ shard, type }) => `zap:${shard}:ts:${type}`
+const mktskey = ({ shard, route }) => `zap:${shard}:ts:${route}`
 
 const redis = new Redis(redisConn)
 

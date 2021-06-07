@@ -1,6 +1,7 @@
 const maxtpost = ({ redis, mkmaxtkey, mktskey }) => (req, res) => {
   const maxt = String(req.body.maxt)
   const shard = req.shard
+  const tskey = mktskey({ shard, route: 'allchats'})
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookpost,to`)
 

@@ -1,6 +1,7 @@
 const webhookpost = ({ redis, mkwebhookkey, mktskey }) => (req, res) => {
   const webhook = req.body.webhook
   const shard = req.shard
+  const tskey = mktskey({ shard, route: 'allchats'})
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookpost,to`)
 

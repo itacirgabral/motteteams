@@ -5,6 +5,7 @@ const sendlocationmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey,
   const description = req.body.description
   const latitude = req.body.latitude
   const longitude = req.body.longitude
+  const tskey = mktskey({ shard, route: 'allchats'})
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendlocationmessage,${to}`)
 

@@ -1,5 +1,6 @@
 const queuerestart = ({ redis, hardid, mkconnstunkey, panoptickey, mktskey }) => async (req, res) => {
   const shard = req.shard
+  const tskey = mktskey({ shard, route: 'allchats'})
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},queuerestart,to`)
 
