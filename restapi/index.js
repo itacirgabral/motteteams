@@ -22,6 +22,7 @@ const mkchatskey = shard => `zap:${shard}:chats`
 const mkrawbreadkey = shard => `zap:${shard}:fifo:rawBread`
 const mkmarkcountkey = shard => `zap:${shard}:markcount`
 const mkmaxtkey = shard => `zap:${shard}:maxt`
+const mktskey = ({ shard, type }) => `zap:${shard}:ts:${type}`
 
 const redis = new Redis(redisConn)
 
@@ -31,43 +32,43 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.post('/sendtextmessage', jwt2shard, express.json(), router.sendtextmessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
-app.post('/sendlocationmessage', jwt2shard, express.json(), router.sendlocationmessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
-app.post('/sendcontactmessage', jwt2shard, express.json(), router.sendcontactmessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
+app.post('/sendtextmessage', jwt2shard, express.json(), router.sendtextmessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }))
+app.post('/sendlocationmessage', jwt2shard, express.json(), router.sendlocationmessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }))
+app.post('/sendcontactmessage', jwt2shard, express.json(), router.sendcontactmessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }))
 
-app.post('/forwardmessage', jwt2shard, express.json(), router.forwardmessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
-app.post('/erasemessage', jwt2shard, express.json(), router.erasemessage({ redis, mkchatskey, mkrawbreadkey }))
+app.post('/forwardmessage', jwt2shard, express.json(), router.forwardmessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }))
+app.post('/erasemessage', jwt2shard, express.json(), router.erasemessage({ redis, mkchatskey, mkrawbreadkey, mktskey }))
 
-app.post('/senddocumentmessage/:to', jwt2shard, router.senddocumentmessage({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
-app.post('/sendaudiomessage/:to', jwt2shard, router.sendaudiomessage({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
-app.post('/sendimagemessage/:to', jwt2shard, router.sendimagemessage({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
-app.post('/sendvideomessage/:to', jwt2shard, router.sendvideomessage({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
-app.post('/sendmediamessage', jwt2shard, express.json(), router.sendmediamessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
+app.post('/senddocumentmessage/:to', jwt2shard, router.senddocumentmessage({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }))
+app.post('/sendaudiomessage/:to', jwt2shard, router.sendaudiomessage({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }))
+app.post('/sendimagemessage/:to', jwt2shard, router.sendimagemessage({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }))
+app.post('/sendvideomessage/:to', jwt2shard, router.sendvideomessage({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }))
+app.post('/sendmediamessage', jwt2shard, express.json(), router.sendmediamessage({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }))
 
-app.post('/webhook', jwt2shard, express.json(), router.webhookpost({ redis, mkwebhookkey }))
-app.get('/webhook', jwt2shard, router.webhookget({ redis, mkwebhookkey }))
-app.put('/webhook', jwt2shard, express.json(), router.webhookput({ redis, mkwebhookkey }))
-app.delete('/webhook', jwt2shard, router.webhookdelete({ redis, mkwebhookkey }))
-app.get('/webhook/history', jwt2shard, router.webhookhistory({ redis, mkwebhookhistorykey }))
+app.post('/webhook', jwt2shard, express.json(), router.webhookpost({ redis, mkwebhookkey, mktskey }))
+app.get('/webhook', jwt2shard, router.webhookget({ redis, mkwebhookkey, mktskey }))
+app.put('/webhook', jwt2shard, express.json(), router.webhookput({ redis, mkwebhookkey, mktskey }))
+app.delete('/webhook', jwt2shard, router.webhookdelete({ redis, mkwebhookkey, mktskey }))
+app.get('/webhook/history', jwt2shard, router.webhookhistory({ redis, mkwebhookhistorykey, mktskey }))
 
-app.post('/maxt', jwt2shard, express.json(), router.maxtpost({ redis, mkmaxtkey }))
-app.delete('/maxt', jwt2shard, router.maxtdelete({ redis, mkmaxtkey }))
+app.post('/maxt', jwt2shard, express.json(), router.maxtpost({ redis, mkmaxtkey, mktskey }))
+app.delete('/maxt', jwt2shard, router.maxtdelete({ redis, mkmaxtkey, mktskey }))
 
-app.get('/alreadytalkedto/:number', jwt2shard, router.alreadytalkedto({ redis }))
-app.post('/startnewchat', jwt2shard, express.json(), router.startnewchat({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }))
-app.get('/allchats', jwt2shard, router.allchats({ redis, mkchatskey }))
-app.post('/chatinfo', jwt2shard, express.json(), router.chatinfo({ redis, mkchatskey, mkrawbreadkey }))
+app.get('/alreadytalkedto/:number', jwt2shard, router.alreadytalkedto({ redis, mktskey }))
+app.post('/startnewchat', jwt2shard, express.json(), router.startnewchat({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }))
+app.get('/allchats', jwt2shard, router.allchats({ redis, mkchatskey, mktskey }))
+app.post('/chatinfo', jwt2shard, express.json(), router.chatinfo({ redis, mkchatskey, mkrawbreadkey, mktskey }))
 
-app.post('/signupconnection', jwt2shard, express.json(), router.signupconnection({ redis, hardid, panoptickey }))
-app.get('/connect', jwt2shard, router.connect({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey }))
-app.get('/stats', jwt2shard, router.stats({ redis }))
-app.get('/connectionstate', jwt2shard, router.connectionstate({ redis, hardid, panoptickey }))
-app.get('/spreadrestart', jwt2shard, router.spreadrestart({ redis, hardid, mkconnstunkey, panoptickey }))
-app.get('/disconnect', jwt2shard, router.disconnect({ redis, hardid, panoptickey }))
-app.get('/queuerestart', jwt2shard, router.queuerestart({ redis, hardid, mkconnstunkey, panoptickey }))
-app.get('/queuesize', jwt2shard, router.queuesize({ redis, mkrawbreadkey }))
-app.get('/cleanqueue', jwt2shard, router.cleanqueue({ redis, mkrawbreadkey }))
-app.post('/loadmessages', jwt2shard, express.json(), router.loadmessages({ redis, mkchatskey, mkrawbreadkey }))
+app.post('/signupconnection', jwt2shard, express.json(), router.signupconnection({ redis, hardid, panoptickey, mktskey }))
+app.get('/connect', jwt2shard, router.connect({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey, mktskey }))
+app.get('/stats', jwt2shard, router.stats({ redis, mktskey }))
+app.get('/connectionstate', jwt2shard, router.connectionstate({ redis, hardid, panoptickey, mktskey }))
+app.get('/spreadrestart', jwt2shard, router.spreadrestart({ redis, hardid, mkconnstunkey, panoptickey, mktskey }))
+app.get('/disconnect', jwt2shard, router.disconnect({ redis, hardid, panoptickey, mktskey }))
+app.get('/queuerestart', jwt2shard, router.queuerestart({ redis, hardid, mkconnstunkey, panoptickey, mktskey }))
+app.get('/queuesize', jwt2shard, router.queuesize({ redis, mkrawbreadkey, mktskey }))
+app.get('/cleanqueue', jwt2shard, router.cleanqueue({ redis, mkrawbreadkey, mktskey }))
+app.post('/loadmessages', jwt2shard, express.json(), router.loadmessages({ redis, mkchatskey, mkrawbreadkey, mktskey }))
 
 try {
   https.createServer({
