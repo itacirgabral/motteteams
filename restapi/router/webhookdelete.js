@@ -1,4 +1,4 @@
-const webhookdelete = ({ redis, mkwebhookkey }) => (req, res) => {
+const webhookdelete = ({ redis, mkwebhookkey, mktskey }) => (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookdelete,to`)

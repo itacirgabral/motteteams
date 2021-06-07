@@ -1,6 +1,6 @@
 const stunttl = 60
 
-const connect = ({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey }) => async (req, res) => {
+const connect = ({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey, mktskey }) => async (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},connect,to`)

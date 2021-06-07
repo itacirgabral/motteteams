@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-const sendaudiomessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+const sendaudiomessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendaudiomessage,to`)

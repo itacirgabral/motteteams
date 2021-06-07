@@ -1,4 +1,4 @@
-const connectionstate = ({ redis, hardid, panoptickey }) => (req, res) => {
+const connectionstate = ({ redis, hardid, panoptickey, mktskey }) => (req, res) => {
   const shard = req.shard
   const blockingRedis = redis.duplicate()
   console.log(`${(new Date()).toLocaleTimeString()},${shard},connectionstate,to`)

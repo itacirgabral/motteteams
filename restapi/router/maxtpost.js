@@ -1,4 +1,4 @@
-const maxtpost = ({ redis, mkmaxtkey }) => (req, res) => {
+const maxtpost = ({ redis, mkmaxtkey, mktskey }) => (req, res) => {
   const maxt = String(req.body.maxt)
   const shard = req.shard
 

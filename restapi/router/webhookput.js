@@ -1,4 +1,4 @@
-const webhookput = ({ redis, mkwebhookkey }) => (req, res) => {
+const webhookput = ({ redis, mkwebhookkey, mktskey }) => (req, res) => {
   const webhook = req.body.webhook
   const shard = req.shard
 

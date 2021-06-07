@@ -1,4 +1,4 @@
-const maxtdelete = ({ redis, mkmaxtkey }) => (req, res) => {
+const maxtdelete = ({ redis, mkmaxtkey, mktskey }) => (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookdelete,to`)

@@ -1,4 +1,4 @@
-const alreadytalkedto = ({ redis }) => (req, res) => {
+const alreadytalkedto = ({ redis, mktskey }) => (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},alreadytalkedto,to`)

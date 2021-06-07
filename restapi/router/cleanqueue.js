@@ -1,4 +1,4 @@
-const cleanqueue = ({ redis, hardid, mkrawbreadkey }) => async (req, res) => {
+const cleanqueue = ({ redis, hardid, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},cleanqueue,to`)

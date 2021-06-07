@@ -1,4 +1,4 @@
-const chatinfo = ({ redis, mkchatskey, mkrawbreadkey }) => async (req, res) => {
+const chatinfo = ({ redis, mkchatskey, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
   const id = req.body.id
 

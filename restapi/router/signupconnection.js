@@ -1,4 +1,4 @@
-const signupconnection = ({ redis, hardid, panoptickey }) => (req, res) => {
+const signupconnection = ({ redis, hardid, panoptickey, mktskey }) => (req, res) => {
   console.log(`${(new Date()).toLocaleTimeString()},000000000000,signupconnection,to`)
 
   if (req.body.url) {

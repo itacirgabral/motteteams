@@ -1,4 +1,4 @@
-const loadmessages = ({ redis, mkchatskey, mkrawbreadkey }) => async (req, res) => {
+const loadmessages = ({ redis, mkchatskey, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
   console.log(`${(new Date()).toLocaleTimeString()},${shard},loadmessages,to`)
 

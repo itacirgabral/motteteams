@@ -1,4 +1,4 @@
-const disconnect = ({ redis, hardid, panoptickey }) => (req, res) => {
+const disconnect = ({ redis, hardid, panoptickey, mktskey }) => (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},disconnect,to`)

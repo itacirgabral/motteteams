@@ -1,4 +1,4 @@
-const webhookhistory = ({ redis, mkwebhookhistorykey }) => (req, res) => {
+const webhookhistory = ({ redis, mkwebhookhistorykey, mktskey }) => (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookhistory,to`)

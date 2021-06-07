@@ -1,4 +1,4 @@
-const sendtextmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+const sendtextmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
   const to = req.body.to
   const quote = req.query.quote

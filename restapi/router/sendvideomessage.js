@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-const sendvideomessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+const sendvideomessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
   const to = req.params.to
   const loop = req.query.loop === 'true'

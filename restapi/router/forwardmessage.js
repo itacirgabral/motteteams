@@ -1,4 +1,4 @@
-const forwardmessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey }) => async (req, res) => {
+const forwardmessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},forwardmessage,to`)

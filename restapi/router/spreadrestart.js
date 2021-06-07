@@ -1,4 +1,4 @@
-const spreadrestart = ({ redis, hardid, mkconnstunkey, panoptickey }) => async (req, res) => {
+const spreadrestart = ({ redis, hardid, mkconnstunkey, panoptickey, mktskey }) => async (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},spreadrestart,to`)

@@ -1,4 +1,4 @@
-const stats = ({ redis }) => async (req, res) => {
+const stats = ({ redis, mktskey }) => async (req, res) => {
   const shard = req.shard
 
   console.log(`${(new Date()).toLocaleTimeString()},${shard},stats,to`)
