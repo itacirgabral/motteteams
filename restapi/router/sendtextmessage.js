@@ -5,7 +5,7 @@ const sendtextmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mkt
   const msg = req.body.msg
   const tskey = mktskey({ shard, route: 'sendtextmessage'})
 
-  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendtextmessage')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendtextmessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendtextmessage,${to}`)
 
   if (to && msg) {
