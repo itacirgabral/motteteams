@@ -2,7 +2,7 @@ const startnewchat = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktske
   const shard = req.shard
   const tskey = mktskey({ shard, route: 'startnewchat'})
 
-  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'startnewchat')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'startnewchat')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},startnewchat,to`)
 
   const to = req.body.to

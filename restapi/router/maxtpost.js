@@ -3,7 +3,7 @@ const maxtpost = ({ redis, mkmaxtkey, mktskey }) => (req, res) => {
   const shard = req.shard
   const tskey = mktskey({ shard, route: 'createmaxt'})
 
-  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'createmaxt')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'createmaxt')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},createmaxt,to`)
 
   if (maxt) {

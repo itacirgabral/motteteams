@@ -4,7 +4,7 @@ const connect = ({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey, mktske
   const shard = req.shard
   const tskey = mktskey({ shard, route: 'connect'})
 
-  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'connect')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'connect')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},connect,to`)
 
   const typeDisconnect = 'disconnectsilent'

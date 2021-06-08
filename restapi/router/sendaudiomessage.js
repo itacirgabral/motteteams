@@ -4,7 +4,7 @@ const sendaudiomessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbr
   const shard = req.shard
   const tskey = mktskey({ shard, route: 'sendaudiomessage'})
 
-  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendaudiomessage')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendaudiomessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendaudiomessage,to`)
 
   const to = req.params.to

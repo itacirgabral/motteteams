@@ -5,7 +5,7 @@ const sendcontactmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, 
   const vcard = req.body.vcard
   const tskey = mktskey({ shard, route: 'sendcontactmessage'})
 
-  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendcontactmessage')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendcontactmessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendcontactmessage,${to}`)
 
   if (to && vcard) {

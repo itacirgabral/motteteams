@@ -2,7 +2,7 @@ const spreadrestart = ({ redis, hardid, mkconnstunkey, panoptickey, mktskey }) =
   const shard = req.shard
   const tskey = mktskey({ shard, route: 'spreadrestart'})
 
-  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'spreadrestart')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'spreadrestart')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},spreadrestart,to`)
 
   const connstunkey = mkconnstunkey(shard)

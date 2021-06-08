@@ -12,7 +12,7 @@ const sendmediamessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mk
   const caption = req.query.caption
   const tskey = mktskey({ shard, route: 'sendmediamessage'})
 
-  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendmediamessage')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendmediamessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendmediamessage,${to}`)
 
   if (to && link) {

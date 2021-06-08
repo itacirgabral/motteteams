@@ -2,7 +2,7 @@ const loadmessages = ({ redis, mkchatskey, mkrawbreadkey, mktskey }) => async (r
   const shard = req.shard
   const tskey = mktskey({ shard, route: 'loadmessages'})
 
-  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'loadmessages')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'loadmessages')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},loadmessages,to`)
 
   const number = req.body.number
