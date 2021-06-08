@@ -1,7 +1,8 @@
 const disconnect = ({ redis, hardid, panoptickey, mktskey }) => (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'allchats'})
+  const tskey = mktskey({ shard, route: 'disconnect'})
 
+  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'disconnect')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},disconnect,to`)
 
   const type = 'disconnect'

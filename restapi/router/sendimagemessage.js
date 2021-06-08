@@ -6,8 +6,9 @@ const sendimagemessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbr
   const upload = uploader().single('file')
   const quote = req.query.quote
   const caption = req.query.caption
-  const tskey = mktskey({ shard, route: 'allchats'})
+  const tskey = mktskey({ shard, route: 'sendimagemessage'})
 
+  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendimagemessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendimagemessage,${to}`)
 
   upload(req, res, async (err) => {

@@ -1,7 +1,8 @@
 const webhookhistory = ({ redis, mkwebhookhistorykey, mktskey }) => (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'allchats'})
+  const tskey = mktskey({ shard, route: 'webhookhistory'})
 
+  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'webhookhistory')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookhistory,to`)
 
   redis.lrange(mkwebhookhistorykey(shard), 0, -1)

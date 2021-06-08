@@ -1,7 +1,8 @@
 const stats = ({ redis, mktskey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'allchats'})
+  const tskey = mktskey({ shard, route: 'stats'})
 
+  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'stats')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},stats,to`)
 
   const pipeline = redis.pipeline()

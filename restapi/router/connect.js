@@ -2,8 +2,9 @@ const stunttl = 60
 
 const connect = ({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey, mktskey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'allchats'})
+  const tskey = mktskey({ shard, route: 'connect'})
 
+  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'connect')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},connect,to`)
 
   const typeDisconnect = 'disconnectsilent'

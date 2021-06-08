@@ -1,8 +1,9 @@
 const webhookpost = ({ redis, mkwebhookkey, mktskey }) => (req, res) => {
   const webhook = req.body.webhook
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'allchats'})
+  const tskey = mktskey({ shard, route: 'webhookpost'})
 
+  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'webhookpost')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookpost,to`)
 
   if (webhook) {

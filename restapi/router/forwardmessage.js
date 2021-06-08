@@ -1,7 +1,8 @@
 const forwardmessage = ({ redis, mkcontactskey, mkmarkcountkey, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'allchats'})
+  const tskey = mktskey({ shard, route: 'forwardmessage'})
 
+  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'forwardmessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},forwardmessage,to`)
 
   const source = req.body.source

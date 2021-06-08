@@ -1,5 +1,7 @@
 const signupconnection = ({ redis, hardid, panoptickey, mktskey }) => (req, res) => {
-  const tskey = mktskey({ shard: '000000000000', route: 'allchats'})
+  const tskey = mktskey({ shard: '000000000000', route: 'signupconnection'})
+
+  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', '000000000000', 'route', 'signupconnection')
   console.log(`${(new Date()).toLocaleTimeString()},000000000000,signupconnection,to`)
 
   if (req.body.url) {

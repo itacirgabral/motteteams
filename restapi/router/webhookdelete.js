@@ -1,7 +1,8 @@
 const webhookdelete = ({ redis, mkwebhookkey, mktskey }) => (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'allchats'})
+  const tskey = mktskey({ shard, route: 'webhookdelete'})
 
+  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'webhookdelete')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookdelete,to`)
 
   const key = mkwebhookkey(shard)

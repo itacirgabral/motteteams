@@ -1,7 +1,8 @@
 const alreadytalkedto = ({ redis, mktskey }) => (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'allchats'})
+  const tskey = mktskey({ shard, route: 'alreadytalkedto'})
 
+  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'alreadytalkedto')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},alreadytalkedto,to`)
 
   if (req.params.number) {

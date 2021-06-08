@@ -1,8 +1,9 @@
 const chatinfo = ({ redis, mkchatskey, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'allchats'})
+  const tskey = mktskey({ shard, route: 'chatinfo'})
   const id = req.body.id
 
+  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'chatinfo')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},chatinfo,${id}`)
 
   if ((Array.isArray(id) && id.length > 0)) {

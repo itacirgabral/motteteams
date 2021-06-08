@@ -1,7 +1,8 @@
 const erasemessage = ({ redis, mkchatskey, mkrawbreadkey, mktskey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'allchats'})
+  const tskey = mktskey({ shard, route: 'erasemessage'})
 
+  redis.call('TS.ADD', tskey, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'erasemessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},erasemessage,to`)
 
   const to = String(req.body.to)
