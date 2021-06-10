@@ -122,7 +122,7 @@ const punkDrummer = (seed) => {
         } else {
           const msgid = `${keys.messageKey}:${jsontosend.wid}`
           pipeline.setnx(msgid, JSON.stringify(jsontosend))
-          pipeline.expire(msgid, oneday)
+          pipeline.expire(msgid, retention)
           pipeline.zadd(keys.messageAscKey, 'NX', jsontosend.timestamp, jsontosend.wid)
         }
 
