@@ -10,6 +10,7 @@ const close = (seed) => {
   const credsKey = `zap:${seed.shard}:creds`
   const closereasonkey = `zap:${seed.shard}:closereason`
   const checkinkey = `zap:${seed.shard}:checkin`
+  const tskey = `zap:${seed.shard}:ts:event:close`
 
   return async (err) => {
     const json = JSON.stringify({ event: 'close', data: err })
@@ -19,6 +20,7 @@ const close = (seed) => {
     pipeline.get(webhookKey)// 2
     pipeline.del(checkinkey)// 3
     pipeline.publish(newsKey, json)// 4
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'close')
 
     const d = new Date()
 

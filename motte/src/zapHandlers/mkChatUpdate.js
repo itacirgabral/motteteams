@@ -7,6 +7,7 @@
 const chatUpdate = (seed) => {
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
+  const tskey = `zap:${seed.shard}:ts:event:chat-update`
 
   return async (chat) => {
     const json = JSON.stringify({ event: 'chat-update', data: chat })
@@ -14,6 +15,7 @@ const chatUpdate = (seed) => {
     pipeline.lpush(logKey, json)
     pipeline.ltrim(logKey, 0, 999)
     pipeline.publish(newsKey, json)
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'chat-update')
     await pipeline.exec()
   }
 }

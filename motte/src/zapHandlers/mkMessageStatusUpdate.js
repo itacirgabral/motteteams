@@ -10,6 +10,7 @@ const messageStatusUpdate = (seed) => {
   const newsKey = `zap:${seed.shard}:news`
   const webhookkey = `zap:${seed.shard}:webhook`
   const markkey = `zap:${seed.shard}:mark`
+  const tskey = `zap:${seed.shard}:ts:event:message-status-update`
 
   const types = {
     2: 'sent',
@@ -24,6 +25,7 @@ const messageStatusUpdate = (seed) => {
     pipeline.ltrim(logKey, 0, 999)// 1
     pipeline.publish(newsKey, json)// 2
     pipeline.get(webhookkey)// 3
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'message-status-update')
 
     const isntGroup = message.to.indexOf('-') === -1
 

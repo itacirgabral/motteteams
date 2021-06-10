@@ -5,6 +5,7 @@
 
 const receivedPong = (seed) => {
   const newsKey = `zap:${seed.shard}:news`
+  const tskey = `zap:${seed.shard}:ts:event:received-pong`
   const pongKey = `zap:${seed.shard}:pong`
   const EX = 'EX'
   const ttl = 30
@@ -16,6 +17,8 @@ const receivedPong = (seed) => {
     const pipeline = seed.redis.pipeline()
     pipeline.set(pongKey, now, EX, ttl)
     pipeline.publish(newsKey, json)
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'received-pong')
+  
     await pipeline.exec()
   }
 }

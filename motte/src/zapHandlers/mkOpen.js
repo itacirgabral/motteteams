@@ -9,6 +9,7 @@ const open = (seed) => {
   const webhookKey = `zap:${seed.shard}:webhook`
   const closereasonkey = `zap:${seed.shard}:closereason`
   const rawbreadkey = `zap:${seed.shard}:fifo:rawBread`
+  const tskey = `zap:${seed.shard}:ts:event:open`
 
   return async (result) => {
     const json = JSON.stringify({ event: 'open', data: result })
@@ -18,6 +19,7 @@ const open = (seed) => {
     pipeline.get(webhookKey)// 2
     pipeline.publish(newsKey, json)// 3
     pipeline.del(closereasonkey)// 4
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'open')
 
     // processar o checkin tem prioridade, vai pela direita
     // Rpush
