@@ -2,6 +2,9 @@
  * when the connection has closed
  * on (event: 'close', listener: (err: {reason?: DisconnectReason | string, isReconnecting: boolean}) => void): this
  */
+
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 const close = (seed) => {
   const panoptickey = 'zap:panoptic'
   const logKey = `zap:${seed.shard}:log`
@@ -20,7 +23,7 @@ const close = (seed) => {
     pipeline.get(webhookKey)// 2
     pipeline.del(checkinkey)// 3
     pipeline.publish(newsKey, json)// 4
-    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'close')
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'close')
 
     const d = new Date()
 

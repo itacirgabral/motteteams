@@ -4,6 +4,8 @@ const stream = require('stream')
 const fetch = require('node-fetch')
 const FileType = require('file-type')
 
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 const sendmediamessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
   const to = req.body.to
@@ -12,7 +14,7 @@ const sendmediamessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mk
   const caption = req.query.caption
   const tskey = mktsroutekey({ shard, route: 'sendmediamessage'})
 
-  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendmediamessage')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'sendmediamessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendmediamessage,${to}`)
 
   if (to && link) {

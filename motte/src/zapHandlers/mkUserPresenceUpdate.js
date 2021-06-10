@@ -1,3 +1,5 @@
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 // await conn.requestPresenceUpdate ("xyz@c.us") // request the update
 const userPresenceUpdate = (seed) => {
   const logKey = `zap:${seed.shard}:log`
@@ -10,7 +12,7 @@ const userPresenceUpdate = (seed) => {
     pipeline.lpush(logKey, json)
     pipeline.ltrim(logKey, 0, 999)
     pipeline.publish(newsKey, json)
-    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'user-presence-update')
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'user-presence-update')
 
     await pipeline.exec()
   }

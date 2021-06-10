@@ -1,3 +1,5 @@
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 const messageNew = (seed) => {
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
@@ -10,7 +12,7 @@ const messageNew = (seed) => {
     pipeline.lpush(logKey, json)// 0
     pipeline.ltrim(logKey, 0, 999)// 1
     pipeline.publish(newsKey, json)// 2
-    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'message-new')
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'message-new')
 
     const wbi = message.toJSON()
     if (!wbi.key.fromMe) {

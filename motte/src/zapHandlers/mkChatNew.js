@@ -1,4 +1,6 @@
 const interestingupdates = ['s.whatsapp.net', 'g.us']
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 /**
  * when a new chat is added
  * on (event: 'chat-new', listener: (chat: WAChat) => void): this
@@ -14,7 +16,7 @@ const chatNew = (seed) => {
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)// 0
     pipeline.ltrim(logKey, 0, 999)// 1
-    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'chat-new')
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'chat-new')
 
     const [number, host] = chat.jid.split('@')
     if (interestingupdates.includes(host)) {

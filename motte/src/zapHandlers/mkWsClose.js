@@ -1,3 +1,5 @@
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 /**
  *  when the socket has closed
  * on (event: 'ws-close', listener: (err: {reason?: DisconnectReason | string}) => void): this
@@ -13,7 +15,7 @@ const wsClose = (seed) => {
     pipeline.lpush(logKey, json)
     pipeline.ltrim(logKey, 0, 999)
     pipeline.publish(newsKey, json)
-    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'ws-close')
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'ws-close')
 
     await pipeline.exec()
   }

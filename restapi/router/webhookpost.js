@@ -1,9 +1,11 @@
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 const webhookpost = ({ redis, mkwebhookkey, mktsroutekey }) => (req, res) => {
   const webhook = req.body.webhook
   const shard = req.shard
   const tskey = mktsroutekey({ shard, route: 'webhookpost'})
 
-  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'webhookpost')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'webhookpost')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookpost,to`)
 
   if (webhook) {

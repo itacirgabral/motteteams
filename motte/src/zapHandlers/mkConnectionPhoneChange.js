@@ -2,6 +2,9 @@
  * when the connection to the phone changes
  * on (event: 'connection-phone-change', listener: (state: {connected: boolean}) => void): this
  */
+
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 const connectionPhoneChange = (seed) => {
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
@@ -13,7 +16,7 @@ const connectionPhoneChange = (seed) => {
     pipeline.lpush(logKey, json)
     pipeline.ltrim(logKey, 0, 999)
     pipeline.publish(newsKey, json)
-    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'connection-phone-change')
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'connection-phone-change')
 
     await pipeline.exec()
   }

@@ -1,3 +1,5 @@
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 /**
  * when the connection has opened successfully
  * on (event: 'open', listener: (result: WAOpenResult) => void): this
@@ -19,7 +21,7 @@ const open = (seed) => {
     pipeline.get(webhookKey)// 2
     pipeline.publish(newsKey, json)// 3
     pipeline.del(closereasonkey)// 4
-    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'open')
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'open')
 
     // processar o checkin tem prioridade, vai pela direita
     // Rpush

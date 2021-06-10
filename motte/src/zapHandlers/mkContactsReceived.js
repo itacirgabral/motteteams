@@ -2,6 +2,9 @@
  * when the contacts has received
  * on (event: 'contacts-received', listener: () => void): this
  */
+
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 const contactsReceived = (seed) => {
   const panoptickey = 'zap:panoptic'
   const logKey = `zap:${seed.shard}:log`
@@ -15,7 +18,7 @@ const contactsReceived = (seed) => {
     pipeline.lpush(logKey, json)
     pipeline.ltrim(logKey, 0, 999)
     pipeline.publish(newsKey, json)
-    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'contacts-received')
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'contacts-received')
     await pipeline.exec()
 
     const checkinloop = () => {

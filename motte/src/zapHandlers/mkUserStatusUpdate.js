@@ -1,3 +1,5 @@
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 /**
  * when a user's status is updated
  * on (event: 'user-status-update', listener: (update: {jid: string, status?: string}) => void): this
@@ -13,7 +15,7 @@ const userStatusUpdate = (seed) => {
     pipeline.lpush(logKey, json)
     pipeline.ltrim(logKey, 0, 999)
     pipeline.publish(newsKey, json)
-    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', seed.shard, 'event', 'user-status-update')
+    pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'user-status-update')
 
     await pipeline.exec()
   }

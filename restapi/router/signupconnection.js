@@ -1,7 +1,9 @@
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 const signupconnection = ({ redis, hardid, panoptickey, mktsroutekey }) => (req, res) => {
   const tskey = mktsroutekey({ shard: '000000000000', route: 'signupconnection'})
 
-  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', '000000000000', 'route', 'signupconnection')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', '000000000000', 'route', 'signupconnection')
   console.log(`${(new Date()).toLocaleTimeString()},000000000000,signupconnection,to`)
 
   if (req.body.url) {

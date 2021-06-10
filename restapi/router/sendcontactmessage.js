@@ -1,3 +1,5 @@
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+
 const sendcontactmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
   const to = req.body.to
@@ -5,7 +7,7 @@ const sendcontactmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, 
   const vcard = req.body.vcard
   const tskey = mktsroutekey({ shard, route: 'sendcontactmessage'})
 
-  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendcontactmessage')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'sendcontactmessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendcontactmessage,${to}`)
 
   if (to && vcard) {

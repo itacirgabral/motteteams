@@ -1,4 +1,5 @@
 const fs = require('fs')
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
 
 const sendimagemessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
@@ -8,7 +9,7 @@ const sendimagemessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbr
   const caption = req.query.caption
   const tskey = mktsroutekey({ shard, route: 'sendimagemessage'})
 
-  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendimagemessage')
+  redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'sendimagemessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendimagemessage,${to}`)
 
   upload(req, res, async (err) => {

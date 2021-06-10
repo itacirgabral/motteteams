@@ -1,8 +1,7 @@
 const sortingMessages = require('./sortingMessages')
 const switcher = require('./switcher')
 
-const second = 1
-const oneday = 24 * 60 * 60 * second
+const retention = Number(process.env.REDIS_RETENTION_MESSAGES_S || '86400')
 
 const punkDrummer = (seed) => {
   const keys = {
@@ -118,7 +117,7 @@ const punkDrummer = (seed) => {
         if (file) {
           const msgid = `${keys.messageKey}:${params.wid}`
           pipeline.setnx(msgid, JSON.stringify(params))
-          pipeline.expire(msgid, oneday)
+          pipeline.expire(msgid, retention)
           pipeline.zadd(keys.messageAscKey, 'NX', params.timestamp, params.wid)
         } else {
           const msgid = `${keys.messageKey}:${jsontosend.wid}`
