@@ -19,7 +19,7 @@ services:
     volumes:
       - grafanadata:/var/lib/grafana
     ports:
-      - "3030:3000"
+      - "3030:300"
     
 volumes:
   redisdata:
