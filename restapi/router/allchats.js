@@ -1,6 +1,6 @@
-const allchats = ({ redis, mkchatskey, mktskey }) => (req, res) => {
+const allchats = ({ redis, mkchatskey, mktsroutekey }) => (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'allchats'})
+  const tskey = mktsroutekey({ shard, route: 'allchats'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'allchats')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},allchats,to`)

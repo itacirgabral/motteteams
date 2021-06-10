@@ -1,12 +1,12 @@
 const fs = require('fs')
 
-const sendimagemessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }) => async (req, res) => {
+const sendimagemessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
   const to = req.params.to
   const upload = uploader().single('file')
   const quote = req.query.quote
   const caption = req.query.caption
-  const tskey = mktskey({ shard, route: 'sendimagemessage'})
+  const tskey = mktsroutekey({ shard, route: 'sendimagemessage'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendimagemessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendimagemessage,${to}`)

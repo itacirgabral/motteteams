@@ -1,6 +1,6 @@
-const webhookhistory = ({ redis, mkwebhookhistorykey, mktskey }) => (req, res) => {
+const webhookhistory = ({ redis, mkwebhookhistorykey, mktsroutekey }) => (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'webhookhistory'})
+  const tskey = mktsroutekey({ shard, route: 'webhookhistory'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'webhookhistory')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookhistory,to`)

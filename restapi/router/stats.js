@@ -1,6 +1,6 @@
-const stats = ({ redis, mktskey }) => async (req, res) => {
+const stats = ({ redis, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'stats'})
+  const tskey = mktsroutekey({ shard, route: 'stats'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'stats')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},stats,to`)

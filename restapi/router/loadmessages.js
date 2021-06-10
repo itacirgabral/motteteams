@@ -1,6 +1,6 @@
-const loadmessages = ({ redis, mkchatskey, mkrawbreadkey, mktskey }) => async (req, res) => {
+const loadmessages = ({ redis, mkchatskey, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'loadmessages'})
+  const tskey = mktsroutekey({ shard, route: 'loadmessages'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'loadmessages')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},loadmessages,to`)

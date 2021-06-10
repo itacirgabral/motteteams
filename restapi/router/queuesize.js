@@ -1,6 +1,6 @@
-const queuesize = ({ redis, hardid, mkrawbreadkey, mktskey }) => async (req, res) => {
+const queuesize = ({ redis, hardid, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'queuesize'})
+  const tskey = mktsroutekey({ shard, route: 'queuesize'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'queuesize')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},queuesize,to`)

@@ -1,6 +1,6 @@
-const cleanqueue = ({ redis, hardid, mkrawbreadkey, mktskey }) => async (req, res) => {
+const cleanqueue = ({ redis, hardid, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'cleanqueue'})
+  const tskey = mktsroutekey({ shard, route: 'cleanqueue'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'cleanqueue')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},cleanqueue,to`)

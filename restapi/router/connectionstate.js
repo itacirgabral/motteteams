@@ -1,7 +1,7 @@
-const connectionstate = ({ redis, hardid, panoptickey, mktskey }) => (req, res) => {
+const connectionstate = ({ redis, hardid, panoptickey, mktsroutekey }) => (req, res) => {
   const shard = req.shard
   const blockingRedis = redis.duplicate()
-  const tskey = mktskey({ shard, route: 'connectionstate'})
+  const tskey = mktsroutekey({ shard, route: 'connectionstate'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'connectionstate')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},connectionstate,to`)

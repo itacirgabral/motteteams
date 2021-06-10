@@ -1,13 +1,13 @@
 const fs = require('fs')
 
-const sendvideomessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }) => async (req, res) => {
+const sendvideomessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
   const to = req.params.to
   const loop = req.query.loop === 'true'
   const upload = uploader().single('file')
   const quote = req.query.quote
   const caption = req.query.caption
-  const tskey = mktskey({ shard, route: 'sendvideomessage'})
+  const tskey = mktsroutekey({ shard, route: 'sendvideomessage'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendvideomessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendvideomessage,${to}`)

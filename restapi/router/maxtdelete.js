@@ -1,6 +1,6 @@
-const maxtdelete = ({ redis, mkmaxtkey, mktskey }) => (req, res) => {
+const maxtdelete = ({ redis, mkmaxtkey, mktsroutekey }) => (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'removemaxt'})
+  const tskey = mktsroutekey({ shard, route: 'removemaxt'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'removemaxt')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},removemaxt,to`)

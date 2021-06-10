@@ -1,6 +1,6 @@
-const chatinfo = ({ redis, mkchatskey, mkrawbreadkey, mktskey }) => async (req, res) => {
+const chatinfo = ({ redis, mkchatskey, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'chatinfo'})
+  const tskey = mktsroutekey({ shard, route: 'chatinfo'})
   const id = req.body.id
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'chatinfo')

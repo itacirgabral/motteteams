@@ -1,8 +1,8 @@
 const fs = require('fs')
 
-const sendaudiomessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }) => async (req, res) => {
+const sendaudiomessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'sendaudiomessage'})
+  const tskey = mktsroutekey({ shard, route: 'sendaudiomessage'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendaudiomessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendaudiomessage,to`)

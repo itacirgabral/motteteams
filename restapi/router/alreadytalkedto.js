@@ -1,6 +1,6 @@
-const alreadytalkedto = ({ redis, mktskey }) => (req, res) => {
+const alreadytalkedto = ({ redis, mktsroutekey }) => (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'alreadytalkedto'})
+  const tskey = mktsroutekey({ shard, route: 'alreadytalkedto'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'alreadytalkedto')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},alreadytalkedto,to`)

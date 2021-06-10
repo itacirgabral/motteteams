@@ -1,6 +1,6 @@
-const webhookget = ({ redis, mkwebhookkey, mktskey }) => (req, res) => {
+const webhookget = ({ redis, mkwebhookkey, mktsroutekey }) => (req, res) => {
   const shard = req.shard
-  const tskey = mktskey({ shard, route: 'webhookget'})
+  const tskey = mktsroutekey({ shard, route: 'webhookget'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'webhookget')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},webhookget,to`)

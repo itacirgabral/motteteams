@@ -1,9 +1,9 @@
-const sendcontactmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktskey }) => async (req, res) => {
+const sendcontactmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
   const to = req.body.to
   const quote = req.query.quote
   const vcard = req.body.vcard
-  const tskey = mktskey({ shard, route: 'sendcontactmessage'})
+  const tskey = mktsroutekey({ shard, route: 'sendcontactmessage'})
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', 86400000, 'LABELS', 'shard', shard, 'route', 'sendcontactmessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendcontactmessage,${to}`)
