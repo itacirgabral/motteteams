@@ -25,7 +25,8 @@ const open = (seed) => {
 
     // processar o checkin tem prioridade, vai pela direita
     // Rpush
-    pipeline.rpush(rawbreadkey, JSON.stringify({ type: 'checkin_v001', jid: `${seed.shard}@s.whatsapp.net` }))
+    // pipeline.rpush(rawbreadkey, JSON.stringify({ type: 'checkin_v001', jid: `${seed.shard}@s.whatsapp.net` }))
+    // DESLIGANDO CHECKIN
 
     const notifysent = {
       type: 'sendhook',
