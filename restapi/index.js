@@ -51,10 +51,10 @@ app.get('/webhook', jwt2shard, router.webhookget({ redis, mkwebhookkey, mktsrout
 app.put('/webhook', jwt2shard, express.json(), router.webhookput({ redis, mkwebhookkey, mktsroutekey }))
 app.delete('/webhook', jwt2shard, router.webhookdelete({ redis, mkwebhookkey, mktsroutekey }))
 app.get('/webhook/history', jwt2shard, router.webhookhistory({ redis, mkwebhookhistorykey, mktsroutekey }))
-app.post('/webhook2', jwt2shard, express.json(), router.webhookpost({ redis, mkwebhook2key, mktsroutekey }))
-app.get('/webhook2', jwt2shard, router.webhookget({ redis, mkwebhook2key, mktsroutekey }))
-app.put('/webhook2', jwt2shard, express.json(), router.webhookput({ redis, mkwebhook2key, mktsroutekey }))
-app.delete('/webhook2', jwt2shard, router.webhookdelete({ redis, mkwebhook2key, mktsroutekey }))
+app.post('/webhook2', jwt2shard, express.json(), router.webhook2post({ redis, mkwebhook2key, mktsroutekey }))
+app.get('/webhook2', jwt2shard, router.webhook2get({ redis, mkwebhook2key, mktsroutekey }))
+app.put('/webhook2', jwt2shard, express.json(), router.webhook2put({ redis, mkwebhook2key, mktsroutekey }))
+app.delete('/webhook2', jwt2shard, router.webhook2delete({ redis, mkwebhook2key, mktsroutekey }))
 app.get('/webhook2/history', jwt2shard, router.webhookhistory({ redis, mkwebhookhistorykey, mktsroutekey }))
 
 // mkwebhook2key
