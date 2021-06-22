@@ -33,13 +33,14 @@ const contactsReceived = (seed) => {
 
         pipeline.set(checkinkey, JSON.stringify(checkin))
 
-        // libera o punk drummer
-        const breadSpread = JSON.stringify({ hardid: seed.hardid, type: 'spreadrestart', shard: seed.shard })
-        pipeline.publish(panoptickey, breadSpread)
+        // o contacts-received pode demorar muito se a conexão do aparelho for ruim
+        // // libera o punk drummer
+        // const breadSpread = JSON.stringify({ hardid: seed.hardid, type: 'spreadrestart', shard: seed.shard })
+        // pipeline.publish(panoptickey, breadSpread)
 
-        // liga o baterista
-        const breadQueue = JSON.stringify({ hardid: seed.hardid, type: 'queuerestart', shard: seed.shard })
-        pipeline.publish(panoptickey, breadQueue)
+        // // liga o baterista
+        // const breadQueue = JSON.stringify({ hardid: seed.hardid, type: 'queuerestart', shard: seed.shard })
+        // pipeline.publish(panoptickey, breadQueue)
 
         pipeline.exec()
       } else {

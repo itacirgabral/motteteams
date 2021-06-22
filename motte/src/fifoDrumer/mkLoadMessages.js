@@ -24,7 +24,13 @@ const mkLoadMessages = ({
 
   const pipeline = seed.redis.pipeline()
   messages
-    .map(m => ({ ...m, isFromHistory: true }))
+    .map(m => ({
+      ...m,
+      isFromHistory: true,
+      isFromMe: m?.key?.fromMe ?
+        true :
+        undefined
+    }))
     .map(JSON.stringify)
     .forEach(el => {
       pipeline.publish(spreadkey, el)

@@ -30,6 +30,14 @@ const open = (seed) => {
     // pipeline.rpush(rawbreadkey, JSON.stringify({ type: 'checkin_v001', jid: `${seed.shard}@s.whatsapp.net` }))
     // DESLIGANDO CHECKIN
 
+    // libera o punk drummer
+    const breadSpread = JSON.stringify({ hardid: seed.hardid, type: 'spreadrestart', shard: seed.shard })
+    pipeline.publish(panoptickey, breadSpread)
+
+    // liga o baterista
+    const breadQueue = JSON.stringify({ hardid: seed.hardid, type: 'queuerestart', shard: seed.shard })
+    pipeline.publish(panoptickey, breadQueue)
+
     const notifysent = {
       type: 'sendhook',
       hardid: seed.hardid,
