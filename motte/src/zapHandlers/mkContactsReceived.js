@@ -21,33 +21,33 @@ const contactsReceived = (seed) => {
     pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'contacts-received')
     await pipeline.exec()
 
-    const checkinloop = () => {
-      if (seed.conn.chats.array.length !== 0) {
-        const pipeline = seed.redis.pipeline()
-        const checkin = seed.conn.chats.array
-          .filter(el => el.count)
-          .map(({ jid, count }) => ({
-            jid,
-            count
-          }))
+    // const checkinloop = () => {
+    //   if (seed.conn.chats.array.length !== 0) {
+    //     const pipeline = seed.redis.pipeline()
+    //     const checkin = seed.conn.chats.array
+    //       .filter(el => el.count)
+    //       .map(({ jid, count }) => ({
+    //         jid,
+    //         count
+    //       }))
 
-        pipeline.set(checkinkey, JSON.stringify(checkin))
+    //     pipeline.set(checkinkey, JSON.stringify(checkin))
 
-        // o contacts-received pode demorar muito se a conexão do aparelho for ruim
-        // // libera o punk drummer
-        // const breadSpread = JSON.stringify({ hardid: seed.hardid, type: 'spreadrestart', shard: seed.shard })
-        // pipeline.publish(panoptickey, breadSpread)
+    //     // o contacts-received pode demorar muito se a conexão do aparelho for ruim
+    //     // // libera o punk drummer
+    //     // const breadSpread = JSON.stringify({ hardid: seed.hardid, type: 'spreadrestart', shard: seed.shard })
+    //     // pipeline.publish(panoptickey, breadSpread)
 
-        // // liga o baterista
-        // const breadQueue = JSON.stringify({ hardid: seed.hardid, type: 'queuerestart', shard: seed.shard })
-        // pipeline.publish(panoptickey, breadQueue)
+    //     // // liga o baterista
+    //     // const breadQueue = JSON.stringify({ hardid: seed.hardid, type: 'queuerestart', shard: seed.shard })
+    //     // pipeline.publish(panoptickey, breadQueue)
 
-        pipeline.exec()
-      } else {
-        setTimeout(checkinloop, 100)
-      }
-    }
-    checkinloop()
+    //     pipeline.exec()
+    //   } else {
+    //     setTimeout(checkinloop, 100)
+    //   }
+    // }
+    // checkinloop()
   }
 }
 

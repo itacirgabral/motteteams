@@ -3,27 +3,27 @@ const mkLoadMessages = ({
   checkinkey,
   lastRawKey
 }) => async ({ crumb, seed, healthcare }) => {
-  const pipeline = seed.redis.pipeline()
-  pipeline.get(checkinkey) // 0
-  pipeline.ltrim(lastRawKey, 0, -2) // 1
-  const pipeback = await pipeline.exec()
+  
+  const messages = await seed.conn.loadAllUnreadMessages()
+  const formatedMessages = messages
+    .map(message => message.toJSON())
+    .map(m => ({ ...m, isFromCheckin: true }))
 
-  const checkin = !pipeback[0][0] && pipeback[0][1] ? JSON.parse(pipeback[0][1]) : []
+  // enviar essas mensagens
+  console.dir(formatedMessages)
 
-  for (const { jid, count } of checkin) {
-    const loaded = await seed.conn.loadMessages(jid, count)
-    const messages = loaded.messages.map(message => message.toJSON())
+  const readChats = formatedMessages.reduce((acc, el) => {
+    const chat = el.key.remoteJid.split('@')[0]
+    acc.add(chat)
 
-    const topunkdrummer = seed.redis.pipeline()
-    messages
-      .map(m => ({ ...m, isFromCheckin: true }))
-      .map(JSON.stringify)
-      .forEach(el => {
-        topunkdrummer.publish(spreadkey, el)
-      })
+    return acc
+  }, new Set())
+  // marcar chats como lidos
+  console.dir(readChats)
 
-    await topunkdrummer.exec()
-  }
+  // salvar wid no messageAsc
+  const readWids = formatedMessages.map(el => el.key.id)
+  console.dir(readWids)
 }
 
 module.exports = mkLoadMessages

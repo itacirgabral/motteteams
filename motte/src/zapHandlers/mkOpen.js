@@ -10,7 +10,7 @@ const open = (seed) => {
   const newsKey = `zap:${seed.shard}:news`
   const webhookKey = `zap:${seed.shard}:webhook`
   const closereasonkey = `zap:${seed.shard}:closereason`
-  // const rawbreadkey = `zap:${seed.shard}:fifo:rawBread`
+  const rawbreadkey = `zap:${seed.shard}:fifo:rawBread`
   const tskey = `zap:${seed.shard}:ts:event:open`
 
   return async (result) => {
@@ -23,12 +23,8 @@ const open = (seed) => {
     pipeline.del(closereasonkey)// 4
     pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'open')
 
-    // DESATIVA O PROCESSO DE RECUPERAR
-    // MENSAGENS NAO LIDAS
     // processar o checkin tem prioridade, vai pela direita
-    // Rpush
-    // pipeline.rpush(rawbreadkey, JSON.stringify({ type: 'checkin_v001', jid: `${seed.shard}@s.whatsapp.net` }))
-    // DESLIGANDO CHECKIN
+    pipeline.rpush(rawbreadkey, JSON.stringify({ type: 'checkin_v001', jid: `${seed.shard}@s.whatsapp.net` }))
 
     // libera o punk drummer
     const breadSpread = JSON.stringify({ hardid: seed.hardid, type: 'spreadrestart', shard: seed.shard })
