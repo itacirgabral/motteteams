@@ -12,7 +12,6 @@ const close = (seed) => {
   const webhookKey = `zap:${seed.shard}:webhook`
   const credsKey = `zap:${seed.shard}:creds`
   const closereasonkey = `zap:${seed.shard}:closereason`
-  const checkinkey = `zap:${seed.shard}:checkin`
   const tskey = `zap:${seed.shard}:ts:event:close`
 
   return async (err) => {
@@ -21,8 +20,7 @@ const close = (seed) => {
     pipeline.lpush(logKey, json)// 0
     pipeline.ltrim(logKey, 0, 999)// 1
     pipeline.get(webhookKey)// 2
-    pipeline.del(checkinkey)// 3
-    pipeline.publish(newsKey, json)// 4
+    pipeline.publish(newsKey, json)// 3
     pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'close')
 
     const d = new Date()
