@@ -46,7 +46,7 @@ const mkSendTextMessage = ({
         json: JSON.stringify({
           type: 'sent',
           timestamp: WebMessageInfo.messageTimestamp,
-          to: WebMessageInfo.key.remoteJid.split('@s.whatsapp.net')[0],
+          to: WebMessageInfo.key.remoteJid.split('@')[0],
           from: seed.shard,
           wid: WebMessageInfo.key.id,
           mark
