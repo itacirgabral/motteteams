@@ -19,7 +19,8 @@ const mkContactInfo = ({
         type: 'contact',
         from: seed.shard,
         number: crumb.jid.split('@s.whatsapp.net')[0],
-        name: vname || notify,
+        name: vname,
+        notify,
         status: typeof status === 'string' ? status : undefined,
         avatar
       })

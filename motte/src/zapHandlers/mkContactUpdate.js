@@ -27,7 +27,8 @@ const contactUpdate = (seed) => {
         type: 'contact update',
         shard: seed.shard,
         number: update.jid.split('@s.whatsapp.net')[0],
-        name: update.notify,
+        name: update.name,
+        notify: update.notify,
         status: update.status,
         avatar: update.imgUrl
       })
