@@ -5,7 +5,7 @@ const mkContactInfo = ({
   lastRawKey
 }) => async ({ crumb, seed, healthcare }) => {
   if (seed.conn.contacts[crumb.jid]) {
-    const { notify, vname } = seed.conn.contacts[crumb.jid]
+    const { notify, name } = seed.conn.contacts[crumb.jid]
     const [avatar, { status }] = await Promise.all([
       seed.conn.getProfilePicture(crumb.jid).catch(() => undefined),
       seed.conn.getStatus(crumb.jid).catch(() => ({ status: undefined }))
@@ -19,7 +19,7 @@ const mkContactInfo = ({
         type: 'contact',
         from: seed.shard,
         number: crumb.jid.split('@s.whatsapp.net')[0],
-        name: vname,
+        name,
         notify,
         status: typeof status === 'string' ? status : undefined,
         avatar
