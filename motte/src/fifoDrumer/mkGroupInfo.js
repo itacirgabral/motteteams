@@ -7,6 +7,9 @@ const mkGroupInfo = ({
   if (seed.conn.contacts[crumb.jid]) {
     const info = await seed.conn.groupMetadataMinimal(crumb.jid).catch(() => false)
 
+    const chat = seed.conn.chats.get(crumb.jid)
+    const notify = chat.name
+
     const notifysent = {
       type: 'sendhook',
       hardid: seed.hardid,
@@ -16,6 +19,7 @@ const mkGroupInfo = ({
         from: seed.shard,
         number: (crumb.jid || '@').split('@')[0],
         owner: (info.owner || '@').split('@')[0],
+        notify,
         creator: (info.creator || '@').split('@')[0],
         creation: String(info.creation),
         participants: info.participants.map(el => ({
