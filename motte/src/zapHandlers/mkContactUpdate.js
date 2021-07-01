@@ -19,23 +19,35 @@ const contactUpdate = (seed) => {
     pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'contact-update')
     pipeline.publish(newsKey, json)
 
-    if (update.jid.indexOf('@s.whatsapp.nets') !== -1) {
-      const notifysent = {
-        type: 'sendhook',
-        hardid: seed.hardid,
-        shard: seed.shard,
-        json: JSON.stringify({
-          type: 'contact update',
-          shard: seed.shard,
-          number: update.jid.split('@s.whatsapp.net')[0],
-          name: update.name,
-          notify: update.notify,
-          status: update.status,
-          avatar: update.imgUrl
-        })
-      }
-      pipeline.publish(panoptickey, JSON.stringify(notifysent))
+    const notifysent = {
+      type: 'sendhook',
+      hardid: seed.hardid,
+      shard: seed.shard
     }
+
+    if (update.jid.indexOf('@s.whatsapp.nets') !== -1) {
+      notifysent.json = JSON.stringify({
+        type: 'contact update',
+        shard: seed.shard,
+        number: update.jid.split('@s.whatsapp.net')[0],
+        name: update.name,
+        notify: update.notify,
+        status: update.status,
+        avatar: update.imgUrl
+      })
+    } else {
+      console.log('group update')
+      notifysent.json = JSON.stringify({
+        type: 'group update',
+        shard: seed.shard,
+        number: update.jid.split('@g.us')[0],
+        avatar: update.imgUrl
+      })
+
+      console.dir(update)
+    }
+
+    pipeline.publish(panoptickey, JSON.stringify(notifysent))
 
     await pipeline.exec()
   }
