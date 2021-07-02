@@ -19,7 +19,7 @@ const receivedPong = (seed) => {
     pipeline.set(pongKey, now, EX, ttl)
     pipeline.publish(newsKey, json)
     pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'received-pong')
-  
+
     await pipeline.exec()
   }
 }

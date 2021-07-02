@@ -2,7 +2,7 @@ const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000'
 
 const alreadytalkedto = ({ redis, mktsroutekey }) => (req, res) => {
   const shard = req.shard
-  const tskey = mktsroutekey({ shard, route: 'alreadytalkedto'})
+  const tskey = mktsroutekey({ shard, route: 'alreadytalkedto' })
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'alreadytalkedto')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},alreadytalkedto,to`)

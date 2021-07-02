@@ -2,7 +2,7 @@ const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000'
 
 const disconnect = ({ redis, hardid, panoptickey, mktsroutekey }) => (req, res) => {
   const shard = req.shard
-  const tskey = mktsroutekey({ shard, route: 'disconnect'})
+  const tskey = mktsroutekey({ shard, route: 'disconnect' })
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'disconnect')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},disconnect,to`)

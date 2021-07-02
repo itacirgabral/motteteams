@@ -5,7 +5,6 @@ const mkLoadMessages = ({
   messageAscKey,
   lastRawKey
 }) => async ({ crumb, seed, healthcare }) => {
-  
   const messages = await seed.conn.loadAllUnreadMessages()
   const formatedMessages = messages
     .map(message => message.toJSON())
@@ -18,7 +17,7 @@ const mkLoadMessages = ({
     .map(JSON.stringify)
     .forEach(el => pipeline.publish(spreadkey, el))
 
-   // salvar wid no messageAsc
+  // salvar wid no messageAsc
   formatedMessages
     .map(el => ({ wid: el.key.id, score: el.messageTimestamp }))
     .forEach(({ wid, score }) => pipeline.zadd(messageAscKey, 'NX', score, wid))

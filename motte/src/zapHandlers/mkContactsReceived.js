@@ -6,7 +6,6 @@
 const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
 
 const contactsReceived = (seed) => {
-  const panoptickey = 'zap:panoptic'
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
   const tskey = `zap:${seed.shard}:ts:event:contacts-received`

@@ -3,7 +3,7 @@ const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000'
 const maxtpost = ({ redis, mkmaxtkey, mktsroutekey }) => (req, res) => {
   const maxt = String(req.body.maxt)
   const shard = req.shard
-  const tskey = mktsroutekey({ shard, route: 'createmaxt'})
+  const tskey = mktsroutekey({ shard, route: 'createmaxt' })
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'createmaxt')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},createmaxt,to`)

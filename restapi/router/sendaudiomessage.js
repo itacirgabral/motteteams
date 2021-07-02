@@ -3,7 +3,7 @@ const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000'
 
 const sendaudiomessage = ({ redis, uploader, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktsroutekey({ shard, route: 'sendaudiomessage'})
+  const tskey = mktsroutekey({ shard, route: 'sendaudiomessage' })
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'sendaudiomessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendaudiomessage,to`)

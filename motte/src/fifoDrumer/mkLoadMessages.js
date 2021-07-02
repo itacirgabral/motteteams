@@ -27,9 +27,9 @@ const mkLoadMessages = ({
     .map(m => ({
       ...m,
       isFromHistory: true,
-      isFromMe: m?.key?.fromMe ?
-        true :
-        undefined
+      isFromMe: m?.key?.fromMe
+        ? true
+        : undefined
     }))
     .map(JSON.stringify)
     .forEach(el => {

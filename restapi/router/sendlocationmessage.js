@@ -7,7 +7,7 @@ const sendlocationmessage = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey,
   const description = req.body.description
   const latitude = req.body.latitude
   const longitude = req.body.longitude
-  const tskey = mktsroutekey({ shard, route: 'sendlocationmessage'})
+  const tskey = mktsroutekey({ shard, route: 'sendlocationmessage' })
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'sendlocationmessage')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},sendlocationmessage,${to}`)

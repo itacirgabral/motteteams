@@ -36,15 +36,12 @@ const contactUpdate = (seed) => {
         avatar: update.imgUrl
       })
     } else {
-      console.log('group update')
       notifysent.json = JSON.stringify({
         type: 'group update',
         shard: seed.shard,
         number: update.jid.split('@g.us')[0],
         avatar: update.imgUrl
       })
-
-      console.dir(update)
     }
 
     pipeline.publish(panoptickey, JSON.stringify(notifysent))

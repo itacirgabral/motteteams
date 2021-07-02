@@ -3,7 +3,7 @@ const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000'
 const connectionstate = ({ redis, hardid, panoptickey, mktsroutekey }) => (req, res) => {
   const shard = req.shard
   const blockingRedis = redis.duplicate()
-  const tskey = mktsroutekey({ shard, route: 'connectionstate'})
+  const tskey = mktsroutekey({ shard, route: 'connectionstate' })
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'connectionstate')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},connectionstate,to`)

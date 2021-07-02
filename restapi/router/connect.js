@@ -3,7 +3,7 @@ const stunttl = 60
 
 const connect = ({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktsroutekey({ shard, route: 'connect'})
+  const tskey = mktsroutekey({ shard, route: 'connect' })
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'connect')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},connect,to`)

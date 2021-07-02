@@ -2,7 +2,7 @@ const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000'
 
 const startnewchat = ({ redis, mkchatskey, mkmarkcountkey, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktsroutekey({ shard, route: 'startnewchat'})
+  const tskey = mktsroutekey({ shard, route: 'startnewchat' })
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'startnewchat')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},startnewchat,to`)

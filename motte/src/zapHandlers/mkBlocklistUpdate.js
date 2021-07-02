@@ -2,7 +2,7 @@
  * when a user is blocked or unblockd
  * on (event: 'blocklist-update', listener: (update: BlocklistUpdate) => void): this
  */
- const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
 
 const blocklistUpdate = (seed) => {
   const logKey = `zap:${seed.shard}:log`
