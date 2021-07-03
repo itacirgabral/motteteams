@@ -25,7 +25,7 @@ const contactUpdate = (seed) => {
       shard: seed.shard
     }
 
-    if (update.jid.indexOf('@s.whatsapp.nets') !== -1) {
+    if (update.jid.indexOf('@s.whatsapp.net') !== -1) {
       notifysent.json = JSON.stringify({
         type: 'contact update',
         shard: seed.shard,
