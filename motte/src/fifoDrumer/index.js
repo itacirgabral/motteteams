@@ -12,6 +12,7 @@ const mkGroupInfo = require('./mkGroupInfo')
 const mkEraseMessage = require('./mkEraseMessage')
 const mkLoadMessages = require('./mkLoadMessages')
 const mkCheckIn = require('./mkCheckIn')
+const mkQueueStop = require('./mkQueueStop')
 
 /*
 ** Fee-fi-fo-fum,
@@ -49,6 +50,7 @@ const fifoDrumer = (seed) => {
   const eraseMessage = mkEraseMessage(keys)
   const loadMessages = mkLoadMessages(keys)
   const checkIn = mkCheckIn(keys)
+  const queueStop = mkQueueStop(keys)
 
   const healthcare = {
     playing: true,
@@ -58,14 +60,11 @@ const fifoDrumer = (seed) => {
   }
 
   process.nextTick(async () => {
-    const pea = await seed.redis.llen(keys.lastRawKey)
-    healthcare.playing = healthcare.playing || pea === 0
-
     while (healthcare.playing) {
       const rawBread = await seed.redisB.brpoplpush(keys.fifoRawKey, keys.lastRawKey, 0)
-      if (healthcare.playing) {
-        const { type, ...crumb } = JSON.parse(rawBread)
+      const { type, ...crumb } = JSON.parse(rawBread)
 
+      if (healthcare.playing) {
         switch (type) {
           case 'startTextMessage_v001':
             await startTextMessage({ crumb, seed, healthcare })
@@ -165,12 +164,23 @@ const fifoDrumer = (seed) => {
                 healthcare.playing = false
               })
             break
+          case 'queueStop_v001':
+            await queueStop({ crumb, seed, healthcare })
+              .catch(err => {
+                console.error(err)
+                healthcare.playing = false
+              })
+            break
         }
       } else {
         // backward fifo
         const pipeline = seed.redis.pipeline()
-        pipeline.rpush(keys.fifoRawKey, rawBread)
+
+        if (crumb.type !== 'queueStop_v001') {
+          pipeline.rpush(keys.fifoRawKey, rawBread)
+        }
         pipeline.lpop(keys.lastRawKey)
+
         await pipeline.exec()
       }
     }
