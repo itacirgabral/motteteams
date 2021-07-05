@@ -1,6 +1,6 @@
 const delay = require('./delay')
 
-const mkLoadMessages = ({
+const mkCheckIn = ({
   spreadkey,
   messageAscKey,
   lastRawKey
@@ -40,4 +40,4 @@ const mkLoadMessages = ({
   await seed.redis.ltrim(lastRawKey, 0, -2)
 }
 
-module.exports = mkLoadMessages
+module.exports = mkCheckIn

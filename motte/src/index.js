@@ -163,49 +163,52 @@ const trafficwand = async () => {
               if (patchpanel.has(leftover.shard)) {
                 const seed = patchpanel.get(leftover.shard)
                 if (seed.conn.state === 'open') {
-                  // descongestiona
-                  const lastRawKey = `zap:${leftover.shard}:last:rawBread`
-                  const lastFifoKey = `zap:${leftover.shard}:fifo:rawBread`
-                  const pipeline = seed.redis.pipeline()
-                  pipeline.lrange(lastRawKey, 0, -1)// 0
-                  pipeline.del(lastRawKey)// 1
-                  pipeline.llen(lastFifoKey)// 2
-                  const pipeback = await pipeline.exec()
+                  let alreadyPlaying = false
+                  let queueSize
 
-                  const peas = pipeback[0][1]
-                  if (peas.length > 0) {
+                  if (!seed?.fifoDrummer?.playing) {
+                    // descongestiona
+                    const lastRawKey = `zap:${leftover.shard}:last:rawBread`
+                    const lastFifoKey = `zap:${leftover.shard}:fifo:rawBread`
+                    const pipeline = seed.redis.pipeline()
+                    pipeline.lrange(lastRawKey, 0, -1)// 0
+                    pipeline.del(lastRawKey)// 1
+                    pipeline.llen(lastFifoKey)// 2
+                    const pipeback = await pipeline.exec()
+
+                    const peas = pipeback[0][1]
+                    queueSize = pipeback[2][1]
+                    if (peas.length > 0) {
+                      const notifysent = {
+                        type: 'sendhook',
+                        hardid: seed.hardid,
+                        shard: seed.shard,
+                        json: JSON.stringify({
+                          type: 'queue get uncongested',
+                          lost: peas.map(el => JSON.parse(el)).map(el => ({ ...el, jid: undefined, to: el.jid.split('@s.whatsapp.net')[0] }))
+                        })
+                      }
+                      await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
+                    }
+
+                    seed.fifoDrummer = fifoDrumer({ ...seed, redisB: listener.duplicate() })
+                  } else {
+                    alreadyPlaying = true
                     const notifysent = {
                       type: 'sendhook',
                       hardid: seed.hardid,
                       shard: seed.shard,
                       json: JSON.stringify({
-                        type: 'queue get uncongested',
-                        lost: peas.map(el => JSON.parse(el)).map(el => ({ ...el, jid: undefined, to: el.jid.split('@s.whatsapp.net')[0] }))
+                        type: 'queue starting',
+                        shard: leftover.shard,
+                        reason: alreadyPlaying
+                          ? 'it was already playing'
+                          : undefined,
+                        queueSize
                       })
                     }
                     await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
                   }
-
-                  let alreadyPlaying = true
-                  if (!seed?.fifoDrummer?.playing) {
-                    seed.fifoDrummer = fifoDrumer({ ...seed, redisB: listener.duplicate() })
-                    alreadyPlaying = false
-                  }
-
-                  const notifysent = {
-                    type: 'sendhook',
-                    hardid: seed.hardid,
-                    shard: seed.shard,
-                    json: JSON.stringify({
-                      type: 'queue starting',
-                      shard: leftover.shard,
-                      reason: alreadyPlaying
-                        ? 'it was already playing'
-                        : undefined,
-                      queueSize: pipeback[2][1]
-                    })
-                  }
-                  await seed.redis.publish(panoptickey, JSON.stringify(notifysent))
                 }
               }
               break

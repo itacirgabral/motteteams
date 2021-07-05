@@ -22,7 +22,7 @@ const mkUserPresenceUpdate = require('./mkUserPresenceUpdate')
 const mkUserStatusUpdate = require('./mkUserStatusUpdate')
 const mkWsClose = require('./mkWsClose')
 
-const mkBattery = require('./mkBattery')
+// const mkBattery = require('./mkBattery')
 
 const appendHalders = ({ conn, seed }) => {
   conn.on('open', mkOpen(seed))

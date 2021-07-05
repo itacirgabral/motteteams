@@ -2,7 +2,7 @@ const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000'
 
 const loadmessages = ({ redis, mkchatskey, mkrawbreadkey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
-  const tskey = mktsroutekey({ shard, route: 'loadmessages'})
+  const tskey = mktsroutekey({ shard, route: 'loadmessages' })
 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'loadmessages')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},loadmessages,to`)
