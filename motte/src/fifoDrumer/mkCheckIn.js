@@ -5,11 +5,13 @@ const mkCheckIn = ({
   messageAscKey,
   lastRawKey
 }) => async ({ crumb, seed, healthcare }) => {
+  console.log(`zap:${seed.shard}:fifoCheckin`)
   const messages = await seed.conn.loadAllUnreadMessages()
   const formatedMessages = messages
     .map(message => message.toJSON())
     .map(m => ({ ...m, isFromCheckin: true }))
 
+  console.log(`messages.length=${messages.length}`)
   const pipeline = seed.redis.pipeline()
 
   // enviar essas mensagens

@@ -1,4 +1,5 @@
 const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
+const checkin = process.env.CHECKIN === 'yes'
 
 /**
  * when the connection has opened successfully
@@ -23,8 +24,10 @@ const open = (seed) => {
     pipeline.del(closereasonkey)// 4
     pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'open')
 
-    // processar o checkin tem prioridade, vai pela direita
-    // pipeline.rpush(rawbreadkey, JSON.stringify({ type: 'checkin_v001', jid: `${seed.shard}@s.whatsapp.net` }))
+    if (checkin) {
+      // processar o checkin tem prioridade, vai pela direita
+      pipeline.rpush(rawbreadkey, JSON.stringify({ type: 'checkin_v001', jid: `${seed.shard}@s.whatsapp.net` }))
+    }
 
     // libera o punk drummer
     const breadSpread = JSON.stringify({ hardid: seed.hardid, type: 'spreadrestart', shard: seed.shard })

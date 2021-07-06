@@ -109,6 +109,11 @@ const trafficwand = async () => {
 
                 if (seed?.fifoDrummer?.playing) {
                   seed.fifoDrummer.playing = false
+                  // para a fila, pela direita
+                  seed.redis.rpush(`zap:${leftover.shard}:fifo:rawBread`, JSON.stringify({
+                    type: 'queueStop_v001',
+                    t: Date.now()
+                  }))
                 }
                 if (seed?.punkDrummer?.playing) {
                   seed.punkDrummer.playing = false
@@ -118,20 +123,18 @@ const trafficwand = async () => {
                 }
 
                 seed.conn.close()
-
-                console.log(`disconnect ${leftover.shard}`)
               } else {
-                const notifysent = {
-                  type: 'sendhook',
-                  hardid, // send to myself
-                  shard: leftover.shard,
-                  json: JSON.stringify({
-                    type: 'closed',
-                    shard: leftover.shard,
-                    reason: 'it was already closed'
-                  })
-                }
-                speaker.publish(panoptickey, JSON.stringify(notifysent))
+                // const notifysent = {
+                //   type: 'sendhook',
+                //   hardid, // send to myself
+                //   shard: leftover.shard,
+                //   json: JSON.stringify({
+                //     type: 'closed',
+                //     shard: leftover.shard,
+                //     reason: 'it was already closed'
+                //   })
+                // }
+                // speaker.publish(panoptickey, JSON.stringify(notifysent))
               }
               break
             case 'disconnectsilent':
@@ -167,6 +170,7 @@ const trafficwand = async () => {
                   let queueSize
 
                   if (!seed?.fifoDrummer?.playing) {
+                    console.log(`zap:${leftover.shard}:queueNotPlaying`)
                     // descongestiona
                     const lastRawKey = `zap:${leftover.shard}:last:rawBread`
                     const lastFifoKey = `zap:${leftover.shard}:fifo:rawBread`
@@ -193,6 +197,7 @@ const trafficwand = async () => {
 
                     seed.fifoDrummer = fifoDrumer({ ...seed, redisB: listener.duplicate() })
                   } else {
+                    console.log(`zap:${leftover.shard}:queuePlaying`)
                     alreadyPlaying = true
                     const notifysent = {
                       type: 'sendhook',

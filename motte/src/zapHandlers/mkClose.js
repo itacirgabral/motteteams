@@ -9,7 +9,6 @@ const close = (seed) => {
   const panoptickey = 'zap:panoptic'
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
-  const rawBreadKey = `zap:${seed.shard}:fifo:rawBread`
   const webhookKey = `zap:${seed.shard}:webhook`
   const credsKey = `zap:${seed.shard}:creds`
   const closereasonkey = `zap:${seed.shard}:closereason`
@@ -39,30 +38,16 @@ const close = (seed) => {
     }
     pipeline.publish(panoptickey, JSON.stringify(notifysent))
 
-    // para a fila, pela direita
-    pipeline.rpush(rawBreadKey, JSON.stringify({
-      type: 'queueStop_v001',
-      t: Date.now()
-    }))
-
     pipeline.publish(panoptickey, JSON.stringify({
       type: 'disconnect',
-      hardid: seed.shard,
-      shard: seed.hardid
+      hardid: seed.hardid,
+      shard: seed.shard
     }))
 
     pipeline.set(closereasonkey, err.reason)
 
     if (err.reason === 'invalid_session') {
       pipeline.del(credsKey)
-    }
-    if (err.reason !== 'intentional ') {
-      const gonnaDown = JSON.stringify({
-        type: 'disconnectsilent', // skip "already" log
-        hardid: seed.hardid,
-        shard: seed.shard
-      })
-      pipeline.publish(panoptickey, gonnaDown)
     }
 
     await pipeline.exec()
