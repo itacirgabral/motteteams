@@ -1,0 +1,49 @@
+version: "3.5"
+services:
+  redis:
+    image: redislabs/redistimeseries
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"
+  minio:
+    image: minio/minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin678
+    command: ['server', '/data', '--console-address', ':9001']
+    volumes:
+      - miniodata:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+  # redisinsight:
+  #   image: redislabs/redisinsight
+  #   restart: unless-stopped
+  #   volumes:
+  #     - redisinsightdata:/db
+  #   ports:
+  #     - "8001:8001"
+  couchdb:
+    image: couchdb
+    restart: unless-stopped
+    volumes:
+      - couchdbdata:/opt/couchdb/data
+    ports:
+      - "5984:5984"
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: admin678
+      NODENAME: mainjsondb
+
+volumes:
+  redisdata:
+    external: true
+  miniodata:
+    external: true
+  redisinsightdata:
+    external: true
+  couchdbdata:
+    external: true
