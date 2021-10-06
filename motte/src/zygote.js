@@ -38,29 +38,29 @@ const zygote = ({ leftover, hardid }) => {
       }).catch(() => {})
     })
 
-    WA.on('credentials-updated', async auth => {
-      console.log('credentials-updated')
-      const creds = JSON.stringify({
-        clientID: auth.clientID,
-        serverToken: auth.serverToken,
-        clientToken: auth.clientToken,
-        encKey: auth.encKey.toString('base64'),
-        macKey: auth.macKey.toString('base64')
-      })
+    // WA.on('credentials-updated', async auth => {
+    //   console.log('credentials-updated')
+    //   const creds = JSON.stringify({
+    //     clientID: auth.clientID,
+    //     serverToken: auth.serverToken,
+    //     clientToken: auth.clientToken,
+    //     encKey: auth.encKey.toString('base64'),
+    //     macKey: auth.macKey.toString('base64')
+    //   })
 
-      const birthcert = JSON.stringify({
-        hardid,
-        mitochondria: leftover.mitochondria,
-        shard: leftover.shard,
-        timestamp: Date.now()
-      })
+    //   const birthcert = JSON.stringify({
+    //     hardid,
+    //     mitochondria: leftover.mitochondria,
+    //     shard: leftover.shard,
+    //     timestamp: Date.now()
+    //   })
 
-      const pipeline = redis.pipeline()
-      pipeline.set(mkcredskey(leftover.shard), creds)
-      pipeline.sadd(bornskey, birthcert)
-      await pipeline.exec()
-      console.log(`${leftover.shard} creds=${creds}`)
-    })
+    //   const pipeline = redis.pipeline()
+    //   pipeline.set(mkcredskey(leftover.shard), creds)
+    //   pipeline.sadd(bornskey, birthcert)
+    //   await pipeline.exec()
+    //   console.log(`${leftover.shard} creds=${creds}`)
+    // })
 
     WA.on('open', async () => {
       const foundShard = WA.user.jid.split('@s.whatsapp.net')[0]
@@ -69,6 +69,24 @@ const zygote = ({ leftover, hardid }) => {
       if (leftover.shard === foundShard) {
         await redis.set(mkwebhookkey(leftover.shard), leftover.url)
         console.log(`${leftover.shard} jwt=${jwt}`)
+
+        //
+        const creds = WA.base64EncodedAuthInfo()
+        const birthcert = JSON.stringify({
+          hardid,
+          mitochondria: leftover.mitochondria,
+          shard: leftover.shard,
+          timestamp: (new Date()).toLocaleString('pt-BR')
+        })
+
+        const credsjson = JSON.stringify(creds)
+
+        const pipeline = redis.pipeline()
+        pipeline.set(mkcredskey(leftover.shard), credsjson)
+        pipeline.sadd(bornskey, birthcert)
+        await pipeline.exec()
+        console.log(`${leftover.shard} creds=${credsjson}`)
+        //
 
         setTimeout(async () => {
           clearTimeout(timeoutid)
