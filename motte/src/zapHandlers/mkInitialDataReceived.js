@@ -1,17 +1,13 @@
-/**
- * when WA updates the credentials
- * on (event: 'credentials-updated', listener: (auth: AuthenticationCredentials) => void): this
- */
-
 const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
 
-const credentialsUpdated = (seed) => {
+const initialDataReceived = (seed) => {
   const logKey = `zap:${seed.shard}:log`
   const newsKey = `zap:${seed.shard}:news`
   const credsKey = `zap:${seed.shard}:creds`
   const tskey = `zap:${seed.shard}:ts:event:credentials-updated`
 
-  return async (auth) => {
+  return async () => {
+    console.log('initialDataReceived')
     const creds = seed.conn.base64EncodedAuthInfo()
 
     const json = JSON.stringify({ event: 'credentials-updated', data: creds })
@@ -28,4 +24,4 @@ const credentialsUpdated = (seed) => {
   }
 }
 
-module.exports = credentialsUpdated
+module.exports = initialDataReceived

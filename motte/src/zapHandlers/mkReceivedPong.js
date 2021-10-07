@@ -12,6 +12,7 @@ const receivedPong = (seed) => {
   const ttl = 30
 
   return async () => {
+    console.log('receivedPong')
     const now = Date.now()
     const json = JSON.stringify({ event: 'received-pong', data: null })
 

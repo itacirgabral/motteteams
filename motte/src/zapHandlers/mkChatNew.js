@@ -12,6 +12,7 @@ const chatNew = (seed) => {
   const tskey = `zap:${seed.shard}:ts:event:chat-new`
 
   return async (chat) => {
+    console.log('chatNew')
     const json = JSON.stringify({ event: 'chat-new', data: chat })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)// 0

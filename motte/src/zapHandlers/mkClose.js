@@ -15,6 +15,7 @@ const close = (seed) => {
   const tskey = `zap:${seed.shard}:ts:event:close`
 
   return async (err) => {
+    console.log('close')
     const json = JSON.stringify({ event: 'close', data: err })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)// 0

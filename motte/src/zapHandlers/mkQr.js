@@ -10,6 +10,7 @@ const qr = (seed) => {
   const tskey = `zap:${seed.shard}:ts:event:qr`
 
   return async (qr) => {
+    console.log('qr')
     const json = JSON.stringify({ event: 'qr', data: qr })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)

@@ -11,6 +11,7 @@ const connectionValidated = (seed) => {
   const tskey = `zap:${seed.shard}:ts:event:connection-validated`
 
   return async (user) => {
+    console.log('connectionValidated')
     const json = JSON.stringify({ event: 'connection-validated', data: user })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)
