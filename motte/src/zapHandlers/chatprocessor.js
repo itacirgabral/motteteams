@@ -59,7 +59,7 @@ const chatprocessor = ({
 
   const timestamp = wbi.messageTimestamp
 
-  if (from !== 'status@broadcast') {
+  if (from !== 'status@broadcast' && !wbi?.key?.fromMe) {
     const conversation = wbi.message.conversation
     const quoteMsg = wbi.message.extendedTextMessage
     const location = wbi.message.locationMessage
