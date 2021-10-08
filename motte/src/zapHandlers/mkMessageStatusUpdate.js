@@ -20,7 +20,7 @@ const messageStatusUpdate = (seed) => {
   }
 
   return async (message) => {
-    console.log('messageStatusUpdate')
+    // console.log('messageStatusUpdate')
     const json = JSON.stringify({ event: 'message-status-update', data: message })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)// 0

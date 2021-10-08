@@ -13,7 +13,7 @@ const open = (seed) => {
   const tskey = `zap:${seed.shard}:ts:event:open`
 
   return async (result) => {
-    console.log('open')
+    // console.log('open')
     const json = JSON.stringify({ event: 'open', data: result })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)// 0
@@ -23,7 +23,6 @@ const open = (seed) => {
     pipeline.del(closereasonkey)// 4
     pipeline.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', seed.shard, 'event', 'open')
 
-    console.log('punk drummer')
     // libera o punk drummer
     const breadSpread = JSON.stringify({ hardid: seed.hardid, type: 'spreadrestart', shard: seed.shard })
     pipeline.publish(panoptickey, breadSpread)
@@ -44,7 +43,7 @@ const open = (seed) => {
     pipeline.publish(panoptickey, JSON.stringify(notifysent))
 
     // DEBUG
-    console.log('open')
+    // console.log('open')
 
     await pipeline.exec()
   }

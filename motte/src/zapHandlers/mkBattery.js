@@ -7,7 +7,7 @@ const mkBattery = (seed) => {
   const tskey = `zap:${seed.shard}:ts:event:battery`
 
   return async (data) => {
-    console.log('mkBattery')
+    // console.log('mkBattery')
     const json = JSON.stringify({ event: 'battery', data: data })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)

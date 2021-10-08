@@ -13,7 +13,7 @@ const contactsReceived = (seed) => {
   const rawbreadkey = `zap:${seed.shard}:fifo:rawBread`
 
   return async () => {
-    console.log('contactsReceived')
+    // console.log('contactsReceived')
     const json = JSON.stringify({ event: 'contacts-received', data: null })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)

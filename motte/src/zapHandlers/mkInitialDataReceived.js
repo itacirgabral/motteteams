@@ -7,7 +7,7 @@ const initialDataReceived = (seed) => {
   const tskey = `zap:${seed.shard}:ts:event:credentials-updated`
 
   return async () => {
-    console.log('initialDataReceived')
+    // console.log('initialDataReceived')
     const creds = seed.conn.base64EncodedAuthInfo()
 
     const json = JSON.stringify({ event: 'credentials-updated', data: creds })

@@ -7,7 +7,7 @@ const messageNew = (seed) => {
   const tskey = `zap:${seed.shard}:ts:event:message-new`
 
   return async (message) => {
-    console.log('messageNew')
+    // console.log('messageNew')
     const json = JSON.stringify({ event: 'message-new', data: message })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)// 0

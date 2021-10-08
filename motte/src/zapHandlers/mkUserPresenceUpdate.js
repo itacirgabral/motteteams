@@ -7,7 +7,7 @@ const userPresenceUpdate = (seed) => {
   const tskey = `zap:${seed.shard}:ts:event:user-presence-update`
 
   return async (update) => {
-    console.log('userPresenceUpdate')
+    // console.log('userPresenceUpdate')
     const json = JSON.stringify({ event: 'user-presence-update', data: update })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)

@@ -11,7 +11,7 @@ const groupUpdate = (seed) => {
   const tskey = `zap:${seed.shard}:ts:event:group-update`
 
   return async (user) => {
-    console.log('groupUpdate')
+    // console.log('groupUpdate')
     const json = JSON.stringify({ event: 'group-update', data: user })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)

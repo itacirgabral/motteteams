@@ -10,7 +10,7 @@ const blocklistUpdate = (seed) => {
   const tskey = `zap:${seed.shard}:ts:event:blocklist-update`
 
   return async (update) => {
-    console.log('blocklistUpdate')
+    // console.log('blocklistUpdate')
     const json = JSON.stringify({ event: 'blocklist-update', data: update })
     const pipeline = seed.redis.pipeline()
     pipeline.lpush(logKey, json)
