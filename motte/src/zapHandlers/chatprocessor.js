@@ -19,11 +19,22 @@ const chatprocessor = ({
       appNotification: 'callMissed'
     }
   }
-
   const isMessageDeleted = wbi.messageStubType === 'REVOKE'
   if (isMessageDeleted) {
     wbi.message = {
-      appNotification: 'messageDeleted'
+      appNotification: 'deleted'
+    }
+  }
+  const isMessageReceived = wbi.status === 'DELIVERY_ACK'
+  if (isMessageReceived) {
+    wbi.message = {
+      appNotification: 'received'
+    }
+  }
+  const isMessageRead = wbi.status === 'READ'
+  if (isMessageRead) {
+    wbi.message = {
+      appNotification: 'read'
     }
   }
 
@@ -282,6 +293,17 @@ const chatprocessor = ({
           loop: !!video.gifPlayback,
           mimetype,
           size: video.fileLength
+        }
+        break
+      case 'received':
+      case 'read':
+        jsontosend = {
+          type,
+          author,
+          timestamp,
+          to,
+          from,
+          wid
         }
         break
     }
