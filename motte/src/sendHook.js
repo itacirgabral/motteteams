@@ -51,7 +51,7 @@ const sendHook = async ({ redis, json, shard, params, file }) => {
 
       await fetch(url.href, {
         method, body: form
-      }).catch(() => {})
+      })
     }
 
     if (webhook2) {

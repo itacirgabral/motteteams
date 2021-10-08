@@ -286,7 +286,7 @@ const chatprocessor = ({
         break
     }
 
-    const newone = JSON.stringify(mimetype ? params : jsontosend)
+    const newone = mimetype ? params : jsontosend
     const filename = mimetype ? wid : undefined
     return {
       newone,
