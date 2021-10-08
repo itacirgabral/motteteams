@@ -19,7 +19,6 @@ const punkDrummer = (seed) => {
   // subscribe
   seed.redisB.subscribe(keys.spreadKey)
   seed.redisB.on('message', async (channel, message) => {
-    console.log(`message=${message}`)
     if (healthcare.playing) {
       // const wbi = JSON.parse(message)
       // const wid = wbi.key.id

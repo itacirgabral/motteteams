@@ -27,9 +27,9 @@ const open = (seed) => {
     const breadSpread = JSON.stringify({ hardid: seed.hardid, type: 'spreadrestart', shard: seed.shard })
     pipeline.publish(panoptickey, breadSpread)
 
-    // // liga o baterista
-    // const breadQueue = JSON.stringify({ hardid: seed.hardid, type: 'queuerestart', shard: seed.shard })
-    // pipeline.publish(panoptickey, breadQueue)
+    // liga o baterista
+    const breadQueue = JSON.stringify({ hardid: seed.hardid, type: 'queuerestart', shard: seed.shard })
+    pipeline.publish(panoptickey, breadQueue)
 
     const notifysent = {
       type: 'sendhook',
