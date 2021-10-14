@@ -1,5 +1,8 @@
 const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
 
+const rediskeys = require('../rediskeys')
+const crypto = require('crypto')
+
 const disconnect = ({ redis, hardid, panoptickey, mktsroutekey }) => (req, res) => {
   const shard = req.shard
   const tskey = mktsroutekey({ shard, route: 'disconnect' })
@@ -9,6 +12,10 @@ const disconnect = ({ redis, hardid, panoptickey, mktsroutekey }) => (req, res) 
 
   const type = 'disconnect'
   const bread = JSON.stringify({ hardid, type, shard })
+
+  /** WIP GMAPI-506 **/
+  const cacapa = `hardid:${hardid}:zap:${shard}:cacapa_${crypto.randomBytes(16).toString('base64')}`
+  redis.xadd(rediskeys.panoptickey, '*', 'hardid', hardid, 'type', 'disconnect', 'shard', shard, 'cacapa', cacapa)
 
   redis.publish(panoptickey, bread)
     .catch(() => {

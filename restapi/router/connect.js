@@ -1,6 +1,9 @@
 const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
 const stunttl = 60
 
+const rediskeys = require('../rediskeys')
+const crypto = require('crypto')
+
 const connect = ({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey, mktsroutekey }) => async (req, res) => {
   const shard = req.shard
   const tskey = mktsroutekey({ shard, route: 'connect' })
@@ -41,6 +44,10 @@ const connect = ({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey, mktsro
             res.status(200).json({ type: typeConnect, shard })
           })
       })
+
+    /** WIP GMAPI-506 **/
+    const cacapa = `hardid:${hardid}:zap:${shard}:cacapa_${crypto.randomBytes(16).toString('base64')}`
+    redis.xadd(rediskeys.panoptickey, '*', 'hardid', hardid, 'type', 'connect', 'shard', shard, 'cacapa', cacapa)
   } else {
     res.status(400).json({
       type: 'connect',

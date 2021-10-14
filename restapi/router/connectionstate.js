@@ -1,5 +1,8 @@
 const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
 
+const rediskeys = require('../rediskeys')
+const crypto = require('crypto')
+
 const connectionstate = ({ redis, hardid, panoptickey, mktsroutekey }) => (req, res) => {
   const shard = req.shard
   const blockingRedis = redis.duplicate()
@@ -8,7 +11,7 @@ const connectionstate = ({ redis, hardid, panoptickey, mktsroutekey }) => (req, 
   redis.call('TS.ADD', tskey, '*', 1, 'RETENTION', retention, 'LABELS', 'shard', shard, 'route', 'connectionstate')
   console.log(`${(new Date()).toLocaleTimeString()},${shard},connectionstate,to`)
 
-  const cacapa = `zap:${shard}:cacapa_${Math.random()}`
+  const cacapa = `hardid:${hardid}:zap:${shard}:cacapa_${crypto.randomBytes(16).toString('base64')}`
   const bread = JSON.stringify({
     hardid,
     type: 'connectionstate',
@@ -31,6 +34,9 @@ const connectionstate = ({ redis, hardid, panoptickey, mktsroutekey }) => (req, 
     })
 
   redis.publish(panoptickey, bread)
+
+  /** WIP GMAPI-506 **/
+  redis.xadd(rediskeys.panoptickey, '*', 'hardid', hardid, 'type', 'connectionstate', 'shard', shard, 'cacapa', cacapa)
 }
 
 module.exports = connectionstate

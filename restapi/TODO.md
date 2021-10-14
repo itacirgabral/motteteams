@@ -1,13 +1,11 @@
 # STREAM
 ## CONROLE CONEXÃO
-- [ ] cleanqueue
-- [ ] connectionstate
-- [ ] connect
-- [ ] disconnect
-- [ ] queuerestart
-- [ ] queuesize
-- [ ] signupconnection
-- [ ] spreadrestart
+- [x] connectionstate
+- [x] connect
+- [x] disconnect
+- [x] queuerestart
+- [x] signupconnection
+- [x] spreadrestart
 
 ## MENSAGENS
 - [ ] erasemessage
@@ -24,11 +22,13 @@
 - [ ] startnewchat
 
 ## SET ON REDIS
+- [ ] cleanqueue
 - [ ] allchats
 - [ ] alreadytalkedto
 - [ ] chatinfo
 - [ ] maxtdelete
 - [ ] maxtpost
+- [ ] queuesize
 - [ ] stats
 - [ ] webhook2delete
 - [ ] webhook2get
