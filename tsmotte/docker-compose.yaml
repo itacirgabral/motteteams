@@ -1,0 +1,13 @@
+version: '3.5'
+services:
+  web:
+    build:
+      context: ./
+    ports:
+      - "4000:4000"
+      - "9229:9229" # debug port
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "4000"
+    volumes: 
+      - ./src:/app/src
