@@ -15,6 +15,7 @@ const connect = ({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey, mktsro
   const connstunkey = mkconnstunkey(shard)
   const bread = JSON.stringify({ hardid, type: typeDisconnect, shard })
 
+  console.log(`connstunkey=${connstunkey}`)
   const pipeline = redis.pipeline()
   pipeline.exists(mkcredskey(shard)) // 0
   pipeline.exists(connstunkey) // 1
