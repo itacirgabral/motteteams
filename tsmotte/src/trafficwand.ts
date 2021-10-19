@@ -1,18 +1,16 @@
 import { Redis  } from 'ioredis'
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs'
 import { stream2bread, Bread } from './stream2bread'
-import { ConnAdm } from './schema'
+// import { ConnAdm } from './schema'
 
-const trafficwand = function trafficwand ({ redis, panoptickey}: { redis: Redis, panoptickey: string }) {
+const trafficwand = function trafficwand ({ redis, panoptickey}: { redis: Redis, panoptickey: string }, cb: (err: Error | null, bread: Bread | null) => void) {
   const redisBlock = redis.duplicate()
 
-  const observable = new Observable<Bread>(subscriber => {
-    redisBlock.xreadgroup('GROUP', 'tsmotte', 'COUNT', 1, 'NOACK', 'STREAMS', panoptickey, '>', (err, stream) => {
-      console.error(err)
-      if(err) {
-        subscriber.error(err)
+    const next = ({ panoptickey, lastlogid }: { panoptickey: string, lastlogid: string}) => {
+    redisBlock.xread('BLOCK', 0, 'STREAMS', panoptickey, lastlogid, function(err, stream) {
+      if (err) {
+        cb(err, null)
       } else {
-        console.dir({ stream })
         for (const county of stream) {
           const countyHead = county[0]
           const countyBody = county[1]
@@ -20,39 +18,22 @@ const trafficwand = function trafficwand ({ redis, panoptickey}: { redis: Redis,
           for (const log of countyBody) {
             const logHead = log[0]
             const logBody = log[1]
+            
+            // lastlogid = logHead
     
             const bread = stream2bread({ log: logBody })
-    
-            console.log('subscriber.next(bread)')
-            subscriber.next(bread)
+            cb(null, bread)
+            next({ panoptickey, lastlogid: logHead })
           }
         }
       }
-
     })
-  })
+  }
 
-  return observable
+  next({ panoptickey, lastlogid: '$'})
+  // 
 }
 
 export {
   trafficwand
 }
-
-// redisBlock.xadd('BLOCK', 0, 'COUNT', 1, 'STREAMS', panoptickey, lastlogid)
-// .then(stream => {
-//   for (const county of stream) {
-//     const countyHead = county[0]
-//     const countyBody = county[1]
-
-//     for (const log of countyBody) {
-//       const logHead = log[0]
-//       const logBody = log[1]
-
-//       lastlogid = logHead
-
-//       const bread = stream2bread({ log: logBody })
-//       subscriber.next(bread)
-//     }
-//   }
-// })
