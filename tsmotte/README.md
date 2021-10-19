@@ -3,3 +3,10 @@
 
 ## LINK BAILEYS
 - `npm link @adiwajshing/baileys-md`
+
+## TOADD
+- rxjs
+- fluent-json-schema
+- ajv
+- fast-json-stringify
+- prom-client

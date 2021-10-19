@@ -33,7 +33,8 @@ const connect = ({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey, mktsro
         const bread = JSON.stringify({ hardid, type: typeConnect, shard })
 
         const pipeline2 = redis.pipeline()
-        pipeline2.set(connstunkey, true, 'EX', stunttl)
+        // DESLIGANDO STUN
+        pipeline2.set(connstunkey, false, 'EX', stunttl)
         pipeline2.publish(panoptickey, bread)
 
         // connect && stun
