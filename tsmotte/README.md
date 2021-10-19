@@ -5,6 +5,7 @@
 - `npm link @adiwajshing/baileys-md`
 
 ## TOADD
+- https://blog.logrocket.com/using-trampolines-to-manage-large-recursive-loops-in-javascript-d8c9db095ae3/
 - rxjs
 - fluent-json-schema
 - ajv
