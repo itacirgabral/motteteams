@@ -34,7 +34,7 @@ const connect = ({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey, mktsro
 
         const pipeline2 = redis.pipeline()
         // DESLIGANDO STUN
-        pipeline2.set(connstunkey, false, 'EX', stunttl)
+        // pipeline2.set(connstunkey, true, 'EX', stunttl)
         pipeline2.publish(panoptickey, bread)
 
         // connect && stun
