@@ -10,5 +10,4 @@ export interface Connect {
   hardid: string;
   shard: string;
   cacapa: string;
-  [k: string]: unknown;
 }

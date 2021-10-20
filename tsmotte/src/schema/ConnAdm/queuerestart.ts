@@ -1,4 +1,5 @@
 import S from 'fluent-json-schema'
+import Ajv from 'ajv'
 
 const mkQueuerestart = S.object()
   .id('queuerestart')
@@ -10,6 +11,10 @@ const mkQueuerestart = S.object()
 
 const queuerestart = mkQueuerestart.valueOf()
 
+const ajv = new Ajv()
+const queuerestartValidate = ajv.compile(queuerestart)
+
 export {
-  queuerestart
+  queuerestart,
+  queuerestartValidate
 } 
