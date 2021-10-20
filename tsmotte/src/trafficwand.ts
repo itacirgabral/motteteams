@@ -1,8 +1,7 @@
 import { Redis  } from 'ioredis'
 import { Observable } from 'rxjs'
-import { stream2bread, Bread } from './stream2bread'
+import { stream2bread } from './stream2bread'
 import { ConnAdm, isConnAdm } from './schema'
-import { Connect } from './schema/ConnAdm'
 
 const trafficwand = ({ redis, panoptickey }: { redis: Redis, panoptickey: string }) => new Observable<ConnAdm>(subscriber => {
   const redisBlock = redis.duplicate()
@@ -12,7 +11,7 @@ const trafficwand = ({ redis, panoptickey }: { redis: Redis, panoptickey: string
     while (true) {
       const stream = await redisBlock.xread('BLOCK', 0, 'STREAMS', panoptickey, lastlogid)
       for (const county of stream) {
-        const countyHead = county[0]
+        // const countyHead = county[0]
         const countyBody = county[1]
 
         // console.log(`countyHead=${countyHead}`)
