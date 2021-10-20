@@ -1,4 +1,5 @@
 import S from 'fluent-json-schema'
+import Ajv from 'ajv'
 
 const mkConnect = S.object()
   .id('connect')
@@ -10,6 +11,10 @@ const mkConnect = S.object()
 
 const connect = mkConnect.valueOf()
 
+const ajv = new Ajv()
+const connectValidate = ajv.compile(connect)
+
 export {
-  connect
+  connect,
+  connectValidate
 } 

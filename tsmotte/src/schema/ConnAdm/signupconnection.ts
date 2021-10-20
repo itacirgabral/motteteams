@@ -1,4 +1,5 @@
 import S from 'fluent-json-schema'
+import Ajv from 'ajv'
 
 const mkSignupconnection = S.object()
   .id('signupconnection')
@@ -12,6 +13,10 @@ const mkSignupconnection = S.object()
 
 const signupconnection = mkSignupconnection.valueOf()
 
+const ajv = new Ajv()
+const signupconnectionValidate = ajv.compile(signupconnection)
+
 export {
-  signupconnection
+  signupconnection,
+  signupconnectionValidate
 } 

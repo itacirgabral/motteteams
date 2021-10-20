@@ -1,9 +1,10 @@
 import { Redis  } from 'ioredis'
 import { Observable } from 'rxjs'
 import { stream2bread, Bread } from './stream2bread'
-// import { ConnAdm } from './schema'
+import { ConnAdm, isConnAdm } from './schema'
+import { Connect } from './schema/ConnAdm'
 
-const trafficwand = ({ redis, panoptickey }: { redis: Redis, panoptickey: string }) => new Observable<Bread>(subscriber => {
+const trafficwand = ({ redis, panoptickey }: { redis: Redis, panoptickey: string }) => new Observable<ConnAdm>(subscriber => {
   const redisBlock = redis.duplicate()
   let lastlogid = '$'
   ;(async () => {
@@ -22,8 +23,40 @@ const trafficwand = ({ redis, panoptickey }: { redis: Redis, panoptickey: string
           lastlogid = logHead
   
           const bread = stream2bread({ log: logBody })
+          switch (bread.type) {
+            case 'signupconnection':
+              if (isConnAdm.isSignupconnection(bread)) {
+                subscriber.next(bread)
+              }
+              break;
+            case 'connect':
+              if (isConnAdm.isConnect(bread)) {
+                subscriber.next(bread)
+              }
+              break;
+            case 'queuerestart':
+              if (isConnAdm.isQueuerestart(bread)) {
+                subscriber.next(bread)
+              }
+              break;
+            case 'spreadrestart':
+              if (isConnAdm.isSpreadrestart(bread)) {
+                subscriber.next(bread)
+              }
+              break;
+            case 'connectionstate':
+              if (isConnAdm.isConnectionstate(bread)) {
+                subscriber.next(bread)
+              }
+              break;
+            case 'disconnect':
+              if (isConnAdm.isDisconnect(bread)) {
+                subscriber.next(bread)
+              }
+              break;
+            default:
+          }
           
-          subscriber.next(bread)
         }
       }
     }

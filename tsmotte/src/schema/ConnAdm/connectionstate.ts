@@ -1,4 +1,5 @@
 import S from 'fluent-json-schema'
+import Ajv from 'ajv'
 
 const mkConnectionstate = S.object()
   .id('connectionstate')
@@ -12,6 +13,10 @@ const mkConnectionstate = S.object()
 
 const connectionstate = mkConnectionstate.valueOf()
 
+const ajv = new Ajv()
+const connectionstateValidate = ajv.compile(connectionstate)
+
 export {
-  connectionstate
+  connectionstate,
+  connectionstateValidate
 } 

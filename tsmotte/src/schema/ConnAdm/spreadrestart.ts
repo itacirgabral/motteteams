@@ -1,4 +1,5 @@
 import S from 'fluent-json-schema'
+import Ajv from 'ajv'
 
 const mkSpreadrestart = S.object()
   .id('spreadrestart')
@@ -12,6 +13,10 @@ const mkSpreadrestart = S.object()
 
 const spreadrestart = mkSpreadrestart.valueOf()
 
+const ajv = new Ajv()
+const spreadrestartValidate = ajv.compile(spreadrestart)
+
 export {
-  spreadrestart
+  spreadrestart,
+  spreadrestartValidate
 } 

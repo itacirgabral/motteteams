@@ -1,4 +1,5 @@
 import S from 'fluent-json-schema'
+import Ajv from 'ajv'
 
 const mkDisconnect = S.object()
   .id('disconnect')
@@ -12,6 +13,10 @@ const mkDisconnect = S.object()
 
 const disconnect = mkDisconnect.valueOf()
 
+const ajv = new Ajv()
+const disconnectValidate = ajv.compile(disconnect)
+
 export {
-  disconnect
+  disconnect,
+  disconnectValidate
 } 
