@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "types": "npx ts-node src/schema/build.ts",
     "docs": "npx typedoc && npx http-server docs",
-    "types": "json2ts -i schemas -o types",
     "dev": "npx node-dev -r dotenv/config --inspect src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
