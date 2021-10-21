@@ -1,6 +1,7 @@
 import { redis } from './redis'
 import { panoptickey } from './rediskeys'
 import { trafficwand } from './trafficwand'
+import { zygote } from './zygote'
 
 const observable = trafficwand({ redis, panoptickey })
 
@@ -20,7 +21,7 @@ observable.subscribe({
         console.dir({ bread })
         break
       case 'signupconnection':
-        console.dir({ bread })
+        zygote(bread)
         break
       case 'spreadrestart':
         console.dir({ bread })
