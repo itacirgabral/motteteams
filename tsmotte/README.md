@@ -3,7 +3,12 @@
 
 ## baileys md
 ```
-npm link @adiwajshing/baileys-md
+cd ../Baleys
+npm adduser --registry http://localhost:4873
+npm publish --registry http://localhost:4873
+```
+```
+npm install -S @adiwajshing/baileys-md --registry http://localhost:4873
 ```
 
 ## NICE TO HAVE
