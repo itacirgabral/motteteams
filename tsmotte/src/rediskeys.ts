@@ -22,6 +22,14 @@ const panoptickey = `hardid:${hardid}:panoptic`
  */
 const bornskey = `hardid:${hardid}:borns`
 
+const mkcredskey = function mkcredskey({ shard }: { shard: string }) {
+  return `hardid:${hardid}:zap:${shard}:creds`
+}
+
+const mkstatekey = function mkstatekey({ shard }: { shard: string }) {
+  return `hardid:${hardid}:zap:${shard}:state`
+}
+
 const mkstmkey = function mkstmkey({ shard }: { shard: string }) {
   return `hardid:${hardid}:zap:${shard}:stm`
 }
@@ -49,6 +57,8 @@ const mkofifkey = function mkofifkey({ shard }: { shard: string }) {
 export {
   panoptickey,
   bornskey,
+  mkcredskey,
+  mkstatekey,
   mkstmkey,
   mktskey,
   mkqrcodekey,

@@ -1,70 +1,49 @@
-import { AuthenticationState, BufferJSON, initInMemoryKeyStore } from '@adiwajshing/baileys-md'
+import { BufferJSON, WABrowserDescription } from '@adiwajshing/baileys-md'
 import baileys from '@adiwajshing/baileys-md'
-import { readFile, writeFile } from "fs"
-import pino from 'pino'
 
 import { redis } from './redis'
-import { panoptickey } from './rediskeys'
+import { mkcredskey } from './rediskeys'
 import { Signupconnection } from './schema/ConnAdm'
-
-const loadState = function loadState (): Promise<AuthenticationState> {
-  return new Promise((resolve, rejects) => {
-    readFile('./auth_info_multi.json', { encoding: 'utf-8' }, (err, data) => {
-      if (err) {
-        rejects(err)
-      } else {
-        const value = JSON.parse(data, BufferJSON.reviver)
-        resolve({ 
-          creds: value.creds, 
-          keys: initInMemoryKeyStore(value.keys) 
-      })
-      }
-    })
-  })
-}
-
-const saveState = function saveState (state: AuthenticationState) {
-  return new Promise((resolve, rejects) => {
-    const value = JSON.stringify(state, BufferJSON.replacer, 2)
-    writeFile('./auth_info_multi.json', value, (err) => {
-      if (err) {
-        rejects(err)
-      } else {
-        resolve(value)
-      }
-    })
-  })
-}
 
 
 const zygote = function zygote (signupconnection: Signupconnection): void {
   const { mitochondria, shard, url, cacapa } = signupconnection
 
-  console.dir({ mitochondria, shard, url, cacapa })
+  const browser: WABrowserDescription = ['BROODERHEN', 'Chrome', '95'] 
 
-  let socket = baileys({
-    logger: pino({ level: 'trace' }),
-    printQRInTerminal: true
+  // TODO enviar qrcode na e url cacapa
+  const socket = baileys({
+    printQRInTerminal: true,
+    browser
   })
-
   socket.ev.on('connection.update', async (update) => {
     if(update.connection === 'close') {
-      const auth = await loadState()
-      socket = baileys({
-        logger: pino({ level: 'trace' }),
-        printQRInTerminal: true,
-        auth
-      })
-
       console.log('logando uma segunda vez')
+      const user = socket.user
+      console.dir({ user })
+      const socket2 = baileys({
+        auth: socket.authState,
+        browser
+      })
+      socket2.ev.on ('auth-state.update', () => {
+        setTimeout(async () => {
+          const user = socket2.user
+          const jid = user.id.split(':')[0]
+          if (jid === shard) {
+            const authInfo = socket2.authState
+            const value = JSON.stringify(authInfo, BufferJSON.replacer, 2)
+            await redis.set(mkcredskey({ shard }), value)
+            await socket2.logout()
+            console.log('hora de dar tchau')
+
+            // TODO enviar o jwt para url e pra fila qrcode ttl
+          } else {
+            console.log(`ops shard=${shard}<>${jid}=jid`)
+          }
+        }, 5000)
+      })
     }
   })
-
-  socket.ev.on ('auth-state.update', async () => {
-    const authInfo = socket.authState
-    await saveState(authInfo)
-  })
-
 }
 
 export {
