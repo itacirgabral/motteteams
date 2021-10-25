@@ -1,4 +1,4 @@
-import { fork } from 'child_process'
+import { fork, ChildProcess } from 'child_process'
 
 const isMain = !process.env.SERVICE
 
@@ -7,21 +7,28 @@ console.log(`SERVICE=${process.env.SERVICE}`)
 
 if (isMain) {
   // 500
-  setTimeout(() => {
-    fork('./src/index', {
-      env: {
-        ...process.env,
-        SERVICE: 'zygote'
-      }
-    })
-  }, 500)
+  const zgt = fork('./src/index', {
+    env: {
+      ...process.env,
+      SERVICE: 'zygote'
+    }
+  })
 
   // 1000
   setInterval(() => {
-    console.log('iniciei zygote')
+    zgt ? zgt.send('opa') : undefined
   }, 1000)
+
 } else if (process.env.SERVICE === 'zygote') {
-  setInterval(() => {
-    console.log('zygote de pé')
-  }, 1000)
+  console.log(`zygote de pé ${process.pid}`)
+  process.on('message', (message) => {
+    console.log(`recebi ${message}`)
+  })
 }
+
+// online
+// disconnect
+// listening
+// message
+// error
+// exit
