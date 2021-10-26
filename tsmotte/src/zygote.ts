@@ -48,8 +48,8 @@ const zygote = function zygote (signupconnection: Signupconnection) {
 
             // Caso seja um subprocesso, sair
             if (process.send) {
-              process.send('zgt hora de dar tchau')
-              process.exit()
+              process.send('SGUTDOWN_ME')
+              // process.exit()
             }
           }, 4000)
         })
@@ -86,6 +86,9 @@ const zygotePC = function zygotePC (signupconnection: Signupconnection) {
     console.dir(el)
   })
   zgt.on('message', el => {
+    if (el === 'SGUTDOWN_ME') {
+      zgt.kill('SIGINT')
+    }
     console.log('zgt message')
     console.dir(el)
   })
