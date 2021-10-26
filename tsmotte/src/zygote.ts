@@ -1,20 +1,26 @@
 import { fork } from 'child_process'
-import { BufferJSON, WABrowserDescription } from '@adiwajshing/baileys-md'
 import baileys from '@adiwajshing/baileys-md'
+import { BufferJSON, WABrowserDescription } from '@adiwajshing/baileys-md'
+import got from 'got'
+
 
 import { redis } from './redis'
 import { mkcredskey } from './rediskeys'
 import { Signupconnection } from './schema/ConnAdm'
+import { makeCountyToken } from './jwt'
+import { rediskeys } from './docs'
 
 const zygote = function zygote (signupconnection: Signupconnection) {
   return new Promise((res, rej) => {
     const { mitochondria, shard, url, cacapa } = signupconnection
 
     const browser: WABrowserDescription = ['BROODERHEN', 'Chrome', '95'] 
+
+    let lastQrcode = ''
   
     // TODO enviar qrcode na e url cacapa
     const socket = baileys({
-      printQRInTerminal: true,
+      printQRInTerminal: true, 
       browser
     })
     socket.ev.on('connection.update', async (update) => {
@@ -27,32 +33,67 @@ const zygote = function zygote (signupconnection: Signupconnection) {
           browser
         })
         socket2.ev.on ('auth-state.update', () => {
-          setTimeout(async () => {
-            const user = socket2.user
-            const jid = user.id.split(':')[0]
-            if (jid === shard) {
+          const user = socket2.user
+          const jid = user.id.split(':')[0]
+          if (jid === shard) {
+            setTimeout(async () => {
               const authInfo = socket2.authState
               const value = JSON.stringify(authInfo, BufferJSON.replacer, 2)
               await redis.set(mkcredskey({ shard }), value)
               await socket2.logout()
   
-              // TODO enviar o jwt para url e pra fila qrcode ttl
-              // TODO criar borns com mitocondria
-  
-              res({ jwt: 'xxx.yyy.zzz' })
-  
-            } else {
-              console.log()
-              rej(`ops shard=${shard}<>${jid}=jid`)
-            }
+              const jwt = makeCountyToken({ shard })
 
-            // Caso seja um subprocesso, sair
+              const timestamp = (new Date()).toLocaleString('pt-BR')
+              const bornskey = rediskeys.bornskey
+              const birth = { type: 'jwt', mitochondria, shard, jwt, timestamp }
+              const birthcert = JSON.stringify(birth)
+              const pipeline = redis.pipeline()
+              pipeline.sadd(bornskey, birthcert)
+              pipeline.lpush(lastQrcode, birthcert)
+              pipeline.expire(lastQrcode, 90)
+
+              await Promise.all([
+                pipeline.exec(),
+                got.post(url, {
+                  json: birth,
+                }).catch(() => {
+                  //
+                })
+              ])
+
+              if (process.send) {
+                process.send('SGUTDOWN_ME')
+              }
+
+              res(birthcert)
+            }, 10_000)
+          } else {
+            rej()
             if (process.send) {
               process.send('SGUTDOWN_ME')
-              // process.exit()
             }
-          }, 4000)
+          }
         })
+      } else if(update.qr) {
+        lastQrcode = update.qr || ''
+        const response = {
+          type: 'qr',
+          qr: update.qr
+        }
+
+        got.post(url, {
+          json: response
+        }).catch(() => {
+          //
+        })
+    
+        const pipeline = redis.pipeline()
+        pipeline.lpush(cacapa, JSON.stringify(response))
+        pipeline.expire(cacapa, 90)
+        pipeline.exec()
+
+        console.dir({ qr: update.qr })
       }
     })
   })

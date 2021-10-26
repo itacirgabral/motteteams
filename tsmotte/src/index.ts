@@ -4,21 +4,19 @@ import { zygote } from './zygote'
 
 const isMain = !process.env.SERVICE
 
-console.log(`isMain=${isMain}`)
-console.log(`SERVICE=${process.env.SERVICE}`)
-
 process.on('message', (message) => {
   console.log(`MAIN <- ${message}`)
 })
 
 // Pocesso principal
 if (isMain) {
-  // Servidor principal
+  console.log('isMain')
   const { inBound } = mkServer()
   console.dir({ inBound })
 
   // Serviço Novo QR CODE
 } else if (process.env.SERVICE === 'zygote') {
+  console.log('isZygote')
   // Recuperando variáveis na ENV
   const signupconnection: Signupconnection = {
     type: 'signupconnection',
