@@ -1,34 +1,35 @@
-import { fork, ChildProcess } from 'child_process'
+import { Signupconnection } from './schema/ConnAdm'
+import { mkServer } from './server'
+import { zygote } from './zygote'
 
 const isMain = !process.env.SERVICE
 
 console.log(`isMain=${isMain}`)
 console.log(`SERVICE=${process.env.SERVICE}`)
 
+process.on('message', (message) => {
+  console.log(`MAIN <- ${message}`)
+})
+
+// Pocesso principal
 if (isMain) {
-  // 500
-  const zgt = fork('./src/index', {
-    env: {
-      ...process.env,
-      SERVICE: 'zygote'
-    }
-  })
+  // Servidor principal
+  const { inBound } = mkServer()
+  console.dir({ inBound })
 
-  // 1000
-  setInterval(() => {
-    zgt ? zgt.send('opa') : undefined
-  }, 1000)
-
+  // Serviço Novo QR CODE
 } else if (process.env.SERVICE === 'zygote') {
-  console.log(`zygote de pé ${process.pid}`)
-  process.on('message', (message) => {
-    console.log(`recebi ${message}`)
-  })
+  // Recuperando variáveis na ENV
+  const signupconnection: Signupconnection = {
+    type: 'signupconnection',
+    hardid: process.env.hardid || '',
+    mitochondria: process.env.mitochondria || '',
+    shard: process.env.shard || '',
+    url: process.env.url || '',
+    cacapa: process.env.cacapa || ''
+  
+  }
+  zygote(signupconnection)
+    .then(console.dir)
+    .catch(console.error)
 }
-
-// online
-// disconnect
-// listening
-// message
-// error
-// exit
