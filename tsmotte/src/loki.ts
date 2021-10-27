@@ -42,13 +42,15 @@ const mkLoki = function mkLoki({ tags }: { tags: Array<Tag> }) {
     const json = {
       streams: [{
         stream,
-        values: [nanoTime, log]
+        values: [
+          [nanoTime, log]
+        ]
       }]
     }
 
     got.post(lokiPushUrl, {
       json
-    })
+    }).catch(console.error)
   }
 }
 

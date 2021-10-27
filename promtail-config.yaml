@@ -1,0 +1,31 @@
+server:
+  http_listen_port: 3101
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: https://admin:wntqaUSDder0WkD0qKM9wM4YodgrLoQu@loki.gm.inf.br/loki/api/v1/push
+
+scrape_configs:
+- job_name: system
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: varlogs
+      __path__: /var/log/*log
+
+# # Defines an HTTP target, which exposes an endpoint against the Promtail
+# # HTTP server to accept log traffic.
+# http:
+#   # Defines the base URL for the push path, adding a prefix to the
+#   # exposed endpoint. The final endpoint path is
+#   # <base_url>loki/api/v1/push. If omitted, defaults to /.
+#   #
+#   # Multiple http targets with the same base_url must not exist.
+#   base_url: /
+
+#   # Map of labels to add to every log line passed through to the target.
+#   labels: {}

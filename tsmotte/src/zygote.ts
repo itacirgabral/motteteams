@@ -3,14 +3,21 @@ import baileys from '@adiwajshing/baileys-md'
 import { BufferJSON, WABrowserDescription } from '@adiwajshing/baileys-md'
 import got from 'got'
 
-
 import { redis } from './redis'
 import { mkcredskey } from './rediskeys'
 import { Signupconnection } from './schema/ConnAdm'
 import { makeCountyToken } from './jwt'
 import { rediskeys } from './docs'
 
-const zygote = function zygote (signupconnection: Signupconnection) {
+interface Birth {
+  type: 'jwt',
+  mitochondria: string;
+  shard: string;
+  jwt: string;
+  timestamp: string;
+}
+
+const zygote = function zygote (signupconnection: Signupconnection): Promise<Birth> {
   return new Promise((res, rej) => {
     const { mitochondria, shard, url, cacapa } = signupconnection
 
@@ -41,13 +48,14 @@ const zygote = function zygote (signupconnection: Signupconnection) {
               const value = JSON.stringify(authInfo, BufferJSON.replacer, 2)
               await redis.set(mkcredskey({ shard }), value)
               await socket2.logout()
-  
+
               const jwt = makeCountyToken({ shard })
 
               const timestamp = (new Date()).toLocaleString('pt-BR')
               const bornskey = rediskeys.bornskey
-              const birth = { type: 'jwt', mitochondria, shard, jwt, timestamp }
+              const birth: Birth = { type: 'jwt', mitochondria, shard, jwt, timestamp }
               const birthcert = JSON.stringify(birth)
+
               const pipeline = redis.pipeline()
               pipeline.sadd(bornskey, birthcert)
               pipeline.lpush(lastQrcode, birthcert)
@@ -66,7 +74,7 @@ const zygote = function zygote (signupconnection: Signupconnection) {
                 process.send('SGUTDOWN_ME')
               }
 
-              res(birthcert)
+              res(birth)
             }, 10_000)
           } else {
             rej()

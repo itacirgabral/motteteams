@@ -7,40 +7,53 @@ services:
       - redisdata:/data
     ports:
       - "6379:6379"
-  # minio:
-  #   image: minio/minio
-  #   restart: unless-stopped
-  #   environment:
-  #     MINIO_ROOT_USER: admin
-  #     MINIO_ROOT_PASSWORD: admin678
-  #   command: ['server', '/data', '--console-address', ':9001']
-  #   volumes:
-  #     - miniodata:/data
-  #   ports:
-  #     - "9000:9000"
-  #     - "9001:9001"
-  # couchdb:
-  #   image: couchdb
-  #   restart: unless-stopped
-  #   volumes:
-  #     - couchdbdata:/opt/couchdb/data
-  #   ports:
-  #     - "5984:5984"
-  #   environment:
-  #     COUCHDB_USER: admin
-  #     COUCHDB_PASSWORD: wntqaUSDder0WkD0qKM9wM4YodgrLoQu
-  #     NODENAME: mainjsondb
+#
+  minio:
+    image: minio/minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin678
+    command: ['server', '/data', '--console-address', ':9001']
+    volumes:
+      - miniodata:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+#
+  couchdb:
+    image: couchdb
+    restart: unless-stopped
+    volumes:
+      - couchdbdata:/opt/couchdb/data
+    ports:
+      - "5984:5984"
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: wntqaUSDder0WkD0qKM9wM4YodgrLoQu
+      NODENAME: mainjsondb
+#
   grafana:
     image: grafana/grafana:8.2.2
     restart: unless-stopped
     ports:
-        - "3000:3000"
+        - "3030:3000"
     environment:
         GF_SECURITY_ADMIN_USER: admin
         GF_SECURITY_ADMIN_PASSWORD: wntqaUSDder0WkD0qKM9wM4YodgrLoQu
         GF_USERS_ALLOW_SIGN_UP: 'false'
     volumes:
         - grafanadata:/var/lib/grafana
+#
+  # promtail:
+  #   image: grafana/promtail:2.3.0
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3101:3101"
+  #   volumes:
+  #     - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
+  #   command: -config.file=/etc/promtail/promtail-config.yaml
+#
   prometheus:
     image: prom/prometheus:v2.30.3
     restart: unless-stopped
@@ -56,14 +69,17 @@ services:
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
+#
   loki:
     image: grafana/loki:2.3.0
     restart: unless-stopped
     ports:
       - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
     volumes:
-      - ./loki-config.yaml:/etc/loki/config.yaml
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
       - lokidata:/loki
+#
   pushgateway:
     image: prom/pushgateway:v1.4.2
     restart: unless-stopped
