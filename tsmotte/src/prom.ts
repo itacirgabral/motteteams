@@ -1,20 +1,33 @@
+import http from 'http'
+import url from 'url'
 import promClient from 'prom-client'
 
-const promPushUrl = process.env.PROM_PUSH_URL || 'http://127.0.0.1:9091'
 
-const collectDefaultMetrics = promClient.collectDefaultMetrics;
-const Registry = promClient.Registry
-const register = new Registry()
+const mkProm = function mkProm () {
+  const register = new promClient.Registry()
+  promClient.collectDefaultMetrics({
+    register,
+    labels: {
+      app: 'GMAPI2',
+      hardid: process.env.HARDID
+    }
+  })
 
-collectDefaultMetrics({
-  register,
-  labels: {
-    resouce: process.env.HARDID || 'dev'
-  }
-})
+  const pomServer = http.createServer((req, res) => {
+    const route = url.parse(req.url || '{"pathname":""}').pathname
+    if (route === '/metrics') {
+      res.setHeader('Content-Type', register.contentType)
+      register.metrics().then(el => {
+        res.end(el)
+      })
+    }
+  })
 
-const prom = new promClient.Pushgateway(promPushUrl)
+  pomServer.listen(8080)
+
+  return pomServer
+}
 
 export {
-  prom
+  mkProm
 }

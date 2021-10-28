@@ -2,6 +2,7 @@ import { Signupconnection } from './schema/ConnAdm'
 import { mkServer } from './server'
 import { zygote } from './zygote'
 import { mkLoki } from './loki'
+import { mkProm } from './prom'
 
 const isMain = !process.env.SERVICE
 
@@ -22,6 +23,8 @@ if (isMain) {
   logInfo({
     log: 'isMain'
   })
+
+  const promServer = mkProm()
 
   // Serviço Novo QR CODE
 } else if (process.env.SERVICE === 'zygote') {
