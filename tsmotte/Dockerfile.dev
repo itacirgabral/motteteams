@@ -1,0 +1,11 @@
+FROM node:16
+
+WORKDIR /app
+
+COPY ./package.json ./
+COPY ./tsconfig.json ./
+COPY ./devloop.js ./devloop.js
+
+# RUN npm install
+
+CMD [ "node", "./devloop.js" ]

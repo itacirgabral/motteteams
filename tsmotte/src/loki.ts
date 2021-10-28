@@ -1,6 +1,6 @@
 import got from 'got'
 
-const lokiPushUrl = process.env.LOKI_PUSH_URL || 'http://localhost:3100/loki/api/v1/push'
+const lokiPushUrl = process.env.LOKI_PUSH_URL || 'http://loki:3100/loki/api/v1/push'
 const hardid = process.env.HARDID || 'dev'
 
 interface Tag {
