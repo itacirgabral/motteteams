@@ -20,21 +20,19 @@ interface Birth {
 const zygote = function zygote (signupconnection: Signupconnection): Promise<Birth> {
   return new Promise((res, rej) => {
     const { mitochondria, shard, url, cacapa } = signupconnection
-
     const browser: WABrowserDescription = ['BROODERHEN', 'Chrome', '95'] 
-
     let lastQrcode = ''
-  
-    // TODO enviar qrcode na e url cacapa
+
+    // TODO PROM-CLIENT SIGNUP_START
     const socket = baileys({
       printQRInTerminal: true, 
       browser
     })
     socket.ev.on('connection.update', async (update) => {
       if(update.connection === 'close') {
-        console.log('zgt logando uma segunda vez')
-        const user = socket.user
-        console.dir({ user })
+        // TODO PROM-CLIENT SIGNUP_SIGNIN
+
+        // esta segunda coneção já poderia ser feita no connect, estudar isso
         const socket2 = baileys({
           auth: socket.authState,
           browser
@@ -43,6 +41,8 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
           const user = socket2.user
           const jid = user.id.split(':')[0]
           if (jid === shard) {
+
+            // 'TODO PROM-CLIENT SIGNUP_SUCCESS'
             setTimeout(async () => {
               const authInfo = socket2.authState
               const value = JSON.stringify(authInfo, BufferJSON.replacer, 2)
@@ -50,6 +50,8 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
               await socket2.logout()
 
               const jwt = makeCountyToken({ shard })
+
+              // TODO PROM-CLIENT SIGNUP_JWT
 
               const timestamp = (new Date()).toLocaleString('pt-BR')
               const bornskey = rediskeys.bornskey
@@ -65,13 +67,11 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
                 pipeline.exec(),
                 got.post(url, {
                   json: birth,
-                }).catch(() => {
-                  //
-                })
+                }).catch(console.error)
               ])
 
               if (process.send) {
-                process.send('SGUTDOWN_ME')
+                process.send('SHUTDOWN_ME')
               }
 
               res(birth)
@@ -79,7 +79,7 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
           } else {
             rej()
             if (process.send) {
-              process.send('SGUTDOWN_ME')
+              process.send('SHUTDOWN_ME')
             }
           }
         })
@@ -92,10 +92,10 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
 
         got.post(url, {
           json: response
-        }).catch(() => {
-          //
-        })
-    
+        }).catch(console.error)
+
+        // TODO PROM-CLIENT SIGNUP_QRCODE
+
         const pipeline = redis.pipeline()
         pipeline.lpush(cacapa, JSON.stringify(response))
         pipeline.expire(cacapa, 90)
@@ -135,7 +135,7 @@ const zygotePC = function zygotePC (signupconnection: Signupconnection) {
     console.dir(el)
   })
   zgt.on('message', el => {
-    if (el === 'SGUTDOWN_ME') {
+    if (el === 'SHUTDOWN_ME') {
       zgt.kill('SIGINT')
     }
     console.log('zgt message')

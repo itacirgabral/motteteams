@@ -2,7 +2,6 @@ import { Signupconnection } from './schema/ConnAdm'
 import { mkServer } from './server'
 import { zygote } from './zygote'
 import { mkLoki } from './loki'
-import { mkProm } from './prom'
 
 const isMain = !process.env.SERVICE
 
@@ -24,8 +23,6 @@ if (isMain) {
     log: 'isMain'
   })
 
-  const promServer = mkProm()
-
   // Serviço Novo QR CODE
 } else if (process.env.SERVICE === 'zygote') {
   console.log('isZygote')
@@ -39,11 +36,11 @@ if (isMain) {
     cacapa: process.env.cacapa || ''
   }
 
-  // logInfo({ log: `isZygote <:> Processo de Leitura de QRCode <:> mitochondria=${
-  //   signupconnection.mitochondria
-  // } <:> shard=${
-  //   signupconnection.shard
-  // }`})
+  logInfo({ log: `isZygote <:> Processo de Leitura de QRCode <:> mitochondria=${
+    signupconnection.mitochondria
+  } <:> shard=${
+    signupconnection.shard
+  }`})
 
   zygote(signupconnection)
     .then(el => {
