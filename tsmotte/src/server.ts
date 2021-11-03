@@ -3,7 +3,9 @@ import { Observable } from 'rxjs'
 import { panoptickey } from './rediskeys'
 import { trafficwand } from './trafficwand'
 import { zygotePC } from './zygote'
+import { wacPC  } from './wac'
 import { ConnAdm } from './schema'
+import { patchpanel } from './patchpanel'
 
 let server: {
   inBound: Observable<ConnAdm>;
@@ -17,16 +19,16 @@ const mkServer = function mkServer () {
       next: bread => {
         switch (bread.type) {
           case 'connect':
-            console.dir({ bread })
+            wacPC(bread)
             break
           case 'connectionstate':
-            console.dir({ bread })
+            wacPC(bread)
             break
           case 'disconnect':
-            console.dir({ bread })
+            wacPC(bread)
             break
           case 'queuerestart':
-            console.dir({ bread })
+            // console.dir({ bread })
             break
           case 'signupconnection':
             zygotePC(bread)
