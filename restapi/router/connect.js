@@ -1,5 +1,5 @@
 const retention = Number(process.env.REDIS_RETENTION_TIMESERIES_MS || '86400000')
-const stunttl = 60
+// const stunttl = 60
 
 const rediskeys = require('../rediskeys')
 const crypto = require('crypto')
@@ -15,7 +15,6 @@ const connect = ({ redis, mkcredskey, mkconnstunkey, hardid, panoptickey, mktsro
   const connstunkey = mkconnstunkey(shard)
   const bread = JSON.stringify({ hardid, type: typeDisconnect, shard })
 
-  console.log(`connstunkey=${connstunkey}`)
   const pipeline = redis.pipeline()
   pipeline.exists(mkcredskey(shard)) // 0
   pipeline.exists(connstunkey) // 1

@@ -14,7 +14,7 @@ const app = express()
 const redisConn = process.env.REDIS_CONN
 const hardid = process.env.HARDID
 const panoptickey = 'zap:panoptic'
-const mkcredskey = shard => `zap:${shard}:creds`
+const mkcredskey = shard => `hardid:${hardid}:zap:${shard}:creds`
 const mkconnstunkey = shard => `zap:${shard}:connstun`
 const mkwebhookkey = shard => `zap:${shard}:webhook`
 const mkwebhook2key = shard => `zap:${shard}:webhook2`
