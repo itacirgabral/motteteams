@@ -4,10 +4,11 @@
 - vagrant plugin install vagrant-docker-login
 - vagrant plugin install vagrant-docker-compose
 
-### .env docker login
-```
-DOCKER_USERNAME=66SgfKqEPEpt9SFOJjEF7tXoa2bSrXV4
-DOCKER_EMAIL=docker@gestorsistemas.com
-DOCKER_PASSWORD=66SgfKqEPEpt9SFOJjEF7tXoa2bSrXV4
-DOCKER_SERVER=https://registry.gestormessenger.com
-```
+## local hashi
+- consul agent -dev
+- sudo nomad agent -dev-connect
+- vagrant up
+- vagrant ssh
+  - nomad node status
+- [nomad](http://localhost:4646/ui) [CRIAR JOB](https://www.nomadproject.io/docs/job-specification)
+- [consul](http://localhost:8500/ui)

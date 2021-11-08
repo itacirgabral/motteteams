@@ -1,0 +1,25 @@
+---
+- hosts: all
+  become: true
+  tasks:
+
+    - name: Install Pre Packages
+      apt:
+        name: ['curl', 'git', 'build-essential']
+        state: latest
+
+    - name: add hashicorp apt key
+      apt_key:
+        url: https://apt.releases.hashicorp.com/gpg
+        state: present
+
+    - name: add hashicorp repository
+      apt_repository:
+        repo: deb [arch=amd64] https://apt.releases.hashicorp.com bionic main
+        state: present
+        update_cache: yes
+
+    - name: Install hashicorp stack
+      apt:
+        name: ['consul', 'nomad', 'vault', 'waypoint', 'boundary']
+        state: latest
