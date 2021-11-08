@@ -9,6 +9,4 @@
 - sudo nomad agent -dev-connect
 - vagrant up
 - vagrant ssh
-  - nomad node status
-- [nomad](http://localhost:4646/ui) [CRIAR JOB](https://www.nomadproject.io/docs/job-specification)
-- [consul](http://localhost:8500/ui)
+- vagrant> sudo nomad agent -config=/etc/nomad.d/nomad.hcl
