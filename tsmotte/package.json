@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@adiwajshing/baileys-md": "^4.0.1",
+    "@adiwajshing/baileys-md": "^4.0.2",
     "dotenv": "^10.0.0",
     "fluent-json-schema": "^3.0.1",
     "got": "^11.8.2",

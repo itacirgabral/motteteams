@@ -5,6 +5,7 @@ import { trafficwand } from './trafficwand'
 import { zygotePC } from './zygote'
 import { wacPC  } from './wac'
 import { ConnAdm } from './schema'
+import { Connect } from './schema/ConnAdm'
 import { patchpanel } from './patchpanel'
 
 let server: {
@@ -31,7 +32,22 @@ const mkServer = function mkServer () {
             // console.dir({ bread })
             break
           case 'signupconnection':
-            zygotePC(bread)
+            // quando fizer o signup
+            // logo em seguida signin
+            zygotePC(bread).then(birth => {
+              console.dir({ birth })
+              if (bread.shard === birth.shard) {
+                birth.auth
+                const letsConn: Connect = {
+                  type: 'connect',
+                  cacapa: birth.qrcode,// só pra não jogar fora
+                  hardid: bread.hardid,
+                  shard: birth.shard,
+                  auth: birth.auth
+                }
+                wacPC(letsConn)
+              }
+            })
             break
           case 'spreadrestart':
             console.dir({ bread })

@@ -20,6 +20,8 @@ import {
  * Tipo ConnAdm, conjunto de tipos que controla a conexão
  */
 type ConnAdm = Connect | Connectionstate | Disconnect | Queuerestart | Signupconnection | Spreadrestart
+type ConnectionSwitch = Connect | Disconnect | Connectionstate
+
 
 const isConnAdm = {
   isConnect,
@@ -32,5 +34,6 @@ const isConnAdm = {
 
 export {
   ConnAdm,
+  ConnectionSwitch,
   isConnAdm
 }

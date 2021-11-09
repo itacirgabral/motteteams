@@ -1,6 +1,7 @@
-import { Signupconnection } from './schema/ConnAdm'
+import { Signupconnection, Connect } from './schema/ConnAdm'
 import { mkServer } from './server'
 import { zygote } from './zygote'
+import { wac } from './wac'
 import { mkLoki } from './loki'
 
 const isMain = !process.env.SERVICE
@@ -51,6 +52,28 @@ if (isMain) {
         el.shard
       } <:> jwt=${
         el.jwt
+      }`})
+    })
+    .catch(console.error)
+} else if (process.env.SERVICE === 'wac') {
+  console.log('isWAC')
+
+  const connect: Connect = {
+    type: 'connect',
+    hardid: process.env.hardid || '',
+    shard: process.env.shard || '',
+    cacapa: process.env.cacapa || '',
+    auth: process.env.auth || ''
+  }
+
+  wac(connect)
+    .then(el => {
+      console.log(el)
+
+      logInfo({ log: `isWAC <:> connect <:> hardid=${
+        process.env.hardid
+      } <:> shard=${
+        process.env.shard
       }`})
     })
     .catch(console.error)
