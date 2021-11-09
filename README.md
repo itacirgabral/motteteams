@@ -10,3 +10,10 @@
 - vagrant up
 - vagrant ssh
 - vagrant> sudo nomad agent -config=/etc/nomad.d/nomad.hcl
+
+## terra ocean
+```
+terraform plan \
+  -var "do_token=${DO_PAT}" \
+  -var "pvt_key=$HOME/.ssh/id_rsa"
+```
