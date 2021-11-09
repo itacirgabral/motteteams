@@ -20,11 +20,7 @@ const mkServer = function mkServer () {
       next: bread => {
         switch (bread.type) {
           case 'connect':
-            wacPC(bread)
-            break
           case 'connectionstate':
-            wacPC(bread)
-            break
           case 'disconnect':
             wacPC(bread)
             break
@@ -35,7 +31,6 @@ const mkServer = function mkServer () {
             // quando fizer o signup
             // logo em seguida signin
             zygotePC(bread).then(birth => {
-              console.dir({ birth })
               if (bread.shard === birth.shard) {
                 birth.auth
                 const letsConn: Connect = {
