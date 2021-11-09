@@ -2,7 +2,7 @@ import { fork } from 'child_process'
 import { Connect, isConnect, Disconnect, isDisconnect, Connectionstate, isConnectionstate } from './schema/ConnAdm'
 import { patchpanel } from './patchpanel'
 import baileys from '@adiwajshing/baileys-md'
-import { BufferJSON, WABrowserDescription } from '@adiwajshing/baileys-md'
+import { BufferJSON, WABrowserDescription, initInMemoryKeyStore  } from '@adiwajshing/baileys-md'
 import { mkcredskey } from './rediskeys'
 import { redis } from './redis'
 
@@ -19,12 +19,17 @@ const wac = function wac (connect: Connect): Promise<string> {
     if(connect.type === 'connect' && isConnect(connect)) {
       console.log('iniciando o processo BAILEY CONNECT')
       const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95']
-      const auth = JSON.parse(connect.auth, BufferJSON.reviver)
+      const authJSON = JSON.parse(connect.auth, BufferJSON.reviver)
+      const auth = { 
+        creds: authJSON.creds, 
+        keys: initInMemoryKeyStore(authJSON.keys) 
+      }
 
       const socket = baileys({
         auth,
         browser
       })
+
       socket.ev.on ('auth-state.update', () => {
         const authInfo = socket.authState
         const authJson = JSON.stringify(authInfo, BufferJSON.replacer, 2)

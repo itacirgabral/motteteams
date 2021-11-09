@@ -32,8 +32,6 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
     })
     socket.ev.on('connection.update', async (update) => {
       if(update.connection === 'close') {
-        const user = socket.user
-        const jid = user.id.split(':')[0]
 
         const authInfo = socket.authState
         const authJson = JSON.stringify(authInfo, BufferJSON.replacer, 2)
@@ -110,7 +108,12 @@ const zygotePC = function zygotePC (signupconnection: Signupconnection): Promise
         cacapa
       }
     })
-  
+
+    zgt.on('message', (birth: Birth) => {
+      zgt.kill('SIGINT')
+      res(birth)
+    })
+
     zgt.on('close', el => {
       console.log('zgt close')
       console.dir(el)
@@ -121,10 +124,6 @@ const zygotePC = function zygotePC (signupconnection: Signupconnection): Promise
     zgt.on('listening', el => {
       console.log('zgt listening')
       console.dir(el)
-    })
-    zgt.on('message', (birth: Birth) => {
-      zgt.kill('SIGINT')
-      res(birth)
     })
     zgt.on('error', el => {
       console.log('zgt error')
