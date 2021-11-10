@@ -21,8 +21,8 @@
     "jsonwebtoken": "^8.5.1",
     "minio": "^7.0.19",
     "nano": "^9.0.5",
-    "pino": "^7.0.5",
-    "prom-client": "^14.0.0",
+    "pino": "^7.2.0",
+    "prom-client": "^14.0.1",
     "rxjs": "^7.4.0"
   },
   "devDependencies": {
