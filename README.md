@@ -1,4 +1,14 @@
-# GMAPI2
+# SETAPÃO DO ZAP
+## TODO Baileys
+- [x] processo leitura de novo qrcode
+- [x] controle de conexão
+- [ ] contatos e grupos
+- [ ] recebimentos de mensagens
+- [ ] administração de contatos e grupos
+- [ ] recebimento de arquivos
+- [ ] envio de mensagens
+- [ ] envio de arquivos
+- [ ] notificação de recebimento
 
 ## vagrant
 - vagrant plugin install vagrant-docker-login
@@ -20,4 +30,5 @@ terraform plan \
 
 ## GMPI 2
 - `docker-compose up -d`
-- `yarn workspace tsmotte start`
+- `yarn workspace tsmotte dev`
+- - `yarn workspace restapi dev`
