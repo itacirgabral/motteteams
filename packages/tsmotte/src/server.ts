@@ -1,4 +1,5 @@
 import { redis } from './redis'
+import { mkcredskey } from './rediskeys'
 import { Observable } from 'rxjs'
 import { panoptickey } from './rediskeys'
 import { trafficwand } from './trafficwand'
@@ -6,7 +7,6 @@ import { zygotePC } from './zygote'
 import { wacPC  } from './wac'
 import { ConnAdm } from './schema'
 import { Connect } from './schema/ConnAdm'
-import { patchpanel } from './patchpanel'
 
 let server: {
   inBound: Observable<ConnAdm>;
@@ -20,6 +20,13 @@ const mkServer = function mkServer () {
       next: bread => {
         switch (bread.type) {
           case 'connect':
+            redis.get(mkcredskey({ shard: bread.shard })).then(auth => {
+              if(auth) {
+                bread.auth = auth
+                wacPC(bread)
+              }
+            })
+            break
           case 'connectionstate':
           case 'disconnect':
             wacPC(bread)
@@ -48,7 +55,8 @@ const mkServer = function mkServer () {
             console.dir({ bread })
             break
           default:
-            console.error({ bread })
+            console.log('redis:stream -> switch ?')
+            console.error(bread)
         }
       },
       error: console.error,

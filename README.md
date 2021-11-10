@@ -18,5 +18,6 @@ terraform plan \
   -var "pvt_key=$HOME/.ssh/id_rsa"
 ```
 
-## lerna
-- yarn workspace packagename add modulename
+## GMPI 2
+- `docker-compose up -d`
+- `yarn workspace tsmotte start`

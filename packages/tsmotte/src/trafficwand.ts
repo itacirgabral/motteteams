@@ -13,7 +13,6 @@ const trafficwand = ({ redis, panoptickey }: { redis: Redis, panoptickey: string
       for (const county of stream) {
         // const countyHead = county[0]
         const countyBody = county[1]
-
         // console.log(`countyHead=${countyHead}`)
 
         for (const log of countyBody) {
@@ -22,35 +21,60 @@ const trafficwand = ({ redis, panoptickey }: { redis: Redis, panoptickey: string
           lastlogid = logHead
   
           const bread = stream2bread({ log: logBody })
+
           switch (bread.type) {
             case 'signupconnection':
               if (isConnAdm.isSignupconnection(bread)) {
+                console.log('isSignupconnection')
                 subscriber.next(bread)
+              } else {
+                console.log('NOT signupconnection')
+                console.dir(bread)
               }
               break;
             case 'connect':
               if (isConnAdm.isConnect(bread)) {
+                console.log('isConnect')
                 subscriber.next(bread)
+              } else {
+                console.log('NOT connect')
+                console.dir(bread)
               }
               break;
             case 'queuerestart':
               if (isConnAdm.isQueuerestart(bread)) {
+                console.log('isQueuerestart')
                 subscriber.next(bread)
+              } else {
+                console.log('NOT queuerestart')
+                console.dir(bread)
               }
               break;
             case 'spreadrestart':
               if (isConnAdm.isSpreadrestart(bread)) {
+                console.log('isSpreadrestart')
                 subscriber.next(bread)
+              } else {
+                console.log('NOT spreadrestart')
+                console.dir(bread)
               }
               break;
             case 'connectionstate':
               if (isConnAdm.isConnectionstate(bread)) {
+                console.log('connectionstate')
                 subscriber.next(bread)
+              } else {
+                console.log('NOT connectionstate')
+                console.dir(bread)
               }
               break;
             case 'disconnect':
               if (isConnAdm.isDisconnect(bread)) {
+                console.log('isDisconnect')
                 subscriber.next(bread)
+              } else {
+                console.log('NOT isDisconnect')
+                console.dir(bread)
               }
               break;
             default:

@@ -6,7 +6,6 @@ import { BufferJSON, WABrowserDescription, initInMemoryKeyStore  } from '@adiwaj
 import { mkcredskey } from './rediskeys'
 import { redis } from './redis'
 
-
 type ConnectionSwitch = Connect | Disconnect | Connectionstate
 
 /**
@@ -19,7 +18,7 @@ const wac = function wac (connect: Connect): Promise<string> {
     if(connect.type === 'connect' && isConnect(connect)) {
       console.log('iniciando o processo BAILEY CONNECT')
       const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95']
-      const authJSON = JSON.parse(connect.auth, BufferJSON.reviver)
+      const authJSON = JSON.parse(connect.auth || '{}', BufferJSON.reviver)
       const auth = { 
         creds: authJSON.creds, 
         keys: initInMemoryKeyStore(authJSON.keys) 
@@ -39,7 +38,7 @@ const wac = function wac (connect: Connect): Promise<string> {
 
         redis.set(mkcredskey({ shard }), authJson)
           .then(() => {
-            res('credenciais novas salvas')
+            res(shard)
           })
       })
     } else {
@@ -53,7 +52,7 @@ const wacPC = (connectionSwitch: ConnectionSwitch) => {
     case 'connect':
       if (isConnect(connectionSwitch) && !patchpanel.has(connectionSwitch.shard)) {
         const { type, hardid, shard, cacapa, auth } = connectionSwitch
-        
+        console.log('wacPC connect')
         // WhatsApp Connection Process 
         const wacP = fork('./src/index', {
           env: {
@@ -67,8 +66,15 @@ const wacPC = (connectionSwitch: ConnectionSwitch) => {
           }
         })
 
+        patchpanel.set(connectionSwitch.shard, {
+          connected: false,
+          connecting: true,
+          wacP
+        })
+
         wacP.on('close', el => {
           console.log('wacP close')
+          patchpanel.delete(connectionSwitch.shard)
           console.dir(el)
         })
         wacP.on('disconnect',  () => {
@@ -78,12 +84,19 @@ const wacPC = (connectionSwitch: ConnectionSwitch) => {
           console.log('wacP listening')
           console.dir(el)
         })
-        wacP.on('message', el => {
-          if (el === 'SHUTDOWN_ME') {
-            wacP.kill('SIGINT')
+        wacP.on('message', (el: string) => {
+          // update patchpanel state
+          const { type, ...body } = JSON.parse(el)
+          switch (type) {
+            case 'SHUTDOWN_ME':
+              patchpanel.delete(shard)  
+              wacP.kill('SIGINT')
+              break
+            default:
+              console.log('wacP message')
+              console.dir(el)
+              break
           }
-          console.log('wacP message')
-          console.dir(el)
         })
         wacP.on('error', el => {
           console.log('wacP error')
@@ -93,17 +106,32 @@ const wacPC = (connectionSwitch: ConnectionSwitch) => {
           console.log('wacP exit')
           console.dir(el)
         })
-
       }
       break
     case 'connectionstate':
+      console.log('wacPC connectionstate')
       if (isConnectionstate(connectionSwitch)) {
-        const { type, } = connectionSwitch
+        const { type, shard, hardid, cacapa } = connectionSwitch
+        if (patchpanel.has(shard)) {
+          const blueCable = patchpanel.get(shard)
+          console.log(`connectionstate=${blueCable?.connected ? 'connected' : 'connecting'}`)
+        } else {
+          console.log('connectionstate trashed')
+        }
       }
       break
     case 'disconnect':
       if (isDisconnect(connectionSwitch)) {
-        // mata processo 
+        // mata processo
+        const { type, hardid, shard, cacapa } = connectionSwitch
+        if (patchpanel.has(shard)) {
+          const blueCable = patchpanel.get(shard)
+          if (blueCable && (blueCable.connected || blueCable.connecting)) {
+            // kill now
+            // patchpanel.delete(shard)  
+            blueCable.wacP.kill('SIGINT')
+          }
+        }
       }
       break
   }

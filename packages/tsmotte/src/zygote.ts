@@ -1,6 +1,6 @@
 import { fork } from 'child_process'
 import baileys from '@adiwajshing/baileys-md'
-import { BufferJSON, WABrowserDescription, AuthenticationState } from '@adiwajshing/baileys-md'
+import { BufferJSON, WABrowserDescription } from '@adiwajshing/baileys-md'
 import got from 'got'
 
 import { redis } from './redis'
@@ -22,7 +22,7 @@ interface Birth {
 const zygote = function zygote (signupconnection: Signupconnection): Promise<Birth> {
   return new Promise((res, rej) => {
     const { mitochondria, shard, url, cacapa } = signupconnection
-    const browser: WABrowserDescription = ['BROODERHEN', 'Chrome', '95'] 
+    const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95'] 
     let lastQrcode = ''
 
     // TODO PROM-CLIENT SIGNUP_START

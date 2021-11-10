@@ -7,5 +7,5 @@ export interface Connect {
   hardid: string;
   shard: string;
   cacapa: string;
-  auth: string;
+  auth?: string;
 }

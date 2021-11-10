@@ -8,7 +8,7 @@ const mkConnect = S.object()
   .prop('hardid', S.string().required())
   .prop('shard', S.string().required())
   .prop('cacapa', S.string().required())
-  .prop('auth', S.string().required())
+  .prop('auth', S.string())
 
 const connect = mkConnect.valueOf()
 
