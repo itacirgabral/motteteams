@@ -3,6 +3,10 @@ import { Observable } from 'rxjs'
 import { stream2bread } from './stream2bread'
 import { ConnAdm, isConnAdm } from './schema'
 
+// ## REDIS TEST ##
+
+import redispack from 'redispack'
+
 const trafficwand = ({ redis, panoptickey }: { redis: Redis, panoptickey: string }) => new Observable<ConnAdm>(subscriber => {
   const redisBlock = redis.duplicate()
   let lastlogid = '$'
