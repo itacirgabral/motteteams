@@ -31,4 +31,7 @@ terraform plan \
 ## GMPI 2
 - `docker-compose up -d`
 - `yarn workspace tsmotte dev`
-- - `yarn workspace restapi dev`
+- `yarn workspace restapi dev`
+
+# DOC
+- [runner](https://github.com/folke/ultra-runner)
