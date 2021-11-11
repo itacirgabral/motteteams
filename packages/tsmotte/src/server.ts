@@ -1,58 +1,60 @@
-import { redis } from './redis'
-import { mkcredskey } from './rediskeys'
+import { client as redis, mkcredskey, panoptickey, trafficwand, Bread } from 'redispack'
 import { Observable } from 'rxjs'
-import { panoptickey } from './rediskeys'
-import { trafficwand } from './trafficwand'
 import { zygotePC } from './zygote'
 import { wacPC  } from './wac'
-import { ConnAdm } from './schema'
-import { Connect } from './schema/ConnAdm'
+import { isConnAdm } from 'types'
+import { Connect } from 'types'
 
 let server: {
-  inBound: Observable<ConnAdm>;
+  inBound: Observable<Bread>;
 }
 
 const mkServer = function mkServer () {
   if (!server) {
-    const observable = trafficwand({ redis, panoptickey })
+    const observable = trafficwand({ redis, streamkey: panoptickey })
 
     observable.subscribe({
       next: bread => {
+        console.log(`server.ts[${bread.type}]`)
         switch (bread.type) {
           case 'connect':
-            redis.get(mkcredskey({ shard: bread.shard })).then(auth => {
-              if(auth) {
-                bread.auth = auth
-                wacPC(bread)
-              }
-            })
+            if (isConnAdm.isConnect(bread)) {
+              redis.get(mkcredskey({ shard: bread.shard })).then(auth => {
+                if(auth) {
+                  bread.auth = auth
+                  wacPC(bread)
+                } else {
+                  console.log('lost auth')
+                }
+              })
+            }
             break
           case 'connectionstate':
-          case 'disconnect':
-            wacPC(bread)
+            if (isConnAdm.isConnectionstate(bread)) {
+              wacPC(bread)
+            }
             break
-          case 'queuerestart':
-            // console.dir({ bread })
+          case 'disconnect':
+            if (isConnAdm.isDisconnect(bread)) {
+              wacPC(bread)
+            }
             break
           case 'signupconnection':
-            // quando fizer o signup
-            // logo em seguida signin
-            zygotePC(bread).then(birth => {
-              if (bread.shard === birth.shard) {
-                birth.auth
-                const letsConn: Connect = {
-                  type: 'connect',
-                  cacapa: birth.qrcode,// só pra não jogar fora
-                  hardid: bread.hardid,
-                  shard: birth.shard,
-                  auth: birth.auth
+            if (isConnAdm.isSignupconnection(bread)) {
+            zygotePC(bread)
+              .then(birth => {
+                if (bread.shard === birth.shard) {
+                  const letsConn: Connect = {
+                    type: 'connect',
+                    cacapa: birth.qrcode,// só pra não jogar fora
+                    hardid: bread.hardid,
+                    shard: birth.shard,
+                    auth: birth.auth
+                  }
+                  wacPC(letsConn)
                 }
-                wacPC(letsConn)
-              }
-            })
-            break
-          case 'spreadrestart':
-            console.dir({ bread })
+              })
+            }
             break
           default:
             console.log('redis:stream -> switch ?')

@@ -1,4 +1,4 @@
-import { Signupconnection, Connect } from './schema/ConnAdm'
+import { Signupconnection, Connect } from 'types'
 import { mkServer } from './server'
 import { zygote } from './zygote'
 import { wac } from './wac'

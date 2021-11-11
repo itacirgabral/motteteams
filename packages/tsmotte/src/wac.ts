@@ -1,10 +1,9 @@
 import { fork } from 'child_process'
-import { Connect, isConnect, Disconnect, isDisconnect, Connectionstate, isConnectionstate } from './schema/ConnAdm'
+import { Connect, Disconnect, Connectionstate, isConnAdm } from 'types'
 import { patchpanel } from './patchpanel'
 import baileys from '@adiwajshing/baileys-md'
 import { BufferJSON, WABrowserDescription, initInMemoryKeyStore  } from '@adiwajshing/baileys-md'
-import { mkcredskey } from './rediskeys'
-import { redis } from './redis'
+import { client as redis, mkcredskey } from 'redispack'
 
 type ConnectionSwitch = Connect | Disconnect | Connectionstate
 
@@ -15,7 +14,7 @@ type ConnectionSwitch = Connect | Disconnect | Connectionstate
  */
 const wac = function wac (connect: Connect): Promise<string> {
   return new Promise((res, rej) => {
-    if(connect.type === 'connect' && isConnect(connect)) {
+    if(connect.type === 'connect' && isConnAdm.isConnect(connect)) {
       console.log('iniciando o processo BAILEY CONNECT')
       const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95']
       const authJSON = JSON.parse(connect.auth || '{}', BufferJSON.reviver)
@@ -50,7 +49,7 @@ const wac = function wac (connect: Connect): Promise<string> {
 const wacPC = (connectionSwitch: ConnectionSwitch) => {
   switch (connectionSwitch.type) {
     case 'connect':
-      if (isConnect(connectionSwitch) && !patchpanel.has(connectionSwitch.shard)) {
+      if (isConnAdm.isConnect(connectionSwitch) && !patchpanel.has(connectionSwitch.shard)) {
         const { type, hardid, shard, cacapa, auth } = connectionSwitch
         console.log('wacPC connect')
         // WhatsApp Connection Process 
@@ -110,7 +109,7 @@ const wacPC = (connectionSwitch: ConnectionSwitch) => {
       break
     case 'connectionstate':
       console.log('wacPC connectionstate')
-      if (isConnectionstate(connectionSwitch)) {
+      if (isConnAdm.isConnectionstate(connectionSwitch)) {
         const { type, shard, hardid, cacapa } = connectionSwitch
         if (patchpanel.has(shard)) {
           const blueCable = patchpanel.get(shard)
@@ -121,7 +120,7 @@ const wacPC = (connectionSwitch: ConnectionSwitch) => {
       }
       break
     case 'disconnect':
-      if (isDisconnect(connectionSwitch)) {
+      if (isConnAdm.isDisconnect(connectionSwitch)) {
         // mata processo
         const { type, hardid, shard, cacapa } = connectionSwitch
         if (patchpanel.has(shard)) {

@@ -3,11 +3,10 @@ import baileys from '@adiwajshing/baileys-md'
 import { BufferJSON, WABrowserDescription } from '@adiwajshing/baileys-md'
 import got from 'got'
 
-import { redis } from './redis'
-import { mkcredskey } from './rediskeys'
-import { Signupconnection } from './schema/ConnAdm'
+import { client as redis, mkcredskey } from 'redispack'
+import { Signupconnection } from 'types'
 import { makeCountyToken } from './jwt'
-import { rediskeys } from './docs'
+import { bornskey } from 'redispack'
 
 interface Birth {
   type: 'jwt',
@@ -41,7 +40,7 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
         
         const jwt = makeCountyToken({ shard })
         const timestamp = (new Date()).toLocaleString('pt-BR')
-        const bornskey = rediskeys.bornskey
+
         const birth: Birth = {
           type: 'jwt',
           mitochondria,

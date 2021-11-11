@@ -25,5 +25,9 @@ const isConnAdm = {
 export {
   ConnAdm,
   ConnectionSwitch,
-  isConnAdm
+  isConnAdm,
+  Connect,
+  Connectionstate,
+  Disconnect,
+  Signupconnection
 }

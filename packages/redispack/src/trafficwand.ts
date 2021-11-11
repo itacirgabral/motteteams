@@ -17,7 +17,7 @@ const stream2bread = function stream2bread ({ log }: { log: Array<string>}): Bre
   return bread
 }
 
-const trafficwand = (redis: Redis) => function trafficwand<T> (streamkey: string, isT: (t: T) => boolean) {
+const trafficwand = function trafficwand ({ redis, streamkey }: { redis: Redis, streamkey: string }) {
   return new Observable<Bread>(subscriber => {
     const redisBlock = redis.duplicate()
     let lastlogid = '$'
