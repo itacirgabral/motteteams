@@ -2,3 +2,4 @@
 .env
 .vagrant
 node_modules
+*.tsbuildinfo
