@@ -22,8 +22,42 @@ const panoptickey = `hardid:${hardid}:panoptic`
  */
 const bornskey = `hardid:${hardid}:borns`
 
+/**
+ * Chave para as credenciais de uma instancia
+ *
+ * @example
+ * ```
+ * "hardid:xyz:zap:ijk:creds"
+ * ```
+ */
 const mkcredskey = function mkcredskey ({ shard }: { shard: string }) {
   return `hardid:${hardid}:zap:${shard}:creds`
+}
+
+/**
+ * Chave para as grupos e contatos agendados
+ * É um hashmap
+ *
+ * @example
+ * ```
+ * "hardid:xyz:zap:ijk:chat:bookphone"
+ * ```
+ */
+const mkbookphonekey = function mkbookphonekey ({ shard, chat }: { shard: string; chat: string }) {
+  return `hardid:${hardid}:zap:${shard}:bookphone`
+}
+
+/**
+ * Chave para as conversas disponíveis
+ * É um hashmap
+ *
+ * @example
+ * ```
+ * "hardid:xyz:zap:ijk:chat:bookphone"
+ * ```
+ */
+const mkchatkey = function mkchatkey ({ shard, chat }: { shard: string; chat: string }) {
+  return `hardid:${hardid}:zap:${shard}:chat`
 }
 
 const mkstatekey = function mkstatekey ({ shard }: { shard: string }) {
@@ -58,6 +92,8 @@ export {
   panoptickey,
   bornskey,
   mkcredskey,
+  mkbookphonekey,
+  mkchatkey,
   mkstatekey,
   mkstmkey,
   mktskey,
