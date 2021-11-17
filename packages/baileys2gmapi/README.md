@@ -35,3 +35,46 @@ gmapi
   "wid": "DAF0B5577C92EF61A956F75C70EE2F46"
 }
 ```
+
+- `yarn workspace baileys2gmapi test`
+
+## TODO testes
+seeds do baileys
+- [ ] mensagem de texto
+- [ ] mensagem de texto em grupo
+- [ ] mensagem de resposta
+- [ ] mensagem de resposta em grupo
+- [ ] mensagem encaminhada
+- [ ] mensagem encaminhada em grupo
+- [ ] mensagem de contato
+- [ ] mensagem de contato em grupo
+- [ ] mensagem de localização
+- [ ] mensagem de localização em grupo
+- [ ] mensagem de imagem
+- [ ] mensagem de imagem em grupo
+- [ ] mensagem de documento
+- [ ] mensagem de documento em grupo
+- [ ] mensagem de audio
+- [ ] mensagem de audio em grupo
+- [ ] mensagem de video
+- [ ] mensagem de video em grupo
+
+expecteds
+- [ ] mensagem de texto
+- [ ] mensagem de texto em grupo
+- [ ] mensagem de resposta
+- [ ] mensagem de resposta em grupo
+- [ ] mensagem encaminhada
+- [ ] mensagem encaminhada em grupo
+- [ ] mensagem de contato
+- [ ] mensagem de contato em grupo
+- [ ] mensagem de localização
+- [ ] mensagem de localização em grupo
+- [ ] mensagem de imagem
+- [ ] mensagem de imagem em grupo
+- [ ] mensagem de documento
+- [ ] mensagem de documento em grupo
+- [ ] mensagem de audio
+- [ ] mensagem de audio em grupo
+- [ ] mensagem de video
+- [ ] mensagem de video em grupo

@@ -17,8 +17,17 @@
     "url": "git+https://github.com/itacirgabral/GMAPI.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "npx ava",
+    "build": "npx tsc"
   },
+  "ava": {
+		"extensions": [
+			"ts"
+		],
+		"require": [
+			"ts-node/register"
+		]
+	},
   "bugs": {
     "url": "https://github.com/itacirgabral/GMAPI/issues"
   },
@@ -27,6 +36,7 @@
     "@types/node": "^16.11.7",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
+    "ava": "^3.15.0",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.3",
