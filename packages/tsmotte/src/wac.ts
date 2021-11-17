@@ -105,17 +105,11 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.dir(messageUpdate)
       })
       socket.ev.on ('messages.upsert', async ({ messages, type }) => {
-        console.log(`messages.upsert ${type} #2`)
+        console.log('messages.upsert')
         if (type === 'notify') {
-          const formatedMessages = messages.map(m => {
-            return {
-              pushName: m.pushName,
-              wid: m.key.id,
-              jid: m.key.remoteJid
-            }
-          })
-  
-          console.log(JSON.stringify(formatedMessages, null, 2))
+          console.log("## PEGA ESSA ##")
+          console.log(JSON.stringify(messages, null, 2))
+          console.log("## PEGA ESSA ##")
   
           // salvar nos redis.chat
         } else if (type === 'prepend') {

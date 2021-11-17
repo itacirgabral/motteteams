@@ -18,7 +18,24 @@
 - [x] presence.update
 
 ## contatos e grupos
-- [ ] zygote messages.upsert prepend
-- [ ] novos contatos
-- [ ] novos grupos
-- [ ] atualização de grupos e contatos
+- [x] zygote messages.upsert prepend
+- [x] novos contatos
+- [x] novos grupos
+
+## receber mensagens
+- [x] bindar o handler de entrada pras mensagens
+- [x] um exemplo de json pra mensagem de texto
+  - direto pessoal
+  - no grupo
+  - resposta
+  - encaminhada
+- [ ] pacote baileys2gmapi
+- [ ] couchdb
+- [ ] documento
+- [ ] min.io
+- [ ] contato, localização
+- [ ] imagem, audio, video
+
+
+## receber mensagens
+A set of message IDs must be explicitly marked read now. Cannot mark an entire "chat" read as it were with Baileys Web. This does mean you have to keep track of unread messages.
