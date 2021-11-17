@@ -43,7 +43,7 @@ const mkcredskey = function mkcredskey ({ shard }: { shard: string }) {
  * "hardid:xyz:zap:ijk:chat:bookphone"
  * ```
  */
-const mkbookphonekey = function mkbookphonekey ({ shard, chat }: { shard: string; chat: string }) {
+const mkbookphonekey = function mkbookphonekey ({ shard }: { shard: string; }) {
   return `hardid:${hardid}:zap:${shard}:bookphone`
 }
 
@@ -56,7 +56,7 @@ const mkbookphonekey = function mkbookphonekey ({ shard, chat }: { shard: string
  * "hardid:xyz:zap:ijk:chat:bookphone"
  * ```
  */
-const mkchatkey = function mkchatkey ({ shard, chat }: { shard: string; chat: string }) {
+const mkchatkey = function mkchatkey ({ shard }: { shard: string; }) {
   return `hardid:${hardid}:zap:${shard}:chat`
 }
 

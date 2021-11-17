@@ -2,7 +2,7 @@ import { fork } from 'child_process'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from 'types'
 import { patchpanel } from './patchpanel'
 import baileys, { BufferJSON, WABrowserDescription, initInMemoryKeyStore  } from '@adiwajshing/baileys-md'
-import { client as redis, mkcredskey } from 'redispack'
+import { client as redis, mkcredskey, mkbookphonekey, mkchatkey } from 'redispack'
 
 type ConnectionSwitch = Connect | Disconnect | Connectionstate
 
@@ -39,7 +39,6 @@ const wac = function wac (connect: Connect): Promise<string> {
             res(shard)
           })
       })
-
       socket.ev.on ('blocklist.set', ({ blocklist }) => {
         console.log('blocklist.set')
         console.dir(blocklist)
@@ -70,14 +69,20 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.log(`connection.update ${connection}`)
         console.dir({ lastDisconnect })
       })
-      socket.ev.on ('contacts.upsert', contact => {
-        console.log('contacts.upsert')
-        // [
-        //   { notify: 'Michael Victor', id: '556592604747@s.whatsapp.net' },
-        //   { notify: 'Bianca Reis', id: '556584716425@s.whatsapp.net' },
-        //   { notify: 'Itacir Gabral 2', id: '556599375661@s.whatsapp.net' }
-        // ]
-        console.dir(contact)
+      socket.ev.on ('contacts.upsert', async (contact) => {
+        const contacts = contact.map(el => ({
+          name: el.notify || '',
+          number: el.id.split('@')[0]
+        }))
+
+        const chatkey = mkchatkey({ shard: connect.shard })
+
+        const pipeline = redis.pipeline()
+        contacts.forEach(el => {
+          pipeline.hset(chatkey, el.number, JSON.stringify(el))
+        })
+
+        await pipeline.exec()
       })
       socket.ev.on ('group-participants.update', ({ id, participants, action }) => {
         console.log(`group-participants.update ${id}`)
@@ -99,8 +104,8 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.log('messages.update')
         console.dir(messageUpdate)
       })
-      socket.ev.on ('messages.upsert', ({ messages, type }) => {
-        console.log(`messages.upsert ${type}`)
+      socket.ev.on ('messages.upsert', async ({ messages, type }) => {
+        console.log(`messages.upsert ${type} #2`)
         if (type === 'notify') {
           const formatedMessages = messages.map(m => {
             return {
@@ -125,10 +130,24 @@ const wac = function wac (connect: Connect): Promise<string> {
             }
           })
 
-          console.log(formatedMessages.filter(el => el.save), null, 4)
-          // salvar nos redis.chat
+
+          // "douglas si@556584784558@s.whatsapp.net"
+          const uniqueEntries = Array.from(new Set(
+            formatedMessages
+              .filter(el => el.save)
+              .map(({ agendaName, jid}) => `${agendaName}@${jid}`)
+          ))
+
+          const bookphonekey = mkbookphonekey({ shard: connect.shard })
+          const pipeline = redis.pipeline()
+          uniqueEntries.forEach(el => {
+            const [agendaName, number] = el.split('@')
+            pipeline.hset(bookphonekey, number, JSON.stringify({ agendaName, number}))
+          })
+  
+          await pipeline.exec()
+
         }
-        
       })
       socket.ev.on ('presence.update', ({ id, presences }) => {
         console.log(`presence.update ${id} ${presences}}`)
