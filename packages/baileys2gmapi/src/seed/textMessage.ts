@@ -1,6 +1,6 @@
 const textMessage = {
   key: {
-    remoteJid: '556599375661@s.whatsapp.net',
+    remoteJid: '123123123123@s.whatsapp.net',
     fromMe: false,
     id: '50F2A87CC40A95126440A0416881EC70'
   },

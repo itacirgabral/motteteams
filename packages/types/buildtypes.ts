@@ -7,9 +7,14 @@ import { connectionstate } from './src/ConnAdm/connectionstate'
 import { disconnect } from './src/ConnAdm/disconnect'
 import { signupconnection } from './src/ConnAdm/signupconnection'
 
+import { textMessage } from './src/Message/textMessage'
+
 const bannerCommentPre = '/**\n* '
 const bannerCommentPos = '\n*/ '
 
+/**
+ * CONNADM
+ */
 compile(connect, 'Connect', {
   bannerComment: `${bannerCommentPre}${'* Tipo Connect, requisita a conexão de uma instância'}${bannerCommentPos}`
 }).then(ts => {
@@ -44,6 +49,19 @@ compile(signupconnection, 'Signupconnection', {
   bannerComment: `${bannerCommentPre}${'* Tipo Signupconnection, requisita a leitura de um novo QR Code'}${bannerCommentPos}`
 }).then(ts => {
   fs.writeFile(path.join(__dirname, 'src', 'ConnAdm', 'Signupconnection.d.ts'), ts, err => {
+    if (err) {
+      console.error(err)
+    }
+  })
+})
+
+/**
+ * MESSAGE
+ */
+compile(textMessage, 'TextMessage', {
+  bannerComment: `${bannerCommentPre}${'* Tipo TextMessage, mensagem de texto'}${bannerCommentPos}`
+}).then(ts => {
+  fs.writeFile(path.join(__dirname, 'src', 'Message', 'TextMessage.d.ts'), ts, err => {
     if (err) {
       console.error(err)
     }

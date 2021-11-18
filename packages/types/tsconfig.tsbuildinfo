@@ -476,6 +476,21 @@
         "signature": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "affectsGlobalScope": false
       },
+      "./src/Message/TextMessage.d.ts": {
+        "version": "fdad311f70c1a1cd98cf4a271295186ac069cfea75818a02cd4ffc9c1b5702d3",
+        "signature": "fdad311f70c1a1cd98cf4a271295186ac069cfea75818a02cd4ffc9c1b5702d3",
+        "affectsGlobalScope": false
+      },
+      "./src/Message/index.ts": {
+        "version": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "signature": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "affectsGlobalScope": false
+      },
+      "./src/Message/textMessage.ts": {
+        "version": "0c2e8cbd68c4dede4e0f7c2d3d9a01d4f81ff882800f7c947d184625d75de8cc",
+        "signature": "a4ae8c013e87406b66fa54f4061022a195d5068c68a5f06835107fe6ae7249ee",
+        "affectsGlobalScope": false
+      },
       "../../node_modules/@babel/types/lib/index.d.ts": {
         "version": "272c2dac4baaf7fdd2d7efeef0fa2547af54cc21883c5e138b8c4d1661697a54",
         "signature": "272c2dac4baaf7fdd2d7efeef0fa2547af54cc21883c5e138b8c4d1661697a54",
@@ -2060,6 +2075,20 @@
         "../../node_modules/@types/node/base.d.ts",
         "../../node_modules/@types/node/index.d.ts"
       ],
+      "./src/Message/TextMessage.d.ts": [
+        "../../node_modules/@types/node/base.d.ts",
+        "../../node_modules/@types/node/index.d.ts"
+      ],
+      "./src/Message/index.ts": [
+        "../../node_modules/@types/node/base.d.ts",
+        "../../node_modules/@types/node/index.d.ts"
+      ],
+      "./src/Message/textMessage.ts": [
+        "../../node_modules/@types/node/base.d.ts",
+        "../../node_modules/@types/node/index.d.ts",
+        "../../node_modules/fluent-json-schema/src/FluentJSONSchema.d.ts",
+        "./node_modules/ajv/dist/ajv.d.ts"
+      ],
       "./src/index.ts": [
         "../../node_modules/@types/node/base.d.ts",
         "../../node_modules/@types/node/index.d.ts",
@@ -3140,6 +3169,13 @@
       "./src/ConnAdm/signupconnection.ts": [
         "./node_modules/ajv/dist/ajv.d.ts"
       ],
+      "./src/Message/TextMessage.d.ts": [
+        "../../node_modules/@types/node/base.d.ts",
+        "../../node_modules/@types/node/index.d.ts"
+      ],
+      "./src/Message/textMessage.ts": [
+        "./node_modules/ajv/dist/ajv.d.ts"
+      ],
       "./src/index.ts": [
         "./src/ConnAdm/index.ts"
       ]
@@ -3332,6 +3368,9 @@
       "./src/ConnAdm/queuerestart.ts",
       "./src/ConnAdm/signupconnection.ts",
       "./src/ConnAdm/spreadrestart.ts",
+      "./src/Message/TextMessage.d.ts",
+      "./src/Message/index.ts",
+      "./src/Message/textMessage.ts",
       "./src/index.ts"
     ]
   },
