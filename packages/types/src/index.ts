@@ -10,12 +10,27 @@ import {
 } from './ConnAdm'
 
 import {
+  AudioMessage,
+  isAudioMessageValidate,
+  ContactMessage,
+  isContactMessageValidate,
+  ImageMessage,
+  isImageMessageValidate,
+  LocationMessage,
+  isLocationMessageValidate,
   TextMessage,
-  isTextMessage
+  VideoMessage,
+  isTextMessage,
+  isVideoMessageValidate
 } from './Message'
 
 const isMessage = {
-  isTextMessage
+  isAudioMessageValidate,
+  isContactMessageValidate,
+  isImageMessageValidate,
+  isLocationMessageValidate,
+  isTextMessage,
+  isVideoMessageValidate
 }
 
 /**
@@ -39,6 +54,11 @@ export {
   Connectionstate,
   Disconnect,
   Signupconnection,
+  isMessage,
+  AudioMessage,
+  ContactMessage,
+  ImageMessage,
+  LocationMessage,
   TextMessage,
-  isMessage
+  VideoMessage
 }

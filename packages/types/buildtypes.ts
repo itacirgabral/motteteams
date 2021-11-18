@@ -7,7 +7,12 @@ import { connectionstate } from './src/ConnAdm/connectionstate'
 import { disconnect } from './src/ConnAdm/disconnect'
 import { signupconnection } from './src/ConnAdm/signupconnection'
 
+import { audioMessage } from './src/Message/audioMessage'
+import { contactMessage } from './src/Message/contactMessage'
+import { imageMessage } from './src/Message/imageMessage'
+import { locationMessage } from './src/Message/locationMessage'
 import { textMessage } from './src/Message/textMessage'
+import { videoMessage } from './src/Message/videoMessage'
 
 const bannerCommentPre = '/**\n* '
 const bannerCommentPos = '\n*/ '
@@ -24,7 +29,6 @@ compile(connect, 'Connect', {
     }
   })
 })
-
 compile(connectionstate, 'Connectionstate', {
   bannerComment: `${bannerCommentPre}${'* Tipo Connectionstate, requisita o estado de uma conexão'}${bannerCommentPos}`
 }).then(ts => {
@@ -34,7 +38,6 @@ compile(connectionstate, 'Connectionstate', {
     }
   })
 })
-
 compile(disconnect, 'Disconnect', {
   bannerComment: `${bannerCommentPre}${'* Tipo Disconnect, requisita para se desconectar'}${bannerCommentPos}`
 }).then(ts => {
@@ -44,7 +47,6 @@ compile(disconnect, 'Disconnect', {
     }
   })
 })
-
 compile(signupconnection, 'Signupconnection', {
   bannerComment: `${bannerCommentPre}${'* Tipo Signupconnection, requisita a leitura de um novo QR Code'}${bannerCommentPos}`
 }).then(ts => {
@@ -58,10 +60,55 @@ compile(signupconnection, 'Signupconnection', {
 /**
  * MESSAGE
  */
+compile(audioMessage, 'AudioMessage', {
+  bannerComment: `${bannerCommentPre}${'* Tipo AudioMessage, mensagem de audiuo'}${bannerCommentPos}`
+}).then(ts => {
+  fs.writeFile(path.join(__dirname, 'src', 'Message', 'AudioMessage.d.ts'), ts, err => {
+    if (err) {
+      console.error(err)
+    }
+  })
+})
+compile(contactMessage, 'ContactMessage', {
+  bannerComment: `${bannerCommentPre}${'* Tipo ContactMessage, mensagem de contato'}${bannerCommentPos}`
+}).then(ts => {
+  fs.writeFile(path.join(__dirname, 'src', 'Message', 'ContactMessage.d.ts'), ts, err => {
+    if (err) {
+      console.error(err)
+    }
+  })
+})
+compile(imageMessage, 'ImageMessage', {
+  bannerComment: `${bannerCommentPre}${'* Tipo ImageMessage, mensagem de imagem'}${bannerCommentPos}`
+}).then(ts => {
+  fs.writeFile(path.join(__dirname, 'src', 'Message', 'ImageMessage.d.ts'), ts, err => {
+    if (err) {
+      console.error(err)
+    }
+  })
+})
+compile(locationMessage, 'LocationMessage', {
+  bannerComment: `${bannerCommentPre}${'* Tipo LocationMessage, mensagem de localização'}${bannerCommentPos}`
+}).then(ts => {
+  fs.writeFile(path.join(__dirname, 'src', 'Message', 'LocationMessage.d.ts'), ts, err => {
+    if (err) {
+      console.error(err)
+    }
+  })
+})
 compile(textMessage, 'TextMessage', {
   bannerComment: `${bannerCommentPre}${'* Tipo TextMessage, mensagem de texto'}${bannerCommentPos}`
 }).then(ts => {
   fs.writeFile(path.join(__dirname, 'src', 'Message', 'TextMessage.d.ts'), ts, err => {
+    if (err) {
+      console.error(err)
+    }
+  })
+})
+compile(videoMessage, 'VideoMessage', {
+  bannerComment: `${bannerCommentPre}${'* Tipo TextMessage, mensagem de video'}${bannerCommentPos}`
+}).then(ts => {
+  fs.writeFile(path.join(__dirname, 'src', 'Message', 'VideoMessage.d.ts'), ts, err => {
     if (err) {
       console.error(err)
     }
