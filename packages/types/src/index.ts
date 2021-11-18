@@ -24,6 +24,8 @@ import {
   isVideoMessageValidate
 } from './Message'
 
+type Message = AudioMessage | ContactMessage | ImageMessage | LocationMessage | TextMessage | VideoMessage
+
 const isMessage = {
   isAudioMessageValidate,
   isContactMessageValidate,
@@ -49,12 +51,13 @@ const isConnAdm = {
 export {
   ConnAdm,
   ConnectionSwitch,
+  Message,
   isConnAdm,
+  isMessage,
   Connect,
   Connectionstate,
   Disconnect,
   Signupconnection,
-  isMessage,
   AudioMessage,
   ContactMessage,
   ImageMessage,

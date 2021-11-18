@@ -1,12 +1,13 @@
 import test from 'ava'
-import baileys2gmapi from '../src/index'
+import baileys2gmapi from './index'
+import * as seed from './seed'
+import * as expected from './expected'
 
 test('ava running', t => {
   t.pass()
 })
 
-test('baileys2gmapi running', t => {
-  const actual = baileys2gmapi()
-  const expected = 'olá mundo'
-  t.is(actual, expected)
+test('MESSAGE > text ', t => {
+  const actual = baileys2gmapi(seed.textMessage)
+  t.deepEqual(actual, expected)
 })
