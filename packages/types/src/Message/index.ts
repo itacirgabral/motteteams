@@ -7,5 +7,6 @@ const isTextMessage = function isTextMessage (x: unknown): x is TextMessage {
 }
 
 export {
+  TextMessage,
   isTextMessage
 }

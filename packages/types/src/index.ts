@@ -9,6 +9,15 @@ import {
   isSignupconnection
 } from './ConnAdm'
 
+import {
+  TextMessage,
+  isTextMessage
+} from './Message'
+
+const isMessage = {
+  isTextMessage
+}
+
 /**
  * Tipo ConnAdm, conjunto de tipos que controla a conexão
  */
@@ -29,5 +38,7 @@ export {
   Connect,
   Connectionstate,
   Disconnect,
-  Signupconnection
+  Signupconnection,
+  TextMessage,
+  isMessage
 }
