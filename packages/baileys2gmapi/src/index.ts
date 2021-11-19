@@ -1,8 +1,21 @@
+import { WAMessage } from '@adiwajshing/baileys-md'
+import { postalScraper } from './postalScraper'
+
 import {
   Message
 } from 'types'
 
-const baileys2gmapi = ({ att }: { att: string }): Message => {
+const baileys2gmapi = (wam: WAMessage): Message => {
+  const {
+    wid,
+    from,
+    to,
+    timestamp,
+    author,
+    forward,
+    reply
+  } = postalScraper(wam)
+
   return 'olá mundo'
 }
 
