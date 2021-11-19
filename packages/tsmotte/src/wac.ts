@@ -1,5 +1,6 @@
 import { fork } from 'child_process'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from 'types'
+import baileys2gmapi from 'baileys2gmapi'
 import { patchpanel } from './patchpanel'
 import baileys, { BufferJSON, WABrowserDescription, initInMemoryKeyStore  } from '@adiwajshing/baileys-md'
 import { client as redis, mkcredskey, mkbookphonekey, mkchatkey } from 'redispack'
@@ -108,7 +109,16 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.log('messages.upsert')
         if (type === 'notify') {
           console.log("## PEGA ESSA ##")
-          console.log(JSON.stringify(messages, null, 2))
+          messages.forEach(message => {
+            try {
+              const gmapiMessage = baileys2gmapi(message)
+              console.dir(gmapiMessage)
+            } catch (error) {
+              console.error(error)
+              console.log(JSON.stringify(message, null, 2))
+              console.dir(message)
+            }
+          })
           console.log("## PEGA ESSA ##")
   
           // salvar nos redis.chat
