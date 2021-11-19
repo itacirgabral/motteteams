@@ -5,7 +5,11 @@ import {
   Message,
   TextMessage,
   LocationMessage,
-  ContactMessage
+  ContactMessage,
+  AudioMessage,
+  ImageMessage,
+  VideoMessage,
+  DocumentMessage
 } from 'types'
 
 const baileys2gmapi = (wam: WAMessage): Message => {
@@ -28,6 +32,10 @@ const baileys2gmapi = (wam: WAMessage): Message => {
   const extendedText = !!wam?.message?.extendedTextMessage
   const location = !!wam?.message?.locationMessage
   const contact = !!wam?.message?.contactMessage
+  const audio = !!wam?.message?.audioMessage
+  const image = !!wam?.message?.imageMessage
+  const video = !!wam?.message?.videoMessage
+  const document = !!wam?.message?.documentMessage
 
   if (conversation) {
     const type = 'textMessage'
@@ -95,6 +103,94 @@ const baileys2gmapi = (wam: WAMessage): Message => {
       to,
       timestamp,
       vcard,
+      author,
+      reply,
+      forward
+    }
+
+    return message
+  } else if (audio) {
+    const type = 'audioMessage'
+    const seconds = wam?.message?.audioMessage?.seconds
+    const mimetype = wam?.message?.audioMessage?.mimetype
+    const bytes = wam?.message?.audioMessage?.fileLength
+
+    const message: AudioMessage = {
+      type,
+      wid,
+      from,
+      to,
+      timestamp,
+      mimetype,
+      seconds,
+      bytes,
+      author,
+      reply,
+      forward
+    }
+
+    return message
+  } else if (image) {
+    const type = 'imageMessage'
+    const mimetype = wam?.message?.imageMessage?.mimetype
+    const bytes = wam?.message?.imageMessage?.fileLength
+    const caption = wam?.message?.imageMessage?.caption
+
+    const message: ImageMessage = {
+      type,
+      wid,
+      from,
+      to,
+      timestamp,
+      mimetype,
+      bytes,
+      caption,
+      author,
+      reply,
+      forward
+    }
+
+    return message
+  } else if (video) {
+    const type = 'videoMessage'
+    const mimetype = wam?.message?.videoMessage?.mimetype
+    const bytes = wam?.message?.videoMessage?.fileLength
+    const seconds = wam?.message?.videoMessage?.seconds
+    const loop = wam?.message?.videoMessage?.gifPlayback
+    const caption = wam?.message?.videoMessage?.caption
+
+    const message: VideoMessage = {
+      type,
+      wid,
+      from,
+      to,
+      timestamp,
+      mimetype,
+      bytes,
+      seconds,
+      loop,
+      caption,
+      author,
+      reply,
+      forward
+    }
+
+    return message
+  } else if (document) {
+    const type = 'documentMessage'
+    const mimetype = wam?.message?.documentMessage?.mimetype
+    const bytes = wam?.message?.documentMessage?.fileLength
+    const filename = wam?.message?.documentMessage?.fileName
+
+    const message: DocumentMessage = {
+      type,
+      wid,
+      from,
+      to,
+      timestamp,
+      mimetype,
+      bytes,
+      filename,
       author,
       reply,
       forward

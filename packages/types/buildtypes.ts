@@ -13,6 +13,7 @@ import { imageMessage } from './src/Message/imageMessage'
 import { locationMessage } from './src/Message/locationMessage'
 import { textMessage } from './src/Message/textMessage'
 import { videoMessage } from './src/Message/videoMessage'
+import { documentMessage } from './src/Message/documentMessage'
 
 const bannerCommentPre = '/**\n* '
 const bannerCommentPos = '\n*/ '
@@ -109,6 +110,16 @@ compile(videoMessage, 'VideoMessage', {
   bannerComment: `${bannerCommentPre}${'* Tipo TextMessage, mensagem de video'}${bannerCommentPos}`
 }).then(ts => {
   fs.writeFile(path.join(__dirname, 'src', 'Message', 'VideoMessage.d.ts'), ts, err => {
+    if (err) {
+      console.error(err)
+    }
+  })
+})
+
+compile(documentMessage, 'DocumentMessage', {
+  bannerComment: `${bannerCommentPre}${'* Tipo DocumentMessage, mensagem de documento'}${bannerCommentPos}`
+}).then(ts => {
+  fs.writeFile(path.join(__dirname, 'src', 'Message', 'DocumentMessage.d.ts'), ts, err => {
     if (err) {
       console.error(err)
     }

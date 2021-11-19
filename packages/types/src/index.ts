@@ -19,20 +19,24 @@ import {
   LocationMessage,
   isLocationMessageValidate,
   TextMessage,
+  isTextMessageValidate,
   VideoMessage,
-  isTextMessage,
-  isVideoMessageValidate
+  isVideoMessageValidate,
+  DocumentMessage,
+  isDocumentMessageValidate
+
 } from './Message'
 
-type Message = AudioMessage | ContactMessage | ImageMessage | LocationMessage | TextMessage | VideoMessage
+type Message = AudioMessage | ContactMessage | ImageMessage | LocationMessage | TextMessage | VideoMessage | DocumentMessage
 
 const isMessage = {
   isAudioMessageValidate,
   isContactMessageValidate,
   isImageMessageValidate,
   isLocationMessageValidate,
-  isTextMessage,
-  isVideoMessageValidate
+  isTextMessageValidate,
+  isVideoMessageValidate,
+  isDocumentMessageValidate
 }
 
 /**
@@ -63,5 +67,6 @@ export {
   ImageMessage,
   LocationMessage,
   TextMessage,
-  VideoMessage
+  VideoMessage,
+  DocumentMessage
 }

@@ -1,18 +1,16 @@
 /**
- * * Tipo TextMessage, mensagem de video
+ * * Tipo DocumentMessage, mensagem de documento
  */
 
-export interface VideoMessage {
-  type: "videoMessage";
+export interface DocumentMessage {
+  type: "documentMessage";
   wid: string;
   from: string;
   to: string;
   timestamp: string;
   mimetype: string;
   bytes: string;
-  seconds: string;
-  loop: boolean;
-  caption: string;
+  filename: string;
   author?: string;
   reply?: string;
   forward?: boolean;

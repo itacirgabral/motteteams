@@ -4,6 +4,7 @@ import { ImageMessage } from './ImageMessage'
 import { LocationMessage } from './LocationMessage'
 import { TextMessage } from './TextMessage.d'
 import { VideoMessage } from './VideoMessage'
+import { DocumentMessage } from './DocumentMessage'
 
 import { audioMessageValidate } from './audioMessage'
 import { contactMessageValidate } from './contactMessage'
@@ -11,6 +12,7 @@ import { imageMessageValidate } from './imageMessage'
 import { locationMessageValidate } from './locationMessage'
 import { textMessageValidate } from './textMessage'
 import { videoMessageValidate } from './videoMessage'
+import { documentMessageValidate } from './documentMessage'
 
 const isAudioMessageValidate = function isAudioMessageValidate (x: unknown) : x is AudioMessage {
   return !!audioMessageValidate(x)
@@ -24,11 +26,14 @@ const isImageMessageValidate = function isImageMessageValidate (x: unknown) : x 
 const isLocationMessageValidate = function isLocationMessageValidate (x: unknown) : x is LocationMessage {
   return !!locationMessageValidate(x)
 }
-const isTextMessage = function isTextMessage (x: unknown): x is TextMessage {
+const isTextMessageValidate = function isTextMessage (x: unknown): x is TextMessage {
   return !!textMessageValidate(x)
 }
 const isVideoMessageValidate = function isVideoMessageValidate (x: unknown) : x is VideoMessage {
   return !!videoMessageValidate(x)
+}
+const isDocumentMessageValidate = function isVideoMessageValidate (x: unknown) : x is VideoMessage {
+  return !!documentMessageValidate(x)
 }
 
 export {
@@ -41,7 +46,9 @@ export {
   LocationMessage,
   isLocationMessageValidate,
   TextMessage,
-  isTextMessage,
+  isTextMessageValidate,
   VideoMessage,
-  isVideoMessageValidate
+  isVideoMessageValidate,
+  DocumentMessage,
+  isDocumentMessageValidate
 }
