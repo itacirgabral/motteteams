@@ -1,11 +1,18 @@
 import { fork } from 'child_process'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from 'types'
-import baileys2gmapi from 'baileys2gmapi'
-import { patchpanel } from './patchpanel'
 import baileys, { BufferJSON, WABrowserDescription, initInMemoryKeyStore  } from '@adiwajshing/baileys-md'
 import { client as redis, mkcredskey, mkbookphonekey, mkchatkey } from 'redispack'
+import baileys2gmapi from 'baileys2gmapi'
+import { patchpanel } from './patchpanel'
 
 type ConnectionSwitch = Connect | Disconnect | Connectionstate
+
+// import nano from 'nano'
+// const coudhdbUrl = process.env.COUCHDB_URL || 'http://localhost:5984'
+// const couch = nano(coudhdbUrl)
+// const jsonStore = couch.db.use('gestormessenger')
+
+// console.log(`coudhdbUrl=${coudhdbUrl}`)
 
 /**
  * Whats App Connect
@@ -108,20 +115,12 @@ const wac = function wac (connect: Connect): Promise<string> {
       socket.ev.on ('messages.upsert', async ({ messages, type }) => {
         console.log('messages.upsert')
         if (type === 'notify') {
-          console.log("## PEGA ESSA ##")
-          messages.forEach(message => {
-            try {
-              const gmapiMessage = baileys2gmapi(message)
-              console.dir(gmapiMessage)
-            } catch (error) {
-              console.error(error)
-              console.log(JSON.stringify(message, null, 2))
-              console.dir(message)
-            }
-          })
-          console.log("## PEGA ESSA ##")
-  
-          // salvar nos redis.chat
+          const cleanMessage = messages.map(baileys2gmapi)
+          console.dir(cleanMessage)
+          // TODO
+          // salvar no redis
+          // salvar no couchdb
+          // salvar nos minio
         } else if (type === 'prepend') {
           // enum WebMessageInfoStubType
           const formatedMessages = messages.map(m => {
