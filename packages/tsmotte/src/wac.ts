@@ -25,15 +25,28 @@ const wac = function wac (connect: Connect): Promise<string> {
   const authFile = fs.readFileSync(connect.auth, 'utf8')
   fs.unlinkSync(connect.auth)
 
+  let state: unknown
+
+  const saveState = ()  => {
+    const { creds, keys } = JSON.parse(authFile, BufferJSON.reviver)
+    state = { 
+      creds: creds, 
+      // stores pre-keys, session & other keys in a JSON object
+      // we deserialize it here
+      keys: initInMemoryKeyStore(keys, saveState) 
+    }
+    return { state, saveState }
+  }
+
   return new Promise((res, rej) => {
     if(connect.type === 'connect' && isConnAdm.isConnect(connect)) {
       console.log('iniciando o processo BAILEY CONNECT')
       const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95']
-      
+
       const authJSON = JSON.parse(authFile, BufferJSON.reviver)
       const auth = { 
         creds: authJSON.creds, 
-        keys: initInMemoryKeyStore(authJSON.keys) 
+        keys: initInMemoryKeyStore(authJSON.keys, saveState) 
       }
 
       console.log('PARSEOU')
@@ -43,18 +56,19 @@ const wac = function wac (connect: Connect): Promise<string> {
         browser
       })
 
-      socket.ev.on ('auth-state.update', () => {
-        const authInfo = socket.authState
-        const authJson = JSON.stringify(authInfo, BufferJSON.replacer, 2)
+      socket.ev.on ('creds.update', saveState)
+      // socket.ev.on ('auth-state.update', () => {
+      //   const authInfo = socket.authState
+      //   const authJson = JSON.stringify(authInfo, BufferJSON.replacer, 2)
 
-        const user = socket.user
-        const shard= user.id.split(':')[0]
+      //   const user = socket.user
+      //   const shard= user.id.split(':')[0]
 
-        redis.set(mkcredskey({ shard }), authJson)
-          .then(() => {
-            res(shard)
-          })
-      })
+      //   redis.set(mkcredskey({ shard }), authJson)
+      //     .then(() => {
+      //       res(shard)
+      //     })
+      // })
       socket.ev.on ('blocklist.set', ({ blocklist }) => {
         console.log('blocklist.set')
         console.dir(blocklist)
