@@ -1,4 +1,6 @@
 import { fork } from 'child_process'
+import * as fs from 'fs'
+import * as pfs from 'fs/promises'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, initInMemoryKeyStore  } from '@adiwajshing/baileys-md'
 import { client as redis, mkcredskey, mkbookphonekey, mkchatkey } from '@gmapi/redispack'
@@ -20,15 +22,21 @@ type ConnectionSwitch = Connect | Disconnect | Connectionstate
  * @returns 
  */
 const wac = function wac (connect: Connect): Promise<string> {
+  const authFile = fs.readFileSync(connect.auth, 'utf8')
+  fs.unlinkSync(connect.auth)
+
   return new Promise((res, rej) => {
     if(connect.type === 'connect' && isConnAdm.isConnect(connect)) {
       console.log('iniciando o processo BAILEY CONNECT')
       const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95']
-      const authJSON = JSON.parse(connect.auth || '{}', BufferJSON.reviver)
+      
+      const authJSON = JSON.parse(authFile, BufferJSON.reviver)
       const auth = { 
         creds: authJSON.creds, 
         keys: initInMemoryKeyStore(authJSON.keys) 
       }
+
+      console.log('PARSEOU')
 
       const socket = baileys({
         auth,
@@ -163,13 +171,17 @@ const wac = function wac (connect: Connect): Promise<string> {
   })
 }
 
-const wacPC = (connectionSwitch: ConnectionSwitch) => {
+const wacPC = async (connectionSwitch: ConnectionSwitch) => {
   switch (connectionSwitch.type) {
     case 'connect':
       if (isConnAdm.isConnect(connectionSwitch) && !patchpanel.has(connectionSwitch.shard)) {
         const { type, hardid, shard, cacapa, auth } = connectionSwitch
         console.log('wacPC connect')
-        // WhatsApp Connection Process 
+
+        // auth can be too large to pass as env
+        const authPathRandom = String(Math.random()).slice(2)
+        await pfs.writeFile(authPathRandom, JSON.stringify(auth))
+
         const wacP = fork('./src/index', {
           env: {
             ...process.env,
@@ -178,7 +190,7 @@ const wacPC = (connectionSwitch: ConnectionSwitch) => {
             hardid,
             shard,
             cacapa,
-            auth
+            auth: authPathRandom
           }
         })
 
