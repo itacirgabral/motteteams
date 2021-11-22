@@ -1,17 +1,11 @@
 {
   "name": "@gmapi/baileys2gmapi",
-  "version": "1.0.3",
+  "version": "1.0.0",
   "description": "> TODO: description",
   "author": "Itacir Gabral <itacirgabral@gmail.com>",
   "homepage": "https://github.com/itacirgabral/GMAPI#readme",
   "license": "ISC",
   "main": "lib/index.js",
-  "directories": {
-    "lib": "lib"
-  },
-  "files": [
-    "src"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/itacirgabral/GMAPI.git"
