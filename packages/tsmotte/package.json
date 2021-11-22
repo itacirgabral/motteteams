@@ -14,6 +14,9 @@
   "license": "ISC",
   "dependencies": {
     "@adiwajshing/baileys-md": "4.0.0",
+    "@gmapi/baileys2gmapi": "^1.0.0",
+    "@gmapi/redispack": "^1.0.1",
+    "@gmapi/types": "^1.0.1",
     "dotenv": "^10.0.0",
     "fluent-json-schema": "^3.0.1",
     "got": "^11.8.2",
