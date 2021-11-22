@@ -1,8 +1,8 @@
 import { fork } from 'child_process'
-import { Connect, Disconnect, Connectionstate, isConnAdm } from 'types'
+import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, initInMemoryKeyStore  } from '@adiwajshing/baileys-md'
-import { client as redis, mkcredskey, mkbookphonekey, mkchatkey } from 'redispack'
-import baileys2gmapi from 'baileys2gmapi'
+import { client as redis, mkcredskey, mkbookphonekey, mkchatkey } from '@gmapi/redispack'
+import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 
 type ConnectionSwitch = Connect | Disconnect | Connectionstate

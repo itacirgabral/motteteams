@@ -5,7 +5,7 @@
 ## Usage
 
 ```
-const types = require('types');
+const types = require('@gmapi/types');
 
 // TODO: DEMONSTRATE API
 ```

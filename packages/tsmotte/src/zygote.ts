@@ -2,10 +2,10 @@ import { fork } from 'child_process'
 import baileys, { BufferJSON, WABrowserDescription } from '@adiwajshing/baileys-md'
 import got from 'got'
 
-import { client as redis, mkcredskey } from 'redispack'
-import { Signupconnection } from 'types'
+import { client as redis, mkcredskey } from '@gmapi/redispack'
+import { Signupconnection } from '@gmapi/types'
 import { makeCountyToken } from './jwt'
-import { bornskey } from 'redispack'
+import { bornskey } from '@gmapi/redispack'
 
 interface Birth {
   type: 'jwt',

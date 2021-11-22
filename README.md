@@ -29,9 +29,10 @@ terraform plan \
 ```
 
 ## GMPI 2
+- `yarn workspace @adiwajshing/baileys-md build:all`
+- `yarn workspace types clean`
+- `yarn workspace types build`
+- `yarn workspace redispack build`
 - `docker-compose up -d`
-- `yarn workspace tsmotte dev`
-- `yarn workspace restapi dev`
-
-# DOC
-- [runner](https://github.com/folke/ultra-runner)
+- `yarn workspace restapi start`
+- `yarn workspace tsmotte start`

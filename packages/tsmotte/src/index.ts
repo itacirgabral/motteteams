@@ -1,4 +1,4 @@
-import { Signupconnection, Connect } from 'types'
+import { Signupconnection, Connect } from '@gmapi/types'
 import { mkServer } from './server'
 import { zygote } from './zygote'
 import { wac } from './wac'

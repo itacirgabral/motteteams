@@ -1,5 +1,5 @@
 {
-  "name": "redispack",
+  "name": "@gmapi/redispack",
   "version": "1.0.0",
   "description": "Contém driver e especiarias para redis",
   "author": "Itacir Gabral <itacirgabral@gmail.com>",

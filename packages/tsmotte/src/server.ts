@@ -1,9 +1,9 @@
-import { client as redis, mkcredskey, panoptickey, trafficwand, Bread } from 'redispack'
+import { client as redis, mkcredskey, panoptickey, trafficwand, Bread } from '@gmapi/redispack'
 import { Observable } from 'rxjs'
 import { zygotePC } from './zygote'
 import { wacPC  } from './wac'
-import { isConnAdm } from 'types'
-import { Connect } from 'types'
+import { isConnAdm } from '@gmapi/types'
+import { Connect } from '@gmapi/types'
 
 let server: {
   inBound: Observable<Bread>;

@@ -5,7 +5,7 @@
 ## Usage
 
 ```
-const redispack = require('redispack');
+const redispack = require('@gmapi/redispack');
 
 // TODO: DEMONSTRATE API
 ```

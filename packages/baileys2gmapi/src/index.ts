@@ -10,7 +10,7 @@ import {
   ImageMessage,
   VideoMessage,
   DocumentMessage
-} from 'types'
+} from '@gmapi/types'
 
 const baileys2gmapi = (wam: WAMessage): Message => {
   const {
