@@ -3,3 +3,4 @@ docs/*
 .env
 *.log
 dist
+auth_info_*.json

@@ -21,6 +21,7 @@ type ConnectionSwitch = Connect | Disconnect | Connectionstate
  * @returns 
  */
 const wac = function wac (connect: Connect): Promise<string> {
+  // the creds file path 
   console.log(`connect.auth=${connect.auth}`)
 
   let state: AuthenticationState
@@ -44,7 +45,7 @@ const wac = function wac (connect: Connect): Promise<string> {
       console.log('iniciando o processo BAILEY CONNECT')
       const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95']
 
-      const { state, saveState } = saveConnect(`./auth_info_multi.TESTE.json`)
+      const { state, saveState } = saveConnect(connect.auth)
       const socket = baileys({
         auth: state,
         browser
@@ -172,10 +173,8 @@ const wacPC = async (connectionSwitch: ConnectionSwitch) => {
   switch (connectionSwitch.type) {
     case 'connect':
       if (isConnAdm.isConnect(connectionSwitch) && !patchpanel.has(connectionSwitch.shard)) {
-        const { type, hardid, shard, cacapa, auth } = connectionSwitch
+        const { type, hardid, shard, cacapa } = connectionSwitch
         console.log('wacPC connect')
-
-        const authPathRandom = 'TESTE'
 
         const wacP = fork('./src/index', {
           env: {
@@ -185,7 +184,7 @@ const wacPC = async (connectionSwitch: ConnectionSwitch) => {
             hardid,
             shard,
             cacapa,
-            auth: authPathRandom
+            auth: `./auth_info_multi.${shard}.json`
           }
         })
 

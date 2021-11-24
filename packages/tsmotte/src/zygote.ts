@@ -1,9 +1,8 @@
 import { fork } from 'child_process'
-import { writeFileSync} from 'fs'
+import { writeFileSync, renameSync, unlinkSync } from 'fs'
 import baileys, { BufferJSON, WABrowserDescription, AuthenticationState, initAuthCreds, initInMemoryKeyStore } from '@adiwajshing/baileys-md'
 import got from 'got'
-
-import { client as redis, mkcredskey } from '@gmapi/redispack'
+import { client as redis } from '@gmapi/redispack'
 import { Signupconnection } from '@gmapi/types'
 import { makeCountyToken } from './jwt'
 import { bornskey } from '@gmapi/redispack'
@@ -41,7 +40,9 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
     const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95'] 
     let lastQrcode = ''
 
-    const { state, saveState } = saveSignup(`./auth_info_multi.TESTE.json`)
+    const zygotetempcreds = `./auth_info_multi.zygote.${String(Math.random()).slice(2)}.json`
+
+    const { state, saveState } = saveSignup(zygotetempcreds)
 
     // TODO PROM-CLIENT SIGNUP_START
     const socket = baileys({
@@ -55,26 +56,33 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
     socket.ev.on('connection.update', async (update) => {
       if(update.connection === 'close') {
 
-        const authInfo = socket.authState
-        const authJson = JSON.stringify(authInfo, BufferJSON.replacer, 2)
+        const me = socket.authState.creds.me?.id.split(':')[0] || ''
 
-        const pipeline = redis.pipeline()
-        pipeline.set(mkcredskey({ shard }), authJson)
-        
+        let auth: string
+        if (me === shard) {
+          auth = `./auth_info_multi.${shard}.json`
+          renameSync(zygotetempcreds, auth)
+        } else {
+          auth = 'no'
+          unlinkSync(zygotetempcreds)
+        }
+
+
         const jwt = makeCountyToken({ shard })
         const timestamp = (new Date()).toLocaleString('pt-BR')
 
         const birth: Birth = {
           type: 'jwt',
           mitochondria,
-          shard,
+          shard: me,
           jwt,
           timestamp,
           qrcode: lastQrcode,
-          auth: authJson
+          auth
         }
         const birthcert = JSON.stringify(birth)
 
+        const pipeline = redis.pipeline()
         pipeline.sadd(bornskey, birthcert)
         pipeline.lpush(lastQrcode, birthcert)
         pipeline.expire(lastQrcode, 90)
