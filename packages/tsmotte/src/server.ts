@@ -19,14 +19,15 @@ const mkServer = function mkServer () {
         switch (bread.type) {
           case 'connect':
             if (isConnAdm.isConnect(bread)) {
-              redis.get(mkcredskey({ shard: bread.shard })).then((auth: string) => {
-                if(auth) {
-                  bread.auth = auth
-                  wacPC(bread)
-                } else {
-                  console.log('lost auth')
-                }
-              })
+              wacPC(bread)
+              // redis.get(mkcredskey({ shard: bread.shard })).then((auth: string) => {
+              //   if(auth) {
+              //     bread.auth = auth
+              //     wacPC(bread)
+              //   } else {
+              //     console.log('lost auth')
+              //   }
+              // })
             }
             break
           case 'connectionstate':

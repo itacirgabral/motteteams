@@ -1,9 +1,8 @@
 import { fork } from 'child_process'
-import * as fs from 'fs'
-import * as pfs from 'fs/promises'
+import { readFileSync, writeFileSync } from 'fs'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
-import baileys, { BufferJSON, WABrowserDescription, initInMemoryKeyStore  } from '@adiwajshing/baileys-md'
-import { client as redis, mkcredskey, mkbookphonekey, mkchatkey } from '@gmapi/redispack'
+import baileys, { BufferJSON, WABrowserDescription, initInMemoryKeyStore, AuthenticationState  } from '@adiwajshing/baileys-md'
+import { client as redis, mkbookphonekey, mkchatkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 
@@ -22,19 +21,21 @@ type ConnectionSwitch = Connect | Disconnect | Connectionstate
  * @returns 
  */
 const wac = function wac (connect: Connect): Promise<string> {
-  const authFile = fs.readFileSync(connect.auth, 'utf8')
-  fs.unlinkSync(connect.auth)
+  console.log(`connect.auth=${connect.auth}`)
 
-  let state: unknown
-
-  const saveState = ()  => {
-    const { creds, keys } = JSON.parse(authFile, BufferJSON.reviver)
-    state = { 
+  let state: AuthenticationState
+  const saveConnect = (filename: string) => {
+    const saveState = () => {
+      console.log('saving auth state saveConnect')
+      const toWrite = JSON.stringify(state, BufferJSON.replacer, 2)
+      writeFileSync(filename, toWrite)
+    }
+    const { creds, keys } = JSON.parse(readFileSync(filename, { encoding: 'utf-8' }), BufferJSON.reviver)
+    state = {
       creds: creds, 
-      // stores pre-keys, session & other keys in a JSON object
-      // we deserialize it here
       keys: initInMemoryKeyStore(keys, saveState) 
     }
+
     return { state, saveState }
   }
 
@@ -43,32 +44,14 @@ const wac = function wac (connect: Connect): Promise<string> {
       console.log('iniciando o processo BAILEY CONNECT')
       const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95']
 
-      const authJSON = JSON.parse(authFile, BufferJSON.reviver)
-      const auth = { 
-        creds: authJSON.creds, 
-        keys: initInMemoryKeyStore(authJSON.keys, saveState) 
-      }
-
-      console.log('PARSEOU')
-
+      const { state, saveState } = saveConnect(`./auth_info_multi.TESTE.json`)
       const socket = baileys({
-        auth,
+        auth: state,
         browser
       })
 
-      socket.ev.on ('creds.update', saveState)
-      // socket.ev.on ('auth-state.update', () => {
-      //   const authInfo = socket.authState
-      //   const authJson = JSON.stringify(authInfo, BufferJSON.replacer, 2)
+      socket.ev.on('creds.update', saveState)
 
-      //   const user = socket.user
-      //   const shard= user.id.split(':')[0]
-
-      //   redis.set(mkcredskey({ shard }), authJson)
-      //     .then(() => {
-      //       res(shard)
-      //     })
-      // })
       socket.ev.on ('blocklist.set', ({ blocklist }) => {
         console.log('blocklist.set')
         console.dir(blocklist)
@@ -192,9 +175,7 @@ const wacPC = async (connectionSwitch: ConnectionSwitch) => {
         const { type, hardid, shard, cacapa, auth } = connectionSwitch
         console.log('wacPC connect')
 
-        // auth can be too large to pass as env
-        const authPathRandom = String(Math.random()).slice(2)
-        await pfs.writeFile(authPathRandom, JSON.stringify(auth))
+        const authPathRandom = 'TESTE'
 
         const wacP = fork('./src/index', {
           env: {
@@ -283,3 +264,21 @@ export {
   wac,
   wacPC
 }
+
+/**
+import makeWASocket, { BufferJSON, useSingleFileAuthState } from '@adiwajshing/baileys-md'
+import * as fs from 'fs'
+
+// utility function to help save the auth state in a single file
+// it's utility ends at demos -- as re-writing a large file over and over again is very inefficient
+const { state, saveState } = useSingleFileAuthState('./auth_info_multi.json')
+
+// will use the given state to connect
+// so if valid credentials are available -- it'll connect without QR
+
+const conn = makeSocket({ auth: state }) 
+
+// this will be called as soon as the credentials are updated
+conn.ev.on ('creds.update', saveState)
+
+ */

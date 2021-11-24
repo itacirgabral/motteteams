@@ -1,5 +1,6 @@
 import { fork } from 'child_process'
-import baileys, { BufferJSON, WABrowserDescription } from '@adiwajshing/baileys-md'
+import { writeFileSync} from 'fs'
+import baileys, { BufferJSON, WABrowserDescription, AuthenticationState, initAuthCreds, initInMemoryKeyStore } from '@adiwajshing/baileys-md'
 import got from 'got'
 
 import { client as redis, mkcredskey } from '@gmapi/redispack'
@@ -17,17 +18,40 @@ interface Birth {
   auth: string;
 }
 
+let state: AuthenticationState
+
+const saveSignup = (filename: string) => {
+  const creds = initAuthCreds()
+	const saveState = () => {
+    console.log('saving auth state saveSignup')
+    const toWrite = JSON.stringify(state, BufferJSON.replacer, 2)
+
+    writeFileSync(filename, toWrite)
+	}
+  const keys = initInMemoryKeyStore({ }, saveState)
+  
+  state = { creds: creds, keys: keys }
+
+	return { state, saveState }
+}
+
 const zygote = function zygote (signupconnection: Signupconnection): Promise<Birth> {
   return new Promise((res, rej) => {
     const { mitochondria, shard, url, cacapa } = signupconnection
     const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95'] 
     let lastQrcode = ''
 
+    const { state, saveState } = saveSignup(`./auth_info_multi.TESTE.json`)
+
     // TODO PROM-CLIENT SIGNUP_START
     const socket = baileys({
-      printQRInTerminal: true, 
+      printQRInTerminal: true,
+      auth: state, 
       browser
     })
+
+    socket.ev.on('creds.update', saveState)
+
     socket.ev.on('connection.update', async (update) => {
       if(update.connection === 'close') {
 
