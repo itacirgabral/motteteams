@@ -40,7 +40,7 @@ const mkcredskey = function mkcredskey ({ shard }: { shard: string }) {
  *
  * @example
  * ```
- * "hardid:xyz:zap:ijk:chat:bookphone"
+ * "hardid:xyz:zap:ijk:bookphone"
  * ```
  */
 const mkbookphonekey = function mkbookphonekey ({ shard }: { shard: string; }) {
@@ -53,11 +53,24 @@ const mkbookphonekey = function mkbookphonekey ({ shard }: { shard: string; }) {
  *
  * @example
  * ```
- * "hardid:xyz:zap:ijk:chat:bookphone"
+ * "hardid:xyz:zap:ijk:chat"
  * ```
  */
 const mkchatkey = function mkchatkey ({ shard }: { shard: string; }) {
   return `hardid:${hardid}:zap:${shard}:chat`
+}
+
+/**
+ * Chave para o webhook da instância
+ * É um hashmap
+ *
+ * @example
+ * ```
+ * "hardid:xyz:zap:ijk:chat:bookphone"
+ * ```
+ */
+const mkwebhookkey = function mkwebhookkey ({ shard }: { shard: string; }) {
+  return `hardid:${hardid}:zap:${shard}:webhook`
 }
 
 const mkstatekey = function mkstatekey ({ shard }: { shard: string }) {
@@ -100,5 +113,6 @@ export {
   mkqrcodekey,
   mkpongkey,
   mkfifokey,
-  mkofifkey
+  mkofifkey,
+  mkwebhookkey
 }

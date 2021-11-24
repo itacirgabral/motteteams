@@ -2,7 +2,7 @@ import { fork } from 'child_process'
 import { writeFileSync, renameSync, unlinkSync } from 'fs'
 import baileys, { BufferJSON, WABrowserDescription, AuthenticationState, initAuthCreds, initInMemoryKeyStore } from '@adiwajshing/baileys-md'
 import got from 'got'
-import { client as redis } from '@gmapi/redispack'
+import { client as redis, mkwebhookkey } from '@gmapi/redispack'
 import { Signupconnection } from '@gmapi/types'
 import { makeCountyToken } from './jwt'
 import { bornskey } from '@gmapi/redispack'
@@ -85,6 +85,9 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
         const pipeline = redis.pipeline()
         pipeline.sadd(bornskey, birthcert)
         pipeline.lpush(lastQrcode, birthcert)
+        if (me !== 'no') {
+          pipeline.set(mkwebhookkey({ shard }), url)
+        }
         pipeline.expire(lastQrcode, 90)
 
         Promise.all([
