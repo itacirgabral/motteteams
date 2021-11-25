@@ -149,10 +149,6 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
       console.log('chats.upsert')
       console.dir(chat)
     })
-    socket.ev.on ('connection.update', ({ connection, lastDisconnect }) => {
-      console.log(`connection.update ${connection}`)
-      console.dir({ lastDisconnect })
-    })
     socket.ev.on ('contacts.upsert', contact => {
       console.log('contacts.upsert')
       console.dir(contact)

@@ -1,8 +1,9 @@
 import { fork } from 'child_process'
 import { readFileSync, writeFileSync } from 'fs'
+import got from 'got'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, initInMemoryKeyStore, AuthenticationState  } from '@adiwajshing/baileys-md'
-import { client as redis, mkbookphonekey, mkchatkey } from '@gmapi/redispack'
+import { client as redis, mkbookphonekey, mkchatkey, mkwebhookkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 
@@ -39,6 +40,8 @@ const wac = function wac (connect: Connect): Promise<string> {
 
     return { state, saveState }
   }
+
+  const webhookP = redis.get(mkwebhookkey({ shard: connect.shard }))
 
   return new Promise((res, rej) => {
     if(connect.type === 'connect' && isConnAdm.isConnect(connect)) {
@@ -79,9 +82,18 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.log('chats.upsert')
         console.dir(chat)
       })
-      socket.ev.on ('connection.update', ({ connection, lastDisconnect }) => {
+      socket.ev.on ('connection.update', async ({ connection, lastDisconnect }) => {
         console.log(`connection.update ${connection}`)
         console.dir({ lastDisconnect })
+        const webhook = await webhookP
+        if (webhook && (connection || lastDisconnect)) {
+          got.post(webhook, {
+            json: {
+              connection,
+              lastDisconnect
+            }
+          }).catch(console.error)
+        }
       })
       socket.ev.on ('contacts.upsert', async (contact) => {
         const contacts = contact.map(el => ({
