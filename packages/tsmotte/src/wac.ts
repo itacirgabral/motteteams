@@ -4,7 +4,7 @@ import got from 'got'
 import nano from 'nano'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, initInMemoryKeyStore, AuthenticationState  } from '@adiwajshing/baileys-md'
-import { client as redis, mkbookphonekey, mkchatkey, mkwebhookkey } from '@gmapi/redispack'
+import { client as redis, mkbookphonekey, mkwebhookkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 
@@ -14,7 +14,6 @@ const coudhdbUrl = process.env.COUCHDB_URL || 'http://localhost:5984'
 console.log(`coudhdbUrl=${coudhdbUrl}`)
 const couch = nano(coudhdbUrl)
 const jsonStore = couch.db.use('gestormessenger')
-
 
 /**
  * Whats App Connect
@@ -74,9 +73,8 @@ const wac = function wac (connect: Connect): Promise<string> {
           messages
         })
       })
-      socket.ev.on ('chats.update', partialChat => {
+      socket.ev.on ('chats.update', () => {
         console.log('chats.update')
-        console.dir(partialChat)
       })
       socket.ev.on ('chats.upsert', chat => {
         console.log('chats.upsert')
@@ -107,11 +105,13 @@ const wac = function wac (connect: Connect): Promise<string> {
                     type: 'AdaptiveCard',
                     version: '1.2',
                     body:[{
-                      type: 'TextBlock',
-                      text: JSON.stringify({ connection, lastDisconnect }, null, 2),
-                      isSubtle: true,
-                      fontType: 'Monospace',
-                      size: 'Small'
+                      type: 'RichTextBlock',
+                      inlines: [
+                          {
+                              type: 'TextRun',
+                              text: JSON.stringify({ connection, lastDisconnect }, null, 2)
+                          }
+                      ]
                     }]
                   }
                 }]
@@ -128,20 +128,8 @@ const wac = function wac (connect: Connect): Promise<string> {
           }
         }
       })
-      socket.ev.on ('contacts.upsert', async (contact) => {
-        const contacts = contact.map(el => ({
-          name: el.notify || '',
-          number: el.id.split('@')[0]
-        }))
-
-        const chatkey = mkchatkey({ shard: connect.shard })
-
-        const pipeline = redis.pipeline()
-        contacts.forEach(el => {
-          pipeline.hset(chatkey, el.number, JSON.stringify(el))
-        })
-
-        await pipeline.exec()
+      socket.ev.on ('contacts.upsert', async () => {
+        console.log('contacts.upsert')
       })
       socket.ev.on ('group-participants.update', ({ id, participants, action }) => {
         console.log(`group-participants.update ${id}`)
@@ -166,87 +154,78 @@ const wac = function wac (connect: Connect): Promise<string> {
       socket.ev.on ('messages.upsert', async ({ messages, type }) => {
         console.log('messages.upsert')
         if (type === 'notify') {
-          const cleanMessage = messages.map(baileys2gmapi)
-          console.dir(cleanMessage)
+          const cleanMessage = messages
+            .map(baileys2gmapi)
 
           const [whMain, whTeams, whSpy] = await webhookP
 
-          if (whMain || whTeams || whSpy) {
-            cleanMessage.forEach(json => {
-              //
-              if (whMain) {
-                got.post(whMain, {
-                  json
-                }).catch(console.error)
-              }
-              //
-              if (whTeams) {
-                got.post(whTeams, {
-                  json: {
-                    type: 'message',
-                    attachments: [{
-                      contentType: 'application/vnd.microsoft.card.adaptive',
-                      contentUrl: null,
-                      content:{
-                        $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
-                        type: 'AdaptiveCard',
-                        version: '1.2',
-                        body:[{
-                          type: 'TextBlock',
-                          text: JSON.stringify(json, null, 2),
-                          isSubtle: true,
-                          fontType: 'Monospace',
-                          size: 'Small'
+          cleanMessage.forEach(json => {
+            // webhook
+            got.post(whMain, {
+              json
+            }).catch(console.error)
+            // couchdb
+            jsonStore.insert(json)
+            //teams
+            if (whTeams) {
+              got.post(whTeams, {
+                json: {
+                  type: 'message',
+                  attachments: [{
+                    contentType: 'application/vnd.microsoft.card.adaptive',
+                    contentUrl: null,
+                    content:{
+                      $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+                      type: 'AdaptiveCard',
+                      version: '1.2',
+                      body:[{
+                        type: 'RichTextBlock',
+                        inlines: [{
+                          type: 'TextRun',
+                          text: JSON.stringify(json, null, 2)
                         }]
-                      }
-                    }]
-                  }
-                }).catch(console.error)
-              }
-              //
+                      }]
+                    }
+                  }]
+                }
+              }).catch(console.error)
+              // extra webhook
               if (whSpy) {
                 got.post(whSpy, {
                   json
                 }).catch(console.error)
               }
-            })
-          }
-
-
-
-          // TODO
-          // salvar no redis
-          // salvar no couchdb
-          // salvar nos minio
-        } else if (type === 'prepend') {
-          // enum WebMessageInfoStubType
-          const formatedMessages = messages.map(m => {
-            return {
-              agendaName: m.messageStubParameters?.length === 1 ?
-                m.messageStubParameters[0] :
-                undefined,
-              jid: m.key.remoteJid,
-              save: m.messageStubType === 99 || m.messageStubType === 65
             }
           })
 
+          // TODO
+          // [x] salvar no redis
+          // [x] salvar no couchdb
+          // [ ] salvar nos minio
+        } else if (type === 'prepend') {
+          const chatMessages = messages
+            .filter(el => !el.messageStubType)
+            .filter(el => !el.status)
 
-          // "douglas si@556584784558@s.whatsapp.net"
-          const uniqueEntries = Array.from(new Set(
-            formatedMessages
-              .filter(el => el.save)
-              .map(({ agendaName, jid}) => `${agendaName}@${jid}`)
-          ))
+          if (chatMessages.length > 0) {
+            const jids = new Set()
+            chatMessages.forEach(m => {
+              if(m.key.remoteJid) {
+                jids.add(m.key.remoteJid)
+              }
+            })
 
-          const bookphonekey = mkbookphonekey({ shard: connect.shard })
-          const pipeline = redis.pipeline()
-          uniqueEntries.forEach(el => {
-            const [agendaName, number] = el.split('@')
-            pipeline.hset(bookphonekey, number, JSON.stringify({ agendaName, number}))
-          })
-  
-          await pipeline.exec()
+            // redis allowedJids
+            console.log(`allowedJids ${Array.from(jids).join(', ')}`)
+            //mkbookphonekey
 
+            const pipeline = redis.pipeline()
+            const bookphonekey = mkbookphonekey({ shard: connect.shard })
+            for(const jid of jids) {
+              pipeline.hsetnx(bookphonekey, jid, 'nodatayet')
+            }
+            await pipeline.exec()
+          }
         } else if (type === 'append') {
           //
         }
