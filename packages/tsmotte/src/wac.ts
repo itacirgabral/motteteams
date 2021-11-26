@@ -1,6 +1,7 @@
 import { fork } from 'child_process'
 import { readFileSync, writeFileSync } from 'fs'
 import got from 'got'
+import nano from 'nano'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, initInMemoryKeyStore, AuthenticationState  } from '@adiwajshing/baileys-md'
 import { client as redis, mkbookphonekey, mkchatkey, mkwebhookkey } from '@gmapi/redispack'
@@ -9,12 +10,11 @@ import { patchpanel } from './patchpanel'
 
 type ConnectionSwitch = Connect | Disconnect | Connectionstate
 
-// import nano from 'nano'
-// const coudhdbUrl = process.env.COUCHDB_URL || 'http://localhost:5984'
-// const couch = nano(coudhdbUrl)
-// const jsonStore = couch.db.use('gestormessenger')
+const coudhdbUrl = process.env.COUCHDB_URL || 'http://localhost:5984'
+console.log(`coudhdbUrl=${coudhdbUrl}`)
+const couch = nano(coudhdbUrl)
+const jsonStore = couch.db.use('gestormessenger')
 
-// console.log(`coudhdbUrl=${coudhdbUrl}`)
 
 /**
  * Whats App Connect
@@ -41,7 +41,7 @@ const wac = function wac (connect: Connect): Promise<string> {
     return { state, saveState }
   }
 
-  const webhookP = redis.get(mkwebhookkey({ shard: connect.shard }))
+  const webhookP = redis.hmget(mkwebhookkey({ shard: connect.shard }), 'main', 'teams', 'spy')
 
   return new Promise((res, rej) => {
     if(connect.type === 'connect' && isConnAdm.isConnect(connect)) {
@@ -85,14 +85,47 @@ const wac = function wac (connect: Connect): Promise<string> {
       socket.ev.on ('connection.update', async ({ connection, lastDisconnect }) => {
         console.log(`connection.update ${connection}`)
         console.dir({ lastDisconnect })
-        const webhook = await webhookP
-        if (webhook && (connection || lastDisconnect)) {
-          got.post(webhook, {
-            json: {
-              connection,
-              lastDisconnect
-            }
-          }).catch(console.error)
+        const [whMain, whTeams, whSpy] = await webhookP
+        if (connection || lastDisconnect) {
+          if (whMain) {
+            got.post(whMain, {
+              json: {
+                connection,
+                lastDisconnect
+              }
+            }).catch(console.error)
+          }
+          if (whTeams) {
+            got.post(whTeams, {
+              json: {
+                type: 'message',
+                attachments: [{
+                  contentType: 'application/vnd.microsoft.card.adaptive',
+                  contentUrl: null,
+                  content:{
+                    $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+                    type: 'AdaptiveCard',
+                    version: '1.2',
+                    body:[{
+                      type: 'TextBlock',
+                      text: JSON.stringify({ connection, lastDisconnect }, null, 2),
+                      isSubtle: true,
+                      fontType: 'Monospace',
+                      size: 'Small'
+                    }]
+                  }
+                }]
+              }
+            }).catch(console.error)
+          }
+          if (whSpy) {
+            got.post(whSpy, {
+              json: {
+                connection,
+                lastDisconnect
+              }
+            }).catch(console.error)
+          }
         }
       })
       socket.ev.on ('contacts.upsert', async (contact) => {
@@ -135,6 +168,52 @@ const wac = function wac (connect: Connect): Promise<string> {
         if (type === 'notify') {
           const cleanMessage = messages.map(baileys2gmapi)
           console.dir(cleanMessage)
+
+          const [whMain, whTeams, whSpy] = await webhookP
+
+          if (whMain || whTeams || whSpy) {
+            cleanMessage.forEach(json => {
+              //
+              if (whMain) {
+                got.post(whMain, {
+                  json
+                }).catch(console.error)
+              }
+              //
+              if (whTeams) {
+                got.post(whTeams, {
+                  json: {
+                    type: 'message',
+                    attachments: [{
+                      contentType: 'application/vnd.microsoft.card.adaptive',
+                      contentUrl: null,
+                      content:{
+                        $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+                        type: 'AdaptiveCard',
+                        version: '1.2',
+                        body:[{
+                          type: 'TextBlock',
+                          text: JSON.stringify(json, null, 2),
+                          isSubtle: true,
+                          fontType: 'Monospace',
+                          size: 'Small'
+                        }]
+                      }
+                    }]
+                  }
+                }).catch(console.error)
+              }
+              //
+              if (whSpy) {
+                got.post(whSpy, {
+                  json
+                }).catch(console.error)
+              }
+            })
+          }
+
+
+
           // TODO
           // salvar no redis
           // salvar no couchdb
@@ -168,6 +247,8 @@ const wac = function wac (connect: Connect): Promise<string> {
   
           await pipeline.exec()
 
+        } else if (type === 'append') {
+          //
         }
       })
       socket.ev.on ('presence.update', ({ id, presences }) => {

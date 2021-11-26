@@ -64,6 +64,11 @@ const mkchatkey = function mkchatkey ({ shard }: { shard: string; }) {
  * Chave para o webhook da instância
  * É um hashmap
  *
+ * fields
+ *  - main
+ *  - teams
+ *  - spy
+ *
  * @example
  * ```
  * "hardid:xyz:zap:ijk:chat:bookphone"

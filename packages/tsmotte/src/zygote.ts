@@ -86,7 +86,7 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
         pipeline.sadd(bornskey, birthcert)
         pipeline.lpush(lastQrcode, birthcert)
         if (me !== 'no') {
-          pipeline.set(mkwebhookkey({ shard }), url)
+          pipeline.hset(mkwebhookkey({ shard }), 'main', url)
         }
         pipeline.expire(lastQrcode, 90)
 
