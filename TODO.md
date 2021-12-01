@@ -24,6 +24,7 @@ connect.ev.on('messages.upsert', ({ messages, type }) => {
 - [x] npm run start test | tee on_delchat.log
 - [x] npm run start test | tee on_newgroup.log
 - [x] npm run start test | tee on_newmsggroup.log
+- [x] npm run start test | tee on_delgroup.log
 - [ ] npm run start test | tee off_newchat.log
 - [ ] npm run start test | tee off_newmsg.log
 - [ ] npm run start test | tee off_delchat.log
