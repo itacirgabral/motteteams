@@ -1,0 +1,11 @@
+{
+    "service": {
+        "name": "redis",
+        "port": 6379,
+        "check": {
+        "test": ["CMD", "redis-cli","ping"],
+            "interval": "10s",
+            "timeout": "5s"
+        }
+    }
+}
