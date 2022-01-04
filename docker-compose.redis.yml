@@ -1,0 +1,12 @@
+version: "3.5"
+services:
+  redis:
+    image: redislabs/redismod
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"
+volumes:
+  redisdata:
+    external: true

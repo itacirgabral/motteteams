@@ -1,0 +1,11 @@
+{
+    "service": {
+        "name": "restapi",
+        "port": 300,
+        "check": {
+            "http": "http://localhost:3000/health",
+            "interval": "10s",
+            "timeout": "5s"
+        }
+    }
+}

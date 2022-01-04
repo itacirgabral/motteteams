@@ -17,7 +17,6 @@
     "url": "https://github.com/itacirgabral/GMAPI/issues"
   },
   "devDependencies": {
-    "@gmapi/types": "^1.0.1",
     "@types/dotenv": "^8.2.0",
     "@types/node": "^16.11.7",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
@@ -32,6 +31,7 @@
   },
   "dependencies": {
     "@adiwajshing/baileys-md": "^4.0.0",
+    "@gmapi/types": "^1.0.0",
     "dotenv": "^10.0.0"
   }
 }
