@@ -1,14 +1,7 @@
 # SETAPÃO DO ZAP
-## TODO Baileys
-- [x] processo leitura de novo qrcode
-- [x] controle de conexão
-- [ ] contatos e grupos
-- [ ] recebimentos de mensagens
-- [ ] administração de contatos e grupos
-- [ ] recebimento de arquivos
-- [ ] envio de mensagens
-- [ ] envio de arquivos
-- [ ] notificação de recebimento
+
+## Waypoint
+- waypoint install -platform=docker -accept-tos
 
 ## vagrant
 - vagrant plugin install vagrant-docker-login

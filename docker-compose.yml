@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   redis:
-    image: redislabs/redistimeseries
+    image: redislabs/redismod
     restart: unless-stopped
     volumes:
       - redisdata:/data
@@ -30,46 +30,46 @@ services:
       COUCHDB_USER: admin
       COUCHDB_PASSWORD: wntqaUSDder0WkD0qKM9wM4YodgrLoQu
       NODENAME: mainjsondb
-  grafana:
-    image: grafana/grafana:8.2.2
-    restart: unless-stopped
-    ports:
-        - "3030:3000"
-    environment:
-        GF_SECURITY_ADMIN_USER: admin
-        GF_SECURITY_ADMIN_PASSWORD: wntqaUSDder0WkD0qKM9wM4YodgrLoQu
-        GF_USERS_ALLOW_SIGN_UP: 'false'
-    volumes:
-        - grafanadata:/var/lib/grafana
-  prometheus:
-    image: prom/prometheus:v2.30.3
-    restart: unless-stopped
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus-config.yaml:/etc/prometheus/prometheus.yml
-      - prometheusdata:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
-  loki:
-    image: grafana/loki:2.3.0
-    restart: unless-stopped
-    ports:
-      - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
-    volumes:
-      - ./loki-config.yaml:/etc/loki/local-config.yaml
-      - lokidata:/loki
-  pushgateway:
-    image: prom/pushgateway:v1.4.2
-    restart: unless-stopped
-    ports:
-      - "9091:9091"
+  # grafana:
+  #   image: grafana/grafana:8.2.2
+  #   restart: unless-stopped
+  #   ports:
+  #       - "3030:3000"
+  #   environment:
+  #       GF_SECURITY_ADMIN_USER: admin
+  #       GF_SECURITY_ADMIN_PASSWORD: wntqaUSDder0WkD0qKM9wM4YodgrLoQu
+  #       GF_USERS_ALLOW_SIGN_UP: 'false'
+  #   volumes:
+  #       - grafanadata:/var/lib/grafana
+  # prometheus:
+  #   image: prom/prometheus:v2.30.3
+  #   restart: unless-stopped
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./prometheus-config.yaml:/etc/prometheus/prometheus.yml
+  #     - prometheusdata:/prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #     - '--web.console.libraries=/etc/prometheus/console_libraries'
+  #     - '--web.console.templates=/etc/prometheus/consoles'
+  #     - '--storage.tsdb.retention.time=200h'
+  #     - '--web.enable-lifecycle'
+  # loki:
+  #   image: grafana/loki:2.3.0
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3100:3100"
+  #   command: -config.file=/etc/loki/local-config.yaml
+  #   volumes:
+  #     - ./loki-config.yaml:/etc/loki/local-config.yaml
+  #     - lokidata:/loki
+  # pushgateway:
+  #   image: prom/pushgateway:v1.4.2
+  #   restart: unless-stopped
+  #   ports:
+  #     - "9091:9091"
   # app:
   #   build:
   #     context: ./tsmotte
@@ -83,7 +83,7 @@ services:
   #     REDIS_URL: ${REDIS_URL}
   #     LOKI_PUSH_URL: ${LOKI_PUSH_URL}
   #     PROM_PUSH_URL: ${PROM_PUSH_URL}
-  #   volumes: 
+  #   volumes:
   #     - ./tsmotte/node_modules:/app/node_modules
   #     - ./tsmotte/src:/app/src
   #   command: ["npm", "start"]
