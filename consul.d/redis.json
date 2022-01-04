@@ -4,6 +4,7 @@
     "tags": [
       "gmapi"
     ],
+    "port": 6379,
     "check": {
       "args": ["docker", "exec", "gmapi_redis_1", "redis-cli", "ping"],
       "interval": "15s"
