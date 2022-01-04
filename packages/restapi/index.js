@@ -78,18 +78,6 @@ app.get('/queuesize', jwt2shard, router.queuesize({ redis, mkrawbreadkey, mktsro
 app.get('/cleanqueue', jwt2shard, router.cleanqueue({ redis, mkrawbreadkey, mktsroutekey }))
 app.post('/loadmessages', jwt2shard, express.json(), router.loadmessages({ redis, mkchatskey, mkrawbreadkey, mktsroutekey }))
 
-try {
-  https.createServer({
-    key: fs.readFileSync(path.join(__dirname, 'sslcert', 'privkey.pem')),
-    cert: fs.readFileSync(path.join(__dirname, 'sslcert', 'cert.pem')),
-    ca: fs.readFileSync(path.join(__dirname, 'sslcert', 'chain.pem'))
-  }, app).listen(4443, () => {
-    console.log(`Example app listening at https://localhost:${4443}`)
-  })
-} catch (error) {
-  console.error(error)
-}
-
 app.listen(3000, () => {
   console.log(`Example app listening at http://localhost:${3000}`)
 })
