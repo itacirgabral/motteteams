@@ -1,0 +1,12 @@
+{
+  "service": {
+    "name": "redis",
+    "tags": [
+      "gmapi"
+    ],
+    "check": {
+      "args": ["docker", "exec", "gmapi_redis_1", "redis-cli", "ping"],
+      "interval": "15s"
+    }
+  }
+}

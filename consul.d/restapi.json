@@ -1,0 +1,13 @@
+{
+  "service": {
+    "name": "restapi",
+    "tags": [
+      "gmapi"
+    ],
+    "port": 3000,
+    "check": {
+      "args": ["curl", "localhost:3000"],
+      "interval": "15s"
+    }
+  }
+}

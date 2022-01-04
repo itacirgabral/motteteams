@@ -2,6 +2,7 @@ version: "3.5"
 services:
   redis:
     image: redislabs/redismod
+    container_name: gmapi_redis_1
     restart: unless-stopped
     volumes:
       - redisdata:/data
