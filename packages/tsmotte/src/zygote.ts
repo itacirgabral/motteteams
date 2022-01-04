@@ -1,10 +1,19 @@
 import { fork } from 'child_process'
 import { writeFileSync, renameSync, unlinkSync } from 'fs'
-import baileys, { BufferJSON, WABrowserDescription, AuthenticationState, initAuthCreds, initInMemoryKeyStore } from '@adiwajshing/baileys-md'
+import baileys, { AuthenticationCreds, AuthenticationState, BufferJSON, SignalDataTypeMap, WABrowserDescription, initAuthCreds, proto } from '@adiwajshing/baileys-md'
 import got from 'got'
 import { client as redis, mkwebhookkey, bornskey } from '@gmapi/redispack'
 import { Signupconnection } from '@gmapi/types'
 import { makeCountyToken } from './jwt'
+
+const KEY_MAP: { [T in keyof SignalDataTypeMap]: string } = {
+  'pre-key': 'preKeys',
+  'session': 'sessions',
+  'sender-key': 'senderKeys',
+  'app-state-sync-key': 'appStateSyncKeys',
+  'app-state-sync-version': 'appStateVersions',
+  'sender-key-memory': 'senderKeyMemory'
+}
 
 interface Birth {
   type: 'jwt',
@@ -16,21 +25,49 @@ interface Birth {
   auth: string;
 }
 
-let state: AuthenticationState
-
 const saveSignup = (filename: string) => {
   const creds = initAuthCreds()
-	const saveState = () => {
-    console.log('saving auth state saveSignup')
-    const toWrite = JSON.stringify(state, BufferJSON.replacer, 2)
+  const keys = { }
 
-    writeFileSync(filename, toWrite)
-	}
-  const keys = initInMemoryKeyStore({ }, saveState)
+  const saveState = () => {
+    console.log('saving auth state')
+    writeFileSync(
+      filename,
+      JSON.stringify({ creds, keys }, BufferJSON.replacer, 2)
+    )
+  }
 
-  state = { creds: creds, keys: keys }
-
-	return { state, saveState }
+	return {
+    state: {
+      creds,
+      keys: {
+        get: (type, ids) => {
+          const key = KEY_MAP[type]
+          return ids.reduce(
+            (dict, id) => {
+              let value = keys[key]?.[id]
+              if(value) {
+                if(type === 'app-state-sync-key') {
+                  value = proto.AppStateSyncKeyData.fromObject(value)
+                }
+                dict[id] = value
+              }
+              return dict
+            }, { }
+          )
+        },
+        set: (data) => {
+          for(const _key in data) {
+            const key = KEY_MAP[_key as keyof SignalDataTypeMap]
+            keys[key] = keys[key] || { }
+            Object.assign(keys[key], data[_key])
+          }
+          saveState()
+        }
+      }
+    },
+    saveState
+  }
 }
 
 const zygote = function zygote (signupconnection: Signupconnection): Promise<Birth> {

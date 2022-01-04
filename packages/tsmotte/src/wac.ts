@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from 'fs'
 import got from 'got'
 import nano from 'nano'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
-import baileys, { BufferJSON, WABrowserDescription, initInMemoryKeyStore, AuthenticationState  } from '@adiwajshing/baileys-md'
+import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, AuthenticationState  } from '@adiwajshing/baileys-md'
 import { client as redis, mkbookphonekey, mkwebhookkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
@@ -15,29 +15,72 @@ console.log(`coudhdbUrl=${coudhdbUrl}`)
 const couch = nano(coudhdbUrl)
 const jsonStore = couch.db.use('gestormessenger')
 
+const KEY_MAP: { [T in keyof SignalDataTypeMap]: string } = {
+  'pre-key': 'preKeys',
+  'session': 'sessions',
+  'sender-key': 'senderKeys',
+  'app-state-sync-key': 'appStateSyncKeys',
+  'app-state-sync-version': 'appStateVersions',
+  'sender-key-memory': 'senderKeyMemory'
+}
+
 /**
  * Whats App Connect
- * @param connect 
- * @returns 
+ * @param connect
+ * @returns
  */
+
 const wac = function wac (connect: Connect): Promise<string> {
-  // the creds file path 
+  // the creds file path
   console.log(`connect.auth=${connect.auth}`)
 
-  let state: AuthenticationState
+  let creds: AuthenticationCreds
+  let keys: any = { }
+
   const saveConnect = (filename: string) => {
+    const result = JSON.parse(readFileSync(filename, { encoding: 'utf-8' }),BufferJSON.reviver)
     const saveState = () => {
-      console.log('saving auth state saveConnect')
-      const toWrite = JSON.stringify(state, BufferJSON.replacer, 2)
-      writeFileSync(filename, toWrite)
-    }
-    const { creds, keys } = JSON.parse(readFileSync(filename, { encoding: 'utf-8' }), BufferJSON.reviver)
-    state = {
-      creds: creds, 
-      keys: initInMemoryKeyStore(keys, saveState) 
+      console.log('saving auth state')
+      writeFileSync(
+        filename,
+        JSON.stringify({ creds, keys }, BufferJSON.replacer, 2)
+      )
     }
 
-    return { state, saveState }
+    creds = result.creds
+    keys = result.keys
+
+    return {
+      state: {
+        creds,
+        keys: {
+          get: (type, ids) => {
+            const key = KEY_MAP[type]
+            return ids.reduce(
+              (dict, id) => {
+                let value = keys[key]?.[id]
+                if(value) {
+                  if(type === 'app-state-sync-key') {
+                    value = proto.AppStateSyncKeyData.fromObject(value)
+                  }
+                  dict[id] = value
+                }
+                return dict
+              }, { }
+            )
+          },
+          set: (data) => {
+            for(const _key in data) {
+              const key = KEY_MAP[_key as keyof SignalDataTypeMap]
+              keys[key] = keys[key] || { }
+              Object.assign(keys[key], data[_key])
+            }
+            saveState()
+          }
+        }
+      },
+      saveState
+    }
   }
 
   const webhookP = redis.hmget(mkwebhookkey({ shard: connect.shard }), 'main', 'teams', 'spy')
@@ -283,7 +326,7 @@ const wacPC = async (connectionSwitch: ConnectionSwitch) => {
           const { type, ...body } = JSON.parse(el)
           switch (type) {
             case 'SHUTDOWN_ME':
-              patchpanel.delete(shard)  
+              patchpanel.delete(shard)
               wacP.kill('SIGINT')
               break
             default:
@@ -322,7 +365,7 @@ const wacPC = async (connectionSwitch: ConnectionSwitch) => {
           const blueCable = patchpanel.get(shard)
           if (blueCable && (blueCable.connected || blueCable.connecting)) {
             // kill now
-            // patchpanel.delete(shard)  
+            // patchpanel.delete(shard)
             blueCable.wacP.kill('SIGINT')
           }
         }
@@ -335,21 +378,3 @@ export {
   wac,
   wacPC
 }
-
-/**
-import makeWASocket, { BufferJSON, useSingleFileAuthState } from '@adiwajshing/baileys-md'
-import * as fs from 'fs'
-
-// utility function to help save the auth state in a single file
-// it's utility ends at demos -- as re-writing a large file over and over again is very inefficient
-const { state, saveState } = useSingleFileAuthState('./auth_info_multi.json')
-
-// will use the given state to connect
-// so if valid credentials are available -- it'll connect without QR
-
-const conn = makeSocket({ auth: state }) 
-
-// this will be called as soon as the credentials are updated
-conn.ev.on ('creds.update', saveState)
-
- */
