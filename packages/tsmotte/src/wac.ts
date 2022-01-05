@@ -29,7 +29,6 @@ const KEY_MAP: { [T in keyof SignalDataTypeMap]: string } = {
  * @param connect
  * @returns
  */
-
 const wac = function wac (connect: Connect): Promise<string> {
   // the creds file path
   console.log(`connect.auth=${connect.auth}`)
@@ -137,7 +136,8 @@ const wac = function wac (connect: Connect): Promise<string> {
             }).catch(console.error)
           }
           if (whTeams) {
-            got.post(whTeams, {
+            got.post({
+              url: whTeams,
               json: {
                 type: 'message',
                 attachments: [{
@@ -149,18 +149,20 @@ const wac = function wac (connect: Connect): Promise<string> {
                     version: '1.2',
                     body:[{
                       type: 'RichTextBlock',
-                      inlines: [
-                          {
-                              type: 'TextRun',
-                              text: JSON.stringify({ connection, lastDisconnect }, null, 2)
-                          }
-                      ]
+                      inlines: [{
+                        type: 'TextRun',
+                        text: JSON.stringify({
+                          connection,
+                          lastDisconnect
+                        })
+                      }]
                     }]
                   }
                 }]
               }
-            }).catch(console.error)
+            })
           }
+          // extra webhook
           if (whSpy) {
             got.post(whSpy, {
               json: {
@@ -203,15 +205,20 @@ const wac = function wac (connect: Connect): Promise<string> {
           const [whMain, whTeams, whSpy] = await webhookP
 
           cleanMessage.forEach(json => {
-            // webhook
-            got.post(whMain, {
-              json
-            }).catch(console.error)
             // couchdb
             jsonStore.insert(json)
+
+            // webhook
+            if (whMain) {
+              got.post(whMain, {
+                json
+              }).catch(console.error)
+            }
+
             //teams
             if (whTeams) {
-              got.post(whTeams, {
+              got.post({
+                url: whTeams,
                 json: {
                   type: 'message',
                   attachments: [{
@@ -231,13 +238,14 @@ const wac = function wac (connect: Connect): Promise<string> {
                     }
                   }]
                 }
+              })
+            }
+
+            // extra webhook
+            if (whSpy) {
+              got.post(whSpy, {
+                json
               }).catch(console.error)
-              // extra webhook
-              if (whSpy) {
-                got.post(whSpy, {
-                  json
-                }).catch(console.error)
-              }
             }
           })
 
