@@ -1,5 +1,8 @@
 # SETAPÃO DO ZAP
 
+# CLOUDFLARED
+- `cloudflared tunnel --hostname zapbridgebot.gestormessenger.team --url localhost:3000 --name zapbridgebot`
+
 ## Waypoint
 - waypoint install -platform=docker -accept-tos
 
