@@ -1,0 +1,2 @@
+- npm install -g verdaccio
+- npm install -f --registry http://localhost:4873/
