@@ -78,6 +78,37 @@ const mkwebhookkey = function mkwebhookkey ({ shard }: { shard: string; }) {
   return `hardid:${hardid}:zap:${shard}:webhook`
 }
 
+/**
+ * Chave para o baterista do teams
+ * É um stream duplex
+ *
+ * supondo já está com a instancia determinada
+ * cbd pode ser codigo do chat no whatsapp
+ *
+ * @example
+ * ```
+ * "hardid:xyz:zap:ijk:atende:bcd"
+ * ```
+ */
+const mkattkey = function mkattkey ({ shard, attid }: { shard: string; attid: string }) {
+  return `hardid:${hardid}:zap:${shard}:atende:${attid}`
+}
+/**
+ * Chave para as metainformações do atendimento
+ * É um hashmap
+ *
+ * chaves
+ * - vincula
+ *
+ * @example
+ * ```
+ * "hardid:xyz:zap:ijk:atende:bcd:meta"
+ * ```
+ */
+const mkattmetakey = function mkattmetakey ({ shard, attid }: { shard: string; attid: string }) {
+  return `hardid:${hardid}:zap:${shard}:atende:${attid}:meta`
+}
+
 const mkstatekey = function mkstatekey ({ shard }: { shard: string }) {
   return `hardid:${hardid}:zap:${shard}:state`
 }
@@ -112,6 +143,8 @@ export {
   mkcredskey,
   mkbookphonekey,
   mkchatkey,
+  mkattkey,
+  mkattmetakey,
   mkstatekey,
   mkstmkey,
   mktskey,
