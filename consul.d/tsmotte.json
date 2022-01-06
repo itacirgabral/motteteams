@@ -1,0 +1,13 @@
+{
+  "service": {
+    "name": "zapapi",
+    "tags": [
+      "gmapi"
+    ],
+    "port": 8538,
+    "check": {
+      "args": ["curl", "localhost:8538"],
+      "interval": "15s"
+    }
+  }
+}

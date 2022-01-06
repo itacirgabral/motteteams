@@ -1,4 +1,5 @@
 import { Signupconnection, Connect } from '@gmapi/types'
+import http from 'http'
 import { mkServer } from './server'
 import { zygote } from './zygote'
 import { wac } from './wac'
@@ -14,6 +15,17 @@ if (isMain) {
   console.log('isMain')
   const { inBound } = mkServer()
 
+  const healthPort = Number(process.env.HEALT_PORT) || 8538
+
+  // chech consul health
+  const server = http.createServer((req, res) => {
+    res.statusCode = 200
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify({
+      ok: true
+    }))
+  })
+  server.listen(healthPort)
 
   // Serviço Novo QR CODE
 } else if (process.env.SERVICE === 'zygote') {
