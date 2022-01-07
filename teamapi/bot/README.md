@@ -6,3 +6,6 @@
 - [microsoftteams](https://docs.microsoft.com/pt-br/microsoftteams/platform/bots/what-are-bots?view=msteams-client-js-latest)
 # SAMPLE
 - [botbuilder](https://github.com/microsoft/botbuilder-samples)
+
+# teams bot
+- cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name zapbot
