@@ -429,9 +429,9 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
         let shouldAck = true
 
         const { attrs, content } = node
-        const isNodeFromMe = areJidsSameUser(attrs.from, authState.creds.me?.id)
-        const remoteJid = attrs.recipient || attrs.from 
-        const fromMe = isNodeFromMe || (attrs.recipient ? false : true)
+        const isNodeFromMe = areJidsSameUser(attrs.participant || attrs.from, authState.creds.me?.id)
+        const remoteJid = !isNodeFromMe ? attrs.from : attrs.recipient
+        const fromMe = !attrs.recipient
 
         const ids = [attrs.id]
         if(Array.isArray(content)) {
@@ -447,7 +447,15 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
         }
 
         const status = getStatusFromReceiptType(attrs.type)
-        if(typeof status !== 'undefined' && !isNodeFromMe) {
+        if(
+            typeof status !== 'undefined' &&
+            (
+                // basically, we only want to know when a message from us has been delivered to/read by the other person
+                // or another device of ours has read some messages
+                status > proto.WebMessageInfo.WebMessageInfoStatus.DELIVERY_ACK ||
+                !isNodeFromMe
+            )
+        ) {
             ev.emit('messages.update', ids.map(id => ({
                 key: { ...key, id },
                 update: { status }
@@ -498,34 +506,36 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
         }
     })
 
-    ev.on('messages.upsert', async({ messages }) => {
-        const chat: Partial<Chat> = { id: messages[0].key.remoteJid }
-        const contactNameUpdates: { [_: string]: string } = { }
-        for(const msg of messages) {
-            if(!!msg.pushName) {
-                const jid = msg.key.fromMe ? jidNormalizedUser(authState.creds.me!.id) : (msg.key.participant || msg.key.remoteJid)
-                contactNameUpdates[jid] = msg.pushName
-                // update our pushname too
-                if(msg.key.fromMe && authState.creds.me?.name !== msg.pushName) {
-                    ev.emit('creds.update', { me: { ...authState.creds.me!, name: msg.pushName! } })
+    ev.on('messages.upsert', async({ messages, type }) => {
+        if(type === 'notify' || type === 'append') {
+            const chat: Partial<Chat> = { id: messages[0].key.remoteJid }
+            const contactNameUpdates: { [_: string]: string } = { }
+            for(const msg of messages) {
+                if(!!msg.pushName) {
+                    const jid = msg.key.fromMe ? jidNormalizedUser(authState.creds.me!.id) : (msg.key.participant || msg.key.remoteJid)
+                    contactNameUpdates[jid] = msg.pushName
+                    // update our pushname too
+                    if(msg.key.fromMe && authState.creds.me?.name !== msg.pushName) {
+                        ev.emit('creds.update', { me: { ...authState.creds.me!, name: msg.pushName! } })
+                    }
                 }
-            }
 
-            await processMessage(msg, chat)
-            if(!!msg.message && !msg.message!.protocolMessage) {
-                chat.conversationTimestamp = toNumber(msg.messageTimestamp)
-                if(!msg.key.fromMe) {
-                    chat.unreadCount = (chat.unreadCount || 0) + 1
+                await processMessage(msg, chat)
+                if(!!msg.message && !msg.message!.protocolMessage) {
+                    chat.conversationTimestamp = toNumber(msg.messageTimestamp)
+                    if(!msg.key.fromMe) {
+                        chat.unreadCount = (chat.unreadCount || 0) + 1
+                    }
                 }
             }
-        }
-        if(Object.keys(chat).length > 1) {
-            ev.emit('chats.update', [ chat ])
-        }
-        if(Object.keys(contactNameUpdates).length) {
-            ev.emit('contacts.update', Object.keys(contactNameUpdates).map(
-                id => ({ id, notify: contactNameUpdates[id] })
-            ))
+            if(Object.keys(chat).length > 1) {
+                ev.emit('chats.update', [ chat ])
+            }
+            if(Object.keys(contactNameUpdates).length) {
+                ev.emit('contacts.update', Object.keys(contactNameUpdates).map(
+                    id => ({ id, notify: contactNameUpdates[id] })
+                ))
+            }
         }
     })
 

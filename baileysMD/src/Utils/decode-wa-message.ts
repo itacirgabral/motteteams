@@ -56,7 +56,7 @@ export const decodeMessageStanza = async(stanza: BinaryNode, auth: Authenticatio
 
     const sender = msgType === 'chat' ? author : chatId
 
-    const fromMe = isMe(participant || chatId)
+    const fromMe = isMe(stanza.attrs.participant || stanza.attrs.from)
     const pushname = stanza.attrs.notify
     
     const key: WAMessageKey = {
@@ -69,8 +69,11 @@ export const decodeMessageStanza = async(stanza: BinaryNode, auth: Authenticatio
     const fullMessage: proto.IWebMessageInfo = {
         key,
         messageTimestamp: +stanza.attrs.t,
-        pushName: pushname,
-        status: key.fromMe ? proto.WebMessageInfo.WebMessageInfoStatus.SERVER_ACK : null,
+        pushName: pushname
+    }
+
+    if(key.fromMe) {
+        fullMessage.status = proto.WebMessageInfo.WebMessageInfoStatus.SERVER_ACK
     }
 
     if(Array.isArray(stanza.content)) {

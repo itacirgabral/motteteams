@@ -7,7 +7,7 @@
     "dev": "npx node-dev -r dotenv/config index.js",
     "start": "node -r dotenv/config index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "glock:restapi": "cloudflared tunnel -f --hostname hLHlNy83jgHTfBTV.gestormessenger.team --url localhost:3000 --name hLHlNy83jgHTfBTV"
+    "tunnel": "cloudflared tunnel -f --hostname hLHlNy83jgHTfBTV.gestormessenger.team --url localhost:3000 --name hLHlNy83jgHTfBTV"
   },
   "keywords": [],
   "author": "",

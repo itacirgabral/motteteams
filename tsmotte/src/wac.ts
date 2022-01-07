@@ -4,7 +4,7 @@ import got from 'got'
 import nano from 'nano'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, AuthenticationState  } from '@adiwajshing/baileys-md'
-import { client as redis, mkbookphonekey, mkwebhookkey } from '@gmapi/redispack'
+import { client as redis, mkbookphonekey, mkwebhookkey, mkattkey, mkattmetakey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 
@@ -205,6 +205,31 @@ const wac = function wac (connect: Connect): Promise<string> {
           const [whMain, whTeams, whSpy] = await webhookP
 
           cleanMessage.forEach(json => {
+            // redis atendimento
+            const attid = json.from
+            // mkattkey, mkattmetakey
+            const attkey = mkattkey({
+              shard: connect.shard,
+              attid
+            })
+            const attmetakey = mkattmetakey({
+              shard: connect.shard,
+              attid
+            })
+            // salvar no redis, sem duplicar
+            const pipeline = redis.pipeline()
+            pipeline.xadd(attkey, '*', 'type', 'zapfront', 'data', JSON.stringify(json))
+            pipeline.xlen(attkey)
+            pipeline.hsetnx(attmetakey, 'status', JSON.stringify({ stage: 0 }))
+
+            pipeline.exec().then(([[err0, _xid], [err1, attlen], [err2, isFirst]]) => {
+              if (isFirst) {
+                console.log(`iniciando atendimento ${connect.shard}:${attid}`)
+              } else {
+                console.log(`${attlen}-ésima  de ${connect.shard}:${attid}`)
+              }
+            }).catch(console.error)
+
             // couchdb
             jsonStore.insert(json)
 
