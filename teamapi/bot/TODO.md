@@ -1,0 +1,2 @@
+- [ ] You must subscribe to the conversationUpdate event with the teamMemberAdded eventType
+- [ ] Send a personal message to each team member when the bot is added.
