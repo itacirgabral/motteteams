@@ -9,8 +9,10 @@ const {
 const ACData = require('adaptivecards-templating');
 const minimist = require('minimist');
 
-const { client: redis, mkreadykey } = require('@gmapi/redispack')
+const { client: redis, mkreadykey, mkcacapakey, panoptickey } = require('@gmapi/redispack')
 const QRCode = require('qrcode')
+
+const hardid = process.env.HARDID
 
 const textBig = new ACData.Template({
     type: 'AdaptiveCard',
@@ -142,11 +144,16 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const isReady = await redis.get(mkreadykey({ shard: recipient }))
             if (isReady) {
               console.log("# READY #")
-              const qrcode = "2@sr6qeveE65RKLFfIYGjJ8hhLWtZ+NjfdBC/H0VoTA+w340r4WlTKGPj/l02CyXHmukyWR8VaAfkPZw==,waSTjqha7w756Sdzh2WYYHglnu9bjZuXYL9ZVMYPUwg=,2NnZLsvbmLO5WpElUOfDU8jx7RRlRA1yv5z9/pgEbx4=,7pYEpG3W5RtcgdL0aYfHlRKoysmxihtymb9W7RsK0e8="
+              const cacapakey = mkcacapakey()
+              const mitochondria = 'teamsapp_DEMO'
+              const webhook = undefined
+              await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', 'signupconnection', 'shard', recipient, 'url', webhook, 'mitochondria', mitochondria, 'cacapa', cacapakey)
+              // BUG shard = recipient should be overhided by shard = whatsappid
 
-              QRCode.toDataURL(qrcode, function (err, url) {
-                console.log(`url=${url}`)
-              })
+              // const qrcode = "2@sr6qeveE65RKLFfIYGjJ8hhLWtZ+NjfdBC/H0VoTA+w340r4WlTKGPj/l02CyXHmukyWR8VaAfkPZw==,waSTjqha7w756Sdzh2WYYHglnu9bjZuXYL9ZVMYPUwg=,2NnZLsvbmLO5WpElUOfDU8jx7RRlRA1yv5z9/pgEbx4=,7pYEpG3W5RtcgdL0aYfHlRKoysmxihtymb9W7RsK0e8="
+              // QRCode.toDataURL(qrcode, function (err, url) {
+              //   // console.log(`url=${url}`)
+              // })
             }
           }
         })

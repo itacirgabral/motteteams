@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const hardid = process.env.HARDID || 'dev'
 
 /**
@@ -21,6 +22,17 @@ const panoptickey = `hardid:${hardid}:panoptic`
  * ```
  */
 const bornskey = `hardid:${hardid}:borns`
+
+/**
+ * Cria uma chave aleatória para
+ * cacapacomunication
+ *
+ * @example
+ * ```
+ * "hardid:xyz:cacapa:xxx"
+ * ```
+ */
+const mkcacapakey = () => `hardid:${hardid}:cacapa:${crypto.randomBytes(16).toString('base64')}`
 
 /**
  * Chave para as credenciais de uma instancia
@@ -152,6 +164,7 @@ const mkofifkey = function mkofifkey ({ shard }: { shard: string }) {
 export {
   panoptickey,
   bornskey,
+  mkcacapakey,
   mkcredskey,
   mkbookphonekey,
   mkchatkey,
