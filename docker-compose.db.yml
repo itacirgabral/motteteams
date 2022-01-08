@@ -41,10 +41,6 @@ services:
 volumes:
   redisdata:
     external: true
-  redisdata1:
-    external: true
-  redisdata2:
-    external: true
   miniodata:
     external: true
   redisinsightdata:
