@@ -3,12 +3,14 @@ const {
     MessageFactory,
     TeamsActivityHandler,
     teamsGetChannelId,
-    TurnContext
+    TurnContext,
+    TeamsInfo
 } = require('botbuilder');
 const ACData = require('adaptivecards-templating');
 const minimist = require('minimist');
 
 const { client: redis, mkreadykey } = require('@gmapi/redispack')
+const QRCode = require('qrcode')
 
 const textBig = new ACData.Template({
     type: 'AdaptiveCard',
@@ -74,27 +76,17 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const readykey = mkreadykey({ shard: recipient })
             console.log(`libera o admin ${readykey}`)
             await redis.set(readykey, true)
-          } else {
-            console.log(`isTeams=${isTeams}`)
-            console.log(`isAdd=${isAdd}`)
-            console.log(`isAdmin=${isAdmin}`)
-            console.log(`isMe=${isMe}`)
           }
         })
 
         this.onMessage(async (context, next) => {
-          // turn off notifications
-          // TurnContext.removeRecipientMention(context.activity)
-
           const text = context.activity.text.trim()
           console.log(`text=${text}`)
 
-          // https://stackoverflow.com/questions/16261635/javascript-split-string-by-space-but-ignore-space-in-quotes-notice-not-to-spli#answer-46946490
-          const idxAt = text.indexOf(' ') + 1
-          const idxAt2 = text.indexOf(' ', idxAt)
-
-          const isCli = text.slice(idxAt, idxAt2) === 'cli'
-          console.log(`isCli="${isCli}"`)
+          const pointer = text.split(' ')[1]
+          const isCli = pointer === 'cli'
+          const isQrcode = pointer === 'qrcode'
+          console.log(`pointer="${pointer}"`)
 
           if (isCli) {
             const arg = text
@@ -140,6 +132,21 @@ class TeamsConversationBot extends TeamsActivityHandler {
                 break
               default:
                 console.dir(conf)
+            }
+          } else if (isQrcode) {
+            const teamDetails = await TeamsInfo.getTeamDetails(context)
+            console.dir(teamDetails)
+            const recipient =  context.activity.recipient.id.split(':')[1]
+            console.dir(context.activity.recipient.id)
+
+            const isReady = await redis.get(mkreadykey({ shard: recipient }))
+            if (isReady) {
+              console.log("# READY #")
+              const qrcode = "2@sr6qeveE65RKLFfIYGjJ8hhLWtZ+NjfdBC/H0VoTA+w340r4WlTKGPj/l02CyXHmukyWR8VaAfkPZw==,waSTjqha7w756Sdzh2WYYHglnu9bjZuXYL9ZVMYPUwg=,2NnZLsvbmLO5WpElUOfDU8jx7RRlRA1yv5z9/pgEbx4=,7pYEpG3W5RtcgdL0aYfHlRKoysmxihtymb9W7RsK0e8="
+
+              QRCode.toDataURL(qrcode, function (err, url) {
+                console.log(`url=${url}`)
+              })
             }
           }
         })
