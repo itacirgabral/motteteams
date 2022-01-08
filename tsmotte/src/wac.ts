@@ -226,7 +226,7 @@ const wac = function wac (connect: Connect): Promise<string> {
               if (isFirst) {
                 console.log(`iniciando atendimento ${connect.shard}:${attid}`)
               } else {
-                console.log(`${attlen}-ésima  de ${connect.shard}:${attid}`)
+                console.log(`${attlen}-ésima de ${connect.shard}:${attid}`)
               }
             }).catch(console.error)
 
