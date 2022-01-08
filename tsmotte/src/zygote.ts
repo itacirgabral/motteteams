@@ -1,10 +1,10 @@
 import { fork } from 'child_process'
-import { writeFileSync, renameSync, unlinkSync } from 'fs'
-import baileys, { AuthenticationCreds, AuthenticationState, BufferJSON, SignalDataTypeMap, WABrowserDescription, initAuthCreds, proto } from '@adiwajshing/baileys-md'
-import got from 'got'
+import { writeFileSync, renameSync } from 'fs'
+import baileys, { BufferJSON, SignalDataTypeMap, WABrowserDescription, initAuthCreds, proto } from '@adiwajshing/baileys-md'
 import { client as redis, mkwebhookkey, bornskey } from '@gmapi/redispack'
 import { Signupconnection } from '@gmapi/types'
 import { makeCountyToken } from './jwt'
+import { measureMemory } from 'vm'
 
 const KEY_MAP: { [T in keyof SignalDataTypeMap]: string } = {
   'pre-key': 'preKeys',
@@ -72,7 +72,7 @@ const saveSignup = (filename: string) => {
 
 const zygote = function zygote (signupconnection: Signupconnection): Promise<Birth> {
   return new Promise((res, rej) => {
-    const { mitochondria, shard, url, cacapa } = signupconnection
+    const { mitochondria, /*shard,*/ url, cacapa } = signupconnection
     const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95']
     let lastQrcode = ''
 
@@ -90,23 +90,19 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
     socket.ev.on('creds.update', saveState)
 
     socket.ev.on('connection.update', async (update) => {
+      const me = socket.authState.creds.me?.id.split(':')[0] || ''
+      // me override shard param
+
       if(update.connection === 'close') {
+        const auth = cacapa
+        const jwt = makeCountyToken({ shard: me })
+        console.log(`#############################ME=${me}`)
 
-        const me = socket.authState.creds.me?.id.split(':')[0] || ''
+        // rename zygotetempcreds
+        // `./auth_info_multi.${me}.json`
+        renameSync(zygotetempcreds, `./auth_info_multi.${me}.json`)
 
-        let auth: string
-        if (me === shard) {
-          auth = `./auth_info_multi.${shard}.json`
-          renameSync(zygotetempcreds, auth)
-        } else {
-          auth = 'no'
-          unlinkSync(zygotetempcreds)
-        }
-
-
-        const jwt = makeCountyToken({ shard })
         const timestamp = (new Date()).toLocaleString('pt-BR')
-
         const birth: Birth = {
           type: 'jwt',
           mitochondria,
@@ -121,16 +117,18 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
         const pipeline = redis.pipeline()
         pipeline.sadd(bornskey, birthcert)
         pipeline.lpush(lastQrcode, birthcert)
-        if (me !== 'no') {
-          pipeline.hset(mkwebhookkey({ shard }), 'main', url)
+        if (url) {
+          pipeline.hset(mkwebhookkey({ shard: me }), 'main', url)
         }
-        pipeline.expire(lastQrcode, 90)
+
+        pipeline.lpush(cacapa, JSON.stringify(birthcert))
+        pipeline.expire(cacapa, 90)
 
         Promise.all([
           pipeline.exec(),
-          got.post(url, {
-            json: birth,
-          }).catch(console.error)
+          // got.post(url, {
+          //   json: birth,
+          // }).catch(console.error)
         ]).then(() => {
           if (process.send) {
             process.send(birth)
@@ -140,15 +138,10 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
       } else if(update.qr) {
         lastQrcode = update.qr || ''
         const response = {
+          shard: me,
           type: 'qr',
           qr: update.qr
         }
-
-        got.post(url, {
-          json: response
-        }).catch(console.error)
-
-        // TODO PROM-CLIENT SIGNUP_QRCODE
 
         const pipeline = redis.pipeline()
         pipeline.lpush(cacapa, JSON.stringify(response))

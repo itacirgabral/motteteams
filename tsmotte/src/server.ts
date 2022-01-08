@@ -44,16 +44,16 @@ const mkServer = function mkServer () {
             if (isConnAdm.isSignupconnection(bread)) {
             zygotePC(bread)
               .then(birth => {
-                if (bread.shard === birth.shard) {
-                  const letsConn: Connect = {
-                    type: 'connect',
-                    cacapa: birth.qrcode,// só pra não jogar fora
-                    hardid: bread.hardid,
-                    shard: birth.shard,
-                    auth: birth.auth
-                  }
-                  wacPC(letsConn)
+                // ignore 1x
+                const auth = `./auth_info_multi.${birth.shard}.json`
+                const letsConn: Connect = {
+                  type: 'connect',
+                  cacapa: birth.auth,
+                  hardid: bread.hardid,
+                  shard: birth.shard,
+                  auth
                 }
+                wacPC(letsConn)
               })
             }
             break

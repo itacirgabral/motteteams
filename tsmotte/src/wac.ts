@@ -95,6 +95,8 @@ const wac = function wac (connect: Connect): Promise<string> {
         browser
       })
 
+      // ONDE COLOCAR O CACAPA CONECT
+
       socket.ev.on('creds.update', saveState)
 
       socket.ev.on ('blocklist.set', ({ blocklist }) => {
@@ -332,6 +334,7 @@ const wacPC = async (connectionSwitch: ConnectionSwitch) => {
             hardid,
             shard,
             cacapa,
+            // ignore 2x :s
             auth: `./auth_info_multi.${shard}.json`
           }
         })
