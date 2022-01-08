@@ -10,6 +10,7 @@ services:
       - "6379:6379"
   redisinsight:
     image: redislabs/redisinsight
+    restart: unless-stopped
     ports:
       - '8001:8001'
     volumes:
@@ -39,6 +40,10 @@ services:
       NODENAME: mainjsondb
 volumes:
   redisdata:
+    external: true
+  redisdata1:
+    external: true
+  redisdata2:
     external: true
   miniodata:
     external: true
