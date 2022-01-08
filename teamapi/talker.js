@@ -58,6 +58,15 @@ class TeamsConversationBot extends TeamsActivityHandler {
           const readykey = mkreadykey({ shard: recipient })
           console.log(`libera o admin ${readykey}`)
           await redis.set(readykey, true)
+
+          // TypeError: Cannot perform 'get' on a proxy that has been revoked
+          // const conversationReference = TurnContext.getConversationReference(context.activity)
+          // await context.adapter.continueConversationAsync(process.env.MicrosoftAppId, conversationReference, async context => {
+          //   console.log('set 1s')
+          //   setTimeout(() => {
+          //     context.sendActivity('proactive hello')
+          //   }, 1000)
+          // })
         }
 
         await next()
@@ -98,8 +107,30 @@ class TeamsConversationBot extends TeamsActivityHandler {
       })
 
       this.onMessage(async (context, next) => {
-        const message = MessageFactory.text(`Olá vc`)
-        await context.sendActivity(message)
+        const teamsChannelId = teamsGetChannelId(context.activity)
+        const message = MessageFactory.text(`Olá vc nova thread`)
+
+        const conversationParameters = {
+          isGroup: true,
+          channelData: {
+              channel: {
+                  id: teamsChannelId
+              }
+          },
+
+          activity: message
+        }
+        const connectorFactory = context.turnState.get(context.adapter.ConnectorFactoryKey)
+        const connectorClient = await connectorFactory.create(context.activity.serviceUrl)
+        const conversationResourceResponse = await connectorClient.conversations.createConversation(conversationParameters)
+        const conversationReference = TurnContext.getConversationReference(context.activity)
+        conversationReference.conversation.id = conversationResourceResponse.id
+        const newConversation = [conversationReference, conversationResourceResponse.activityId]
+
+        await context.adapter.continueConversationAsync(process.env.MicrosoftAppId, newConversation[0], async turnContext => {
+          await turnContext.sendActivity(MessageFactory.text('resposta na thread'))
+        })
+
         await next()
       })
   }
