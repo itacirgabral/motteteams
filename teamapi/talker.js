@@ -8,7 +8,7 @@ const {
 const ACData = require('adaptivecards-templating');
 const minimist = require('minimist');
 
-import { client as redis, mkreadykey } from '@gmapi/redispack'
+const { client: redis, mkreadykey } = require('@gmapi/redispack')
 
 const textBig = new ACData.Template({
     type: 'AdaptiveCard',

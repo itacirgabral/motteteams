@@ -112,14 +112,13 @@ const mkattmetakey = function mkattmetakey ({ shard, attid }: { shard: string; a
 /**
  * Chave para marcar instância como pronta
  *
- *
  * @example
  * ```
- * "hardid:xyz:zap:ijk:ready"
+ * "hardid:xyz:bot:ijk:ready"
  * ```
  */
 const mkreadykey = function mkreadykey ({ shard }: { shard: string; }) {
-  return `hardid:${hardid}:zap:${shard}:ready`
+  return `hardid:${hardid}:bot:${shard}:ready`
 }
 
 const mkstatekey = function mkstatekey ({ shard }: { shard: string }) {

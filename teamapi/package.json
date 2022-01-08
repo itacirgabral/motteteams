@@ -11,6 +11,7 @@
         "tunnel": "cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name zapbot"
     },
     "dependencies": {
+        "@gmapi/redispack": "^1.0.0",
         "adaptive-expressions": "^4.14.1",
         "adaptivecards-templating": "^2.1.0",
         "botbuilder": "~4.15.0",
