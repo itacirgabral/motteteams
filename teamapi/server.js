@@ -23,8 +23,6 @@ const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
 const botFrameworkAuthentication = createBotFrameworkAuthenticationFromConfiguration(null, credentialsFactory);
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
-//
-
 adapter.onTurnError = async (context, error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
@@ -54,5 +52,6 @@ server.listen(process.env.port || process.env.PORT || 3978, function() {
   console.log(`\n${ server.name } listening to ${ server.url }`);
 });
 server.post('/api/messages', async (req, res) => {
+  console.log(`<< ${JSON.stringify(req.body)} >>`)
   await adapter.process(req, res, (context) => bot.run(context));
 });

@@ -1,10 +1,11 @@
-# More Information
+# ZAPBRIDGE
+- [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)
+- [Proactive message](https://stackoverflow.com/questions/62034876/using-the-bot-framework-to-post-to-a-microsoft-teams-channel-with-nodejs#answer-62041785)
 
-You have a new Teams project scaffolded!
+# DOC
+- [microsoftteams](https://docs.microsoft.com/pt-br/microsoftteams/platform/bots/what-are-bots?view=msteams-client-js-latest)
+# SAMPLE
+- [botbuilder](https://github.com/microsoft/botbuilder-samples)
 
-## GUIDE
-
-- https://docs.microsoft.com/en-us/microsoftteams/platform/get-started/get-started-overview?tabs=vscode
-- https://dev.teams.microsoft.com/
-- https://docs.microsoft.com/en-us/microsoftteams/platform/resources/schema/manifest-schema
-- https://github.com/pnp/generator-teams/blob/master/docs/docs/tutorials/build-a-tab-with-sso-support.md
+# teams bot
+- cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name zapbot
