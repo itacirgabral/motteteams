@@ -95,8 +95,6 @@ const wac = function wac (connect: Connect): Promise<string> {
         browser
       })
 
-      // ONDE COLOCAR O CACAPA CONECT
-
       socket.ev.on('creds.update', saveState)
 
       socket.ev.on ('blocklist.set', ({ blocklist }) => {
@@ -112,10 +110,11 @@ const wac = function wac (connect: Connect): Promise<string> {
       })
       socket.ev.on ('chats.set', ({ chats, messages }) => {
         console.log('chats.set')
-        console.dir({
-          chats,
-          messages
-        })
+
+        const pipeline = redis.pipeline()
+        pipeline.lpush(connect.cacapa, JSON.stringify({ type: 'connected' }))
+        pipeline.expire(connect.cacapa, 90)
+        pipeline.exec().catch(console.error)
       })
       socket.ev.on ('chats.update', () => {
         console.log('chats.update')

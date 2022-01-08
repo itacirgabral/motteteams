@@ -96,10 +96,7 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
       if(update.connection === 'close') {
         const auth = cacapa
         const jwt = makeCountyToken({ shard: me })
-        console.log(`#############################ME=${me}`)
 
-        // rename zygotetempcreds
-        // `./auth_info_multi.${me}.json`
         renameSync(zygotetempcreds, `./auth_info_multi.${me}.json`)
 
         const timestamp = (new Date()).toLocaleString('pt-BR')
