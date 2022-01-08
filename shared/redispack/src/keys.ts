@@ -109,6 +109,19 @@ const mkattmetakey = function mkattmetakey ({ shard, attid }: { shard: string; a
   return `hardid:${hardid}:zap:${shard}:atende:${attid}:meta`
 }
 
+/**
+ * Chave para marcar instância como pronta
+ *
+ *
+ * @example
+ * ```
+ * "hardid:xyz:zap:ijk:ready"
+ * ```
+ */
+const mkreadykey = function mkreadykey ({ shard }: { shard: string; }) {
+  return `hardid:${hardid}:zap:${shard}:ready`
+}
+
 const mkstatekey = function mkstatekey ({ shard }: { shard: string }) {
   return `hardid:${hardid}:zap:${shard}:state`
 }
@@ -146,6 +159,7 @@ export {
   mkattkey,
   mkattmetakey,
   mkstatekey,
+  mkreadykey,
   mkstmkey,
   mktskey,
   mkqrcodekey,

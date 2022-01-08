@@ -8,6 +8,8 @@ const {
 const ACData = require('adaptivecards-templating');
 const minimist = require('minimist');
 
+import { client as redis, mkreadykey } from '@gmapi/redispack'
+
 const textBig = new ACData.Template({
     type: 'AdaptiveCard',
     body: [
@@ -30,12 +32,14 @@ class TeamsConversationBot extends TeamsActivityHandler {
           const isTeams = context.activity.channelId === 'msteams'
           const isAdd = context.activity.action === 'add'
           const recipient =  context.activity.recipient.id.split(':')[1]
-          const isMe = recipient === process.env.ZAPBRIDGE_BOT_ID
+          const isMe = recipient === process.env.MicrosoftAppId
           if (isTeams && isAdd && isMe) {
+            const readykey = mkreadykey({ shard: recipient })
+            const isReady = await redis.get(readykey)
 
             const adaptiveCard = textBig.expand({
               $root: {
-                text: 'ae galera cheguei'
+                text: isReady ? 'pode pah' : 'app instalado'
               }
             })
             const card = CardFactory.adaptiveCard(adaptiveCard)
@@ -44,17 +48,38 @@ class TeamsConversationBot extends TeamsActivityHandler {
               isGroup: true,
               channelData: context.activity.channelData,
               activity: message
-            };
+            }
 
-            const connectorFactory = context.turnState.get(context.adapter.ConnectorFactoryKey);
-            const connectorClient = await connectorFactory.create(context.activity.serviceUrl);
+            const connectorFactory = context.turnState.get(context.adapter.ConnectorFactoryKey)
+            const connectorClient = await connectorFactory.create(context.activity.serviceUrl)
 
-            const conversationResourceResponse = await connectorClient.conversations.createConversation(conversationParameters);
+            await connectorClient.conversations.createConversation(conversationParameters)
           } else {
             console.log(`channel=${context.activity.channelId} action=${context.activity.action} recipient=${context.activity.recipient.id}`)
           }
 
           await next()
+        })
+
+        this.onConversationUpdate(async (context, next) => {
+          console.log('onConversationUpdate')
+          const isTeams = context.activity.channelId === 'msteams'
+          const recipient =  context.activity.recipient.id.split(':')[1]
+          const isMe = recipient === process.env.MicrosoftAppId
+          const isAdd = context.activity.channelData.eventType === 'teamMemberAdded'
+          const isAdmin = context.activity.channelData.team.name === 'GSADMIN'
+
+          // app foi instalado numa equipe chamado GSADMIN ?
+          if (isTeams && isAdd && isAdmin && isMe) {
+            const readykey = mkreadykey({ shard: recipient })
+            console.log(`libera o admin ${readykey}`)
+            await redis.set(readykey, true)
+          } else {
+            console.log(`isTeams=${isTeams}`)
+            console.log(`isAdd=${isAdd}`)
+            console.log(`isAdmin=${isAdmin}`)
+            console.log(`isMe=${isMe}`)
+          }
         })
 
         this.onMessage(async (context, next) => {
