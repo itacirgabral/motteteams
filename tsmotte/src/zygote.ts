@@ -118,7 +118,7 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
           pipeline.hset(mkwebhookkey({ shard: me }), 'main', url)
         }
 
-        pipeline.lpush(cacapa, JSON.stringify(birthcert))
+        pipeline.rpush(cacapa, JSON.stringify(birthcert))
         pipeline.expire(cacapa, 90)
 
         Promise.all([
