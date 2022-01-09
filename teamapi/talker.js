@@ -158,9 +158,14 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const card = CardFactory.heroCard('VINCULA', `${memberTeamsInfo.name} ${teamsInfo.name} ${teamsInfo.id}`)
             const message = MessageFactory.attachment(card)
 
-            console.log("pre sendActivity")
+            console.log("pre 0 sendActivity")
             await context.sendActivity(message)
-            console.log("pos sendActivity")
+            console.log("pos 0 sendActivity")
+            // await setTimeout(1000)
+            // console.log("pre 1 sendActivity")
+            // await context.sendActivity(message)
+            // console.log("pos 1 sendActivity")
+
           } else {
             console.log('nenhum comando')
           }
