@@ -57,15 +57,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
           const readykey = mkreadykey({ shard: recipient })
           console.log(`libera o admin ${readykey}`)
           await redis.set(readykey, true)
-
-          // TypeError: Cannot perform 'get' on a proxy that has been revoked
-          // const conversationReference = TurnContext.getConversationReference(context.activity)
-          // await context.adapter.continueConversationAsync(process.env.MicrosoftAppId, conversationReference, async context => {
-          //   console.log('set 1s')
-          //   setTimeout(() => {
-          //     context.sendActivity('proactive hello')
-          //   }, 1000)
-          // })
         }
 
         await next()
@@ -114,12 +105,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const isCommand = cutarroba.lastIndexOf(' ') === -1
         if (isCommand) {
           if (cutarroba === 'qrcode') {
-            // const [memberTeamsInfo, teamsInfo] = await Promise.all([
-            //   TeamsInfo.getMember(context, context.activity.from.id),
-            //   TeamsInfo.getTeamDetails(context, context.activity.channelData.teamsTeamId)
-            // ])
-            // console.dir({ teamsInfo, memberTeamsInfo })
-
             const cacapakey = mkcacapakey()
             const mitochondria = 'teamsapp_DEMO'
             const webhook = undefined
@@ -152,18 +137,30 @@ class TeamsConversationBot extends TeamsActivityHandler {
             await context.adapter.continueConversationAsync(process.env.MicrosoftAppId, newConversation[0], async turnContext => {
               await xaddP
               const [_key, el] = await redis.blpop(cacapakey, 90)
-              console.log('BLPOPED')
-              
               const { type, qr } = JSON.parse(el)
               if (type === 'qr') {
                 const url = await QRCode.toDataURL(qr)
                 const adaptiveCard = image64T.expand({ $root: { url } })
                 const card = CardFactory.adaptiveCard(adaptiveCard)
                 const message2 = MessageFactory.attachment(card)
+
+                // ao invés de responder, atualizar ?
+                // await context.updateActivity(message)
                 await turnContext.sendActivity(message2)
               }
-
             })
+          } else if (cutarroba === 'vincula') {
+            const [memberTeamsInfo, teamsInfo] = await Promise.all([
+              TeamsInfo.getMember(context, context.activity.from.id),
+              TeamsInfo.getTeamDetails(context, context.activity.channelData.teamsTeamId)
+            ])
+
+            const card = CardFactory.heroCard('VINCULA', `${memberTeamsInfo.name} ${teamsInfo.name} ${teamsInfo.id}`)
+            const message = MessageFactory.attachment(card)
+
+            console.log("pre sendActivity")
+            await context.sendActivity(message)
+            console.log("pos sendActivity")
           } else {
             console.log('nenhum comando')
           }
