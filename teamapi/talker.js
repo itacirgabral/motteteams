@@ -114,17 +114,23 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const isCommand = cutarroba.lastIndexOf(' ') === -1
         if (isCommand) {
           if (cutarroba === 'qrcode') {
-            const [memberTeamsInfo, teamsInfo] = await Promise.all([
-              TeamsInfo.getMember(context, context.activity.from.id),
-              TeamsInfo.getTeamDetails(context, context.activity.channelData.teamsTeamId)
-            ])
+            // const [memberTeamsInfo, teamsInfo] = await Promise.all([
+            //   TeamsInfo.getMember(context, context.activity.from.id),
+            //   TeamsInfo.getTeamDetails(context, context.activity.channelData.teamsTeamId)
+            // ])
+            // console.dir({ teamsInfo, memberTeamsInfo })
 
-            console.dir({ teamsInfo, memberTeamsInfo })
+            const cacapakey = mkcacapakey()
+            const mitochondria = 'teamsapp_DEMO'
+            const webhook = undefined
+            const recipient = context.activity.recipient.id || 'teamsapp_dev'
 
             const message = MessageFactory.attachment(CardFactory.heroCard(
-              memberTeamsInfo.email,
-              'QRCODE'
+              'QRCODE',
+              'Ligar novo dispositivo'
             ))
+
+            const xaddP = redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', 'signupconnection', 'shard', recipient, 'url', webhook, 'mitochondria', mitochondria, 'cacapa', cacapakey)
   
             const conversationParameters = {
               isGroup: true,
@@ -144,16 +150,19 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const newConversation = [conversationReference, conversationResourceResponse.activityId]
   
             await context.adapter.continueConversationAsync(process.env.MicrosoftAppId, newConversation[0], async turnContext => {
+              await xaddP
+              const [_key, el] = await redis.blpop(cacapakey, 90)
+              console.log('BLPOPED')
+              
+              const { type, qr } = JSON.parse(el)
+              if (type === 'qr') {
+                const url = await QRCode.toDataURL(qr)
+                const adaptiveCard = image64T.expand({ $root: { url } })
+                const card = CardFactory.adaptiveCard(adaptiveCard)
+                const message2 = MessageFactory.attachment(card)
+                await turnContext.sendActivity(message2)
+              }
 
-
-              const adaptiveCard = image64T.expand({
-                $root: {
-                  url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
-                }
-              })
-              const card = CardFactory.adaptiveCard(adaptiveCard)
-              const message2 = MessageFactory.attachment(card)
-              await turnContext.sendActivity(message2)
             })
           } else {
             console.log('nenhum comando')
