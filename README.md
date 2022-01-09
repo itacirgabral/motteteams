@@ -11,7 +11,7 @@ docker-compose -f docker-compose.redis.yml up -d
 - `cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name zapbot`
 
 # Consul
-- consul agent -dev -enable-script-checks -config-dir=./consul.d
+- ./consul.sh
 
 # re baileys
 - `git clone -b multi-device --single-branch https://github.com/adiwajshing/Baileys/ baileysMD`
