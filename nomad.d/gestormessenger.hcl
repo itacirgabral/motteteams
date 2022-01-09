@@ -1,5 +1,5 @@
-job "gmapi" {
-  datacenters = ["dc1"]
+job "gmapidev" {
+  datacenters = ["gestormessenger"]
   type = "service"
   update {
     max_parallel = 1
@@ -18,11 +18,12 @@ job "gmapi" {
   group "am6" {
     count = 1
     network {
+      mode = "bridge"
       port "redisport" {
         to = 6379
       }
-      port "restport" {
-        to = 3000
+      port "redisinsightport" {
+        to = 8001
       }
     }
 
@@ -30,13 +31,6 @@ job "gmapi" {
       name = "redis"
       tags = ["gmapi"]
       port = "redisport"
-    }
-
-    restart {
-      attempts = 2
-      interval = "30m"
-      delay = "15s"
-      mode = "fail"
     }
 
     task "redis" {
@@ -47,6 +41,21 @@ job "gmapi" {
             "redisdata:/data"
         ]
         ports = ["redisport"]
+      }
+      resources {
+        cpu    = 500 # 500 MHz
+        memory = 256 # 256MB
+      }
+    }
+
+    task "redisinsight" {
+      driver = "docker"
+      config {
+        image = "redislabs/redisinsight"
+        volumes = [
+            "redisinsightdata:/db"
+        ]
+        ports = ["redisinsightport"]
       }
       resources {
         cpu    = 500 # 500 MHz

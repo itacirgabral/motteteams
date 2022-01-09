@@ -41,3 +41,19 @@ consul connect proxy \
     -service-addr 127.0.0.1:3000 \
     -listen ':8443'
 ```
+
+nomad command
+```hcl
+task "server" {
+  driver = "exec"
+  config {
+    command = "/bin/http-echo"
+    args = [
+      "-listen",
+      ":5678",
+      "-text",
+      "hello world",
+    ]
+  }
+}
+```
