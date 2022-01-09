@@ -17,12 +17,14 @@ if (isMain) {
 
   const healthPort = Number(process.env.HEALT_PORT) || 8538
 
+  let n = 0
   // chech consul health
   const server = http.createServer((req, res) => {
     res.statusCode = 200
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify({
-      ok: true
+      ok: true,
+      n: n++
     }))
   })
   server.listen(healthPort)

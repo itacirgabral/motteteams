@@ -2,7 +2,9 @@
   "service": {
     "name": "teamsapi",
     "tags": [
-      "gmapi"
+      "gmapi",
+      "dev",
+      "frontlayer"
     ],
     "port": 3978,
     "check": {

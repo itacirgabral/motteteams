@@ -2,7 +2,9 @@
   "service": {
     "name": "zapapi",
     "tags": [
-      "gmapi"
+      "gmapi",
+      "dev",
+      "servicelayer"
     ],
     "port": 8538,
     "check": {

@@ -33,3 +33,11 @@ console.dir(member)
   userRole: 'user'
 }
 ```
+
+The next example starts a local proxy that also accepts inbound connections on port 8443, authorizes the connection, then proxies it to port 3000:
+```
+consul connect proxy \
+    -service restapi \
+    -service-addr 127.0.0.1:3000 \
+    -listen ':8443'
+```

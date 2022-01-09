@@ -2,7 +2,9 @@
   "service": {
     "name": "restapi",
     "tags": [
-      "gmapi"
+      "gmapi",
+      "dev",
+      "frontlayer"
     ],
     "port": 3000,
     "check": {

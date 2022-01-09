@@ -1,8 +1,8 @@
 # GMAPI
 ## teams app
 - [x] mensagens todas chegando
-- [ ] redis key teamsdialogs
-- [ ] package zapteams
+- [x] redis key teamsdialogs
+- [x] package zapteams
 - [ ] modelo adaptive
   - texto, contato, localização
   - imagem, arquivo
