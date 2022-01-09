@@ -8,7 +8,7 @@
         "start": "node ./server.js",
         "watch": "npx node-dev ./server.js",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "tunnel": "cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name zapbot"
+        "tunnel": "cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name zapbot --config ./cloudflarer.cert.json"
     },
     "dependencies": {
         "@gmapi/redispack": "^1.0.0",
