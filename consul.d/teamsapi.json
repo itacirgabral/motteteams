@@ -1,0 +1,13 @@
+{
+  "service": {
+    "name": "teamsapi",
+    "tags": [
+      "gmapi"
+    ],
+    "port": 3978,
+    "check": {
+      "args": ["curl", "localhost:3978/health"],
+      "interval": "15s"
+    }
+  }
+}
