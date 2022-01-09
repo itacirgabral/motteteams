@@ -114,9 +114,16 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const isCommand = cutarroba.lastIndexOf(' ') === -1
         if (isCommand) {
           if (cutarroba === 'qrcode') {
+            const [memberTeamsInfo, teamsInfo] = await Promise.all([
+              TeamsInfo.getMember(context, context.activity.from.id),
+              TeamsInfo.getTeamDetails(context, context.activity.channelData.teamsTeamId)
+            ])
+
+            console.dir({ teamsInfo, memberTeamsInfo })
+
             const message = MessageFactory.attachment(CardFactory.heroCard(
-              'QR Code',
-              'Uma conexão por favor!'
+              memberTeamsInfo.email,
+              'QRCODE'
             ))
   
             const conversationParameters = {
@@ -128,7 +135,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
               },
               activity: message
             }
-  
+
             const connectorFactory = context.turnState.get(context.adapter.ConnectorFactoryKey)
             const connectorClient = await connectorFactory.create(context.activity.serviceUrl)
             const conversationResourceResponse = await connectorClient.conversations.createConversation(conversationParameters)
@@ -137,18 +144,16 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const newConversation = [conversationReference, conversationResourceResponse.activityId]
   
             await context.adapter.continueConversationAsync(process.env.MicrosoftAppId, newConversation[0], async turnContext => {
-              // const teamMemberDetails = await TeamsInfo.getTeamMember(context)
-              // console.dir(teamMemberDetails)
-  
+
+
               const adaptiveCard = image64T.expand({
                 $root: {
                   url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
                 }
               })
               const card = CardFactory.adaptiveCard(adaptiveCard)
-              const message = MessageFactory.attachment(card)
-  
-              await turnContext.sendActivity(message)
+              const message2 = MessageFactory.attachment(card)
+              await turnContext.sendActivity(message2)
             })
           } else {
             console.log('nenhum comando')
