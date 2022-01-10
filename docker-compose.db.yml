@@ -14,7 +14,15 @@ services:
     ports:
       - '8001:8001'
     volumes:
-      - redisinsightdata:/db 
+      - redisinsightdata:/db
+  consul:
+    image: consul
+    volumes:
+      - ./consul.d:/consul/conf.d
+    command consul agent -dev -enable-script-checks -datacenter=gestormessenger -domain=consul.gestormessenger.team -encrypt=U4sgIOflhy4j5IBtb4aWdr+ph3ZYQH9gcC1tpAti7m4= -config-dir=/consul/conf.d
+    # ports:
+    #   - 80:8500 #HTTP API/UI
+    #   - 53:8600/udp #DNS
   # minio:
   #   image: minio/minio
   #   restart: unless-stopped
