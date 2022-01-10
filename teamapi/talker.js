@@ -69,17 +69,20 @@ class TeamsConversationBot extends TeamsActivityHandler {
       this.onConversationUpdate(async (context, next) => {
         console.log('onConversationUpdate')
         const isTeams = context.activity.channelId === 'msteams'
-        const recipient =  context.activity.recipient.id.split(':')[1]
-        const isMe = recipient === process.env.MicrosoftAppId
         const isAdd = context.activity.channelData.eventType === 'teamMemberAdded'
-        const isAdmin = context.activity.channelData.team.name === 'GSADMIN'
+        const isGSADMIN = context.activity.channelData.team.name === 'GSADMIN'
+
+        const cid = context.activity.conversation.id
+        const shard = cid.slice(cid.indexOf(':') + 1).split('@thread.tacv2')[0]
+        console.log(`botEquipe=${shard}`)
 
         // app foi instalado numa equipe chamado GSADMIN ?
-        if (isTeams && isAdd && isAdmin && isMe) {
+        if (isTeams && isAdd && isGSADMIN) {
           console.log('ready')
-          const readykey = mkreadykey({ shard: recipient })
+          const readykey = mkreadykey({ shard })
           console.log(`libera o admin ${readykey}`)
-          await redis.set(readykey, true)
+
+          await redis.hset(readykey, 'admin', 'GSADMIN')
         }
 
         await next()
@@ -89,15 +92,17 @@ class TeamsConversationBot extends TeamsActivityHandler {
         console.log('onInstallationUpdate')
         const isTeams = context.activity.channelId === 'msteams'
         const isAdd = context.activity.action === 'add'
-        const recipient =  context.activity.recipient.id.split(':')[1]
-        const isMe = recipient === process.env.MicrosoftAppId
-        if (isTeams && isAdd && isMe) {
-          const readykey = mkreadykey({ shard: recipient })
-          const isReady = await redis.get(readykey)
+        
+        const cid = context.activity.conversation.id
+        const shard = cid.slice(cid.indexOf(':') + 1).split('@thread.tacv2')[0]
+
+        if (isTeams && isAdd) {
+          const readykey = mkreadykey({ shard })
+          const isReady = await redis.hget(readykey, 'isAdmin')
 
           const adaptiveCard = textBig.expand({
             $root: {
-              text: isReady ? 'pode pah' : 'app instalado'
+              text: `BOT instalado${isReady ? ' e pronto!' : ', falta configurar.'}` 
             }
           })
           const card = CardFactory.adaptiveCard(adaptiveCard)
@@ -138,7 +143,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const info = {
               memberInfo,
               teamsInfo,
-              activity,
               teamsChannels,
               teamsMembers,
               activity
@@ -158,6 +162,24 @@ class TeamsConversationBot extends TeamsActivityHandler {
             await context.sendActivity(message)
           } else if (cutarroba === 'qrcode') {
             console.log('qrcode')
+            const cacapakey = mkcacapakey()
+            const mitochondria = 'teamsapp_DEMO'
+            const webhook = undefined
+
+            const cid = context.activity.conversation.id
+            const shard = cid.slice(cid.indexOf(':') + 1).split('@thread.tacv2')[0]
+            console.log(`shard=${shard}`)
+
+            const readykey = mkreadykey({ shard })
+            const [admin, plan] = await redis.hmget(readykey, 'admin', 'plan')
+
+            if (admin === 'GSADMIN' && plan === 'dev') {
+              await context.sendActivity(MessageFactory.text('Calma ae'))
+            } else {
+              const textMessage = `Bot ${admin ?? 'lost'}. Plan ${plan ?? 'free'}.`
+              await context.sendActivity(MessageFactory.text(textMessage))
+            }
+
           } else if (cutarroba === 'fim') {
             console.log('fim')
           } else if (cutarroba === 'fix') {

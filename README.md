@@ -57,3 +57,6 @@ task "server" {
   }
 }
 ```
+
+## DOCKER
+- cat ./canister_password.log | docker login --username itacirgabral --password-stdin
