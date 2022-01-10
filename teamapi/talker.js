@@ -166,6 +166,21 @@ class TeamsConversationBot extends TeamsActivityHandler {
             // await context.sendActivity(message)
             // console.log("pos 1 sendActivity")
 
+          } else if (cutarroba === 'finaliza') {
+            const conversationReference = TurnContext.getConversationReference(context.activity)
+            const channelId = context.activity.channelId
+            const serviceUrl = context.activity.serviceUrl
+
+            console.dir({ conversationReference, channelId, serviceUrl })
+            console.log(JSON.stringify(conversationReference, null, 2))
+            console.log(`channelId=${channelId}`)
+            console.log(`serviceUrl=${serviceUrl}`)
+
+            const channelData = context.activity.channelData
+            console.dir({ channelData })
+            console.log(JSON.stringify(channelData, null, 2))
+            // const teamsChannelId = teamsGetChannelId(context.activity)
+
           } else {
             console.log('nenhum comando')
           }
