@@ -15,26 +15,31 @@ services:
       - '8001:8001'
     volumes:
       - redisinsightdata:/db
-  consul:
-    image: consul
-    volumes:
-      - ./consul.d:/consul/conf.d
-    command consul agent -dev -enable-script-checks -datacenter=gestormessenger -domain=consul.gestormessenger.team -encrypt=U4sgIOflhy4j5IBtb4aWdr+ph3ZYQH9gcC1tpAti7m4= -config-dir=/consul/conf.d
-    # ports:
-    #   - 80:8500 #HTTP API/UI
-    #   - 53:8600/udp #DNS
-  # minio:
-  #   image: minio/minio
-  #   restart: unless-stopped
-  #   environment:
-  #     MINIO_ROOT_USER: admin
-  #     MINIO_ROOT_PASSWORD: admin678
-  #   command: ['server', '/data', '--console-address', ':9001']
+  # registrator:
+  #   image: gliderlabs/registrator
   #   volumes:
-  #     - miniodata:/data
+  #     - /var/run/docker.sock:/tmp/docker.sock
+  #   command: consul://consul:8500
+  # consul:
+  #   image: consul
+  #   volumes:
+  #     - ./consul.d:/consul/conf.d
+  #   command: consul agent -dev -enable-script-checks -datacenter=gestormessenger -domain=consul.gestormessenger.team -encrypt=U4sgIOflhy4j5IBtb4aWdr+ph3ZYQH9gcC1tpAti7m4= -config-dir=/consul/conf.d
   #   ports:
-  #     - "9000:9000"
-  #     - "9001:9001"
+  #     - 8500:8500 #HTTP API/UI
+  #     - 53:8600/udp #DNS
+  minio:
+    image: minio/minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin678
+    command: ['server', '/data', '--console-address', ':9001']
+    volumes:
+      - miniodata:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
   couchdb:
     image: couchdb
     restart: unless-stopped

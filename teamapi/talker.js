@@ -1,4 +1,5 @@
 const {
+  ActivityTypes,
   CardFactory,
   MessageFactory,
   TeamsActivityHandler,
@@ -29,12 +30,34 @@ const textBig = new ACData.Template({
   version: '1.3'
 })
 
+CardFactory.actions([{
+  type: ''
+}])
+
 const image64T = new ACData.Template({
   type: 'AdaptiveCard',
   body: [{
     type: 'Image',
     url: '${url}'
   }],
+  $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+  version: '1.3'
+})
+const downloadJsonButton = new ACData.Template({
+  type: 'AdaptiveCard',
+  body: [{
+    type: 'TextBlock',
+    text: '${text}',
+    'wrap': true
+  }],
+  'actions': [
+    {
+        'type': 'Action.OpenUrl',
+        "title": "Download",
+        "iconUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPOyiihETr7PTfqdd_1DPMJmGHv_ALrhLcYXHCCzmd3_UKcnCyE0_7OPfFRNJSLjjyTWY&usqp=CAU",
+        'url': '${url}'
+    }
+  ],
   $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
   version: '1.3'
 })
@@ -97,90 +120,48 @@ class TeamsConversationBot extends TeamsActivityHandler {
       })
 
       this.onMessage(async (context, next) => {
-        const teamsChannelId = teamsGetChannelId(context.activity)
         const text = context.activity.text.trim()
         console.log(`text=${text}`)
 
         const cutarroba = text.slice(text.indexOf(' ') + 1).trim()
         const isCommand = cutarroba.lastIndexOf(' ') === -1
         if (isCommand) {
-          if (cutarroba === 'qrcode') {
-            const cacapakey = mkcacapakey()
-            const mitochondria = 'teamsapp_DEMO'
-            const webhook = undefined
-            const recipient = context.activity.recipient.id || 'teamsapp_dev'
-
-            const message = MessageFactory.attachment(CardFactory.heroCard(
-              'QRCODE',
-              'Ligar novo dispositivo'
-            ))
-
-            const xaddP = redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', 'signupconnection', 'shard', recipient, 'url', webhook, 'mitochondria', mitochondria, 'cacapa', cacapakey)
-  
-            const conversationParameters = {
-              isGroup: true,
-              channelData: {
-                  channel: {
-                      id: teamsChannelId
-                  }
-              },
-              activity: message
+          if (cutarroba === 'extrato') {
+            console.log('extrato')
+            const [memberInfo, teamsInfo, teamsChannels, teamsMembers] = await Promise.all([
+              TeamsInfo.getMember(context, context.activity.from.id),
+              TeamsInfo.getTeamDetails(context, context.activity.channelData.teamsTeamId),
+              TeamsInfo.getTeamChannels(context, context.activity.channelData.teamsTeamId),
+              TeamsInfo.getTeamMembers(context, context.activity.channelData.teamsTeamId)
+            ])
+            const activity = context.activity
+            const info = {
+              memberInfo,
+              teamsInfo,
+              activity,
+              teamsChannels,
+              teamsMembers,
+              activity
             }
 
-            const connectorFactory = context.turnState.get(context.adapter.ConnectorFactoryKey)
-            const connectorClient = await connectorFactory.create(context.activity.serviceUrl)
-            const conversationResourceResponse = await connectorClient.conversations.createConversation(conversationParameters)
-            const conversationReference = TurnContext.getConversationReference(context.activity)
-            conversationReference.conversation.id = conversationResourceResponse.id
-            const newConversation = [conversationReference, conversationResourceResponse.activityId]
-  
-            await context.adapter.continueConversationAsync(process.env.MicrosoftAppId, newConversation[0], async turnContext => {
-              await xaddP
-              const [_key, el] = await redis.blpop(cacapakey, 90)
-              const { type, qr } = JSON.parse(el)
-              if (type === 'qr') {
-                const url = await QRCode.toDataURL(qr)
-                const adaptiveCard = image64T.expand({ $root: { url } })
-                const card = CardFactory.adaptiveCard(adaptiveCard)
-                const message2 = MessageFactory.attachment(card)
-
-                // ao invés de responder, atualizar ?
-                // await context.updateActivity(message)
-                await turnContext.sendActivity(message2)
+            const infoText = JSON.stringify(info, null, 2)
+            const infofileBase64 = Buffer.from(infoText).toString('base64')
+            const adaptiveCard = downloadJsonButton.expand({
+              $root: {
+                text: infoText,
+                url: `data:text/plain;base64,${ infofileBase64 }`
               }
             })
-          } else if (cutarroba === 'vincula') {
-            const [memberTeamsInfo, teamsInfo] = await Promise.all([
-              TeamsInfo.getMember(context, context.activity.from.id),
-              TeamsInfo.getTeamDetails(context, context.activity.channelData.teamsTeamId)
-            ])
-
-            const card = CardFactory.heroCard('VINCULA', `${memberTeamsInfo.name} ${teamsInfo.name} ${teamsInfo.id}`)
+            const card = CardFactory.adaptiveCard(adaptiveCard)
             const message = MessageFactory.attachment(card)
-
-            console.log("pre 0 sendActivity")
+            
             await context.sendActivity(message)
-            console.log("pos 0 sendActivity")
-            // await setTimeout(1000)
-            // console.log("pre 1 sendActivity")
-            // await context.sendActivity(message)
-            // console.log("pos 1 sendActivity")
-
-          } else if (cutarroba === 'finaliza') {
-            const conversationReference = TurnContext.getConversationReference(context.activity)
-            const channelId = context.activity.channelId
-            const serviceUrl = context.activity.serviceUrl
-
-            console.dir({ conversationReference, channelId, serviceUrl })
-            console.log(JSON.stringify(conversationReference, null, 2))
-            console.log(`channelId=${channelId}`)
-            console.log(`serviceUrl=${serviceUrl}`)
-
-            const channelData = context.activity.channelData
-            console.dir({ channelData })
-            console.log(JSON.stringify(channelData, null, 2))
-            // const teamsChannelId = teamsGetChannelId(context.activity)
-
+          } else if (cutarroba === 'qrcode') {
+            console.log('qrcode')
+          } else if (cutarroba === 'fim') {
+            console.log('fim')
+          } else if (cutarroba === 'fix') {
+            console.log('fix')
           } else {
             console.log('nenhum comando')
           }
