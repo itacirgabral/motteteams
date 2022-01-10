@@ -29,11 +29,6 @@ const textBig = new ACData.Template({
   $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
   version: '1.3'
 })
-
-CardFactory.actions([{
-  type: ''
-}])
-
 const image64T = new ACData.Template({
   type: 'AdaptiveCard',
   body: [{
@@ -73,16 +68,31 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const isGSADMIN = context.activity.channelData.team.name === 'GSADMIN'
 
         const cid = context.activity.conversation.id
-        const shard = cid.slice(cid.indexOf(':') + 1).split('@thread.tacv2')[0]
+        const teamid = cid.slice(cid.indexOf(':') + 1).split('@thread.tacv2')[0]
+        const orgid = context.activity.channelData.tenant.id
+        const shard = `${orgid}.${teamid}`
         console.log(`botEquipe=${shard}`)
 
-        // app foi instalado numa equipe chamado GSADMIN ?
         if (isTeams && isAdd && isGSADMIN) {
-          console.log('ready')
           const readykey = mkreadykey({ shard })
-          console.log(`libera o admin ${readykey}`)
 
-          await redis.hset(readykey, 'admin', 'GSADMIN')
+          // sintetic minimal channelData
+          const channelData = {
+            teamsChannelId: context.activity.channelData.team.id,
+            teamsTeamId: context.activity.channelData.team.id,
+            ...context.activity.channelData,
+            team: {
+              ...context.activity.channelData.team,
+              name: undefined,
+              aadGroupId: undefined
+            },
+            eventType: undefined
+          }
+          const admin = JSON.stringify(channelData)
+          const adminId = channelData.teamsChannelId
+
+          console.log(`libera o admin ${shard}`)
+          await redis.hset(readykey, 'admin', admin, 'adminId', adminId)
         }
 
         await next()
@@ -94,11 +104,13 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const isAdd = context.activity.action === 'add'
         
         const cid = context.activity.conversation.id
-        const shard = cid.slice(cid.indexOf(':') + 1).split('@thread.tacv2')[0]
+        const teamid = cid.slice(cid.indexOf(':') + 1).split('@thread.tacv2')[0]
+        const orgid = context.activity.channelData.tenant.id
+        const shard = `${orgid}.${teamid}`
 
         if (isTeams && isAdd) {
           const readykey = mkreadykey({ shard })
-          const isReady = await redis.hget(readykey, 'isAdmin')
+          const isReady = await redis.hexists(readykey, 'admin')
 
           const adaptiveCard = textBig.expand({
             $root: {
@@ -166,17 +178,25 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const mitochondria = 'teamsapp_DEMO'
             const webhook = undefined
 
+            //          19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2;messageid=1641843296187
             const cid = context.activity.conversation.id
-            const shard = cid.slice(cid.indexOf(':') + 1).split('@thread.tacv2')[0]
+            const teamid = cid.slice(cid.indexOf(':') + 1).split('@thread.tacv2')[0]
+            const orgid = context.activity.channelData.tenant.id
+            const shard = `${orgid}.${teamid}`
             console.log(`shard=${shard}`)
 
             const readykey = mkreadykey({ shard })
-            const [admin, plan] = await redis.hmget(readykey, 'admin', 'plan')
+            const [adminId, plan] = await redis.hmget(readykey, 'adminId', 'plan')
 
-            if (admin === 'GSADMIN' && plan === 'dev') {
-              await context.sendActivity(MessageFactory.text('Calma ae'))
+            if (!!adminId && plan === 'dev') {
+              if (adminId === cid.split(';messageid=')[0]) {
+                await context.sendActivity(MessageFactory.text('Perai, nova conversa'))
+              } else {
+                console.log(`adminId=${adminId} cid=${cid}`)
+                await context.sendActivity(MessageFactory.text('Solicitação enviada para GSADMIN'))
+              }
             } else {
-              const textMessage = `Bot ${admin ?? 'lost'}. Plan ${plan ?? 'free'}.`
+              const textMessage = `Bot ${!!adminId ?? 'lost'}. Plan ${plan ?? 'free'}.`
               await context.sendActivity(MessageFactory.text(textMessage))
             }
 
