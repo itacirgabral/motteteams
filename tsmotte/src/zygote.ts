@@ -4,7 +4,6 @@ import baileys, { BufferJSON, SignalDataTypeMap, WABrowserDescription, initAuthC
 import { client as redis, mkwebhookkey, bornskey } from '@gmapi/redispack'
 import { Signupconnection } from '@gmapi/types'
 import { makeCountyToken } from './jwt'
-import { measureMemory } from 'vm'
 
 const KEY_MAP: { [T in keyof SignalDataTypeMap]: string } = {
   'pre-key': 'preKeys',
@@ -113,7 +112,7 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
 
         const pipeline = redis.pipeline()
         pipeline.sadd(bornskey, birthcert)
-        pipeline.lpush(lastQrcode, birthcert)
+        // pipeline.lpush(lastQrcode, birthcert)
         if (url) {
           pipeline.hset(mkwebhookkey({ shard: me }), 'main', url)
         }
