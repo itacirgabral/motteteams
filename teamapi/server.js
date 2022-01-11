@@ -7,7 +7,8 @@ const {
     CloudAdapter,
     ConfigurationServiceClientCredentialFactory,
     createBotFrameworkAuthenticationFromConfiguration,
-    MessageFactory
+    MessageFactory,
+    TurnContext
 } = require('botbuilder');
 const { TeamsConversationBot } = require('./talker');
 const { setTimeout } = require('timers');
@@ -59,40 +60,63 @@ server.post('/api/messages', async (req, res) => {
   await adapter.process(req, res, (context) => bot.run(context))
 })
 
-// 19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2
+let first = false
+
 server.get('/pah', async (req, res) => {
   console.log('pah')
 
-  const appId = process.env.MicrosoftAppId
-  const channelId = 'msteams'
-  const serviceUrl = 'https://smba.trafficmanager.net/br/'
-  const audience = undefined
-
-  const message = MessageFactory.text("Olá meu povo")
-  const channelData = {
-    teamsChannelId: '19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2',
-    teamsTeamId: '19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2',
-    channel: {
-      id: '19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2'
-    },
-    team: {
-      id: '19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2'
-    },
-    tenant: { id: 'a9e299eb-5fa6-4173-8b91-8906bb8a7d92' }
-  }
-
-  const conversationParameters = {
-    isGroup: true,
-    channelData,
-    activity: message
-  }
-
-  await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
-    console.log('turnado')
-  })
+  if (first) {
+    // first = !first
+    const appId = process.env.MicrosoftAppId
+    const channelId = 'msteams'
+    const serviceUrl = 'https://smba.trafficmanager.net/br/'
+    const audience = undefined
+    const message = MessageFactory.text("Vou mandar um QRCODE")
+    const channelData = {
+      "teamsChannelId": "19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2",
+      "teamsTeamId": "19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2",
+      "team": {
+        "id": "19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2"
+      },
+      "tenant": {
+        "id": "a9e299eb-5fa6-4173-8b91-8906bb8a7d92"
+      },
+      "channel": {
+        "id": "19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2"
+      }
+    }
+    const conversationParameters = {
+      isGroup: true,
+      channelData,
+      activity: message
+    }
   
-  console.log('pum')
-  res.status(200)
-  res.json({ status: 200, ok: true })
+    console.log('pah 1')
+    await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
+      console.log('turnado')
+
+      const ref = TurnContext.getConversationReference(context.activity)
+      console.dir(ref)
+      console.log(JSON.stringify(ref, null, 2))
+    })
+  
+    console.log('pum')
+    res.status(200)
+    res.json({ status: 200, ok: true })
+  } else {
+    const ref = {
+      "activityId": "19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2;messageid=1641866695072",
+      "conversation": {
+        "id": "19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2;messageid=1641866695072",
+        "isGroup": true
+      },
+      "channelId": "msteams",
+      "serviceUrl": "https://smba.trafficmanager.net/br/"
+    }
+
+    await adapter.continueConversationAsync(process.env.MicrosoftAppId, ref, async turnContext => {
+      await turnContext.sendActivity(MessageFactory.text('Resposta pra thread'))
+    })
+  }
 })
 
