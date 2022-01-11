@@ -1,0 +1,15 @@
+import { AudioMessage } from './AudioMessage';
+import { ContactMessage } from './ContactMessage';
+import { ImageMessage } from './ImageMessage';
+import { LocationMessage } from './LocationMessage';
+import { TextMessage } from './TextMessage.d';
+import { VideoMessage } from './VideoMessage';
+import { DocumentMessage } from './DocumentMessage';
+declare const isAudioMessageValidate: (x: unknown) => x is AudioMessage;
+declare const isContactMessageValidate: (x: unknown) => x is ContactMessage;
+declare const isImageMessageValidate: (x: unknown) => x is ImageMessage;
+declare const isLocationMessageValidate: (x: unknown) => x is LocationMessage;
+declare const isTextMessageValidate: (x: unknown) => x is TextMessage;
+declare const isVideoMessageValidate: (x: unknown) => x is VideoMessage;
+declare const isDocumentMessageValidate: (x: unknown) => x is VideoMessage;
+export { AudioMessage, isAudioMessageValidate, ContactMessage, isContactMessageValidate, ImageMessage, isImageMessageValidate, LocationMessage, isLocationMessageValidate, TextMessage, isTextMessageValidate, VideoMessage, isVideoMessageValidate, DocumentMessage, isDocumentMessageValidate };

@@ -1,0 +1,12 @@
+import { Connect } from './Connect.d';
+import { Connectionstate } from './Connectionstate.d';
+import { Disconnect } from './Disconnect.d';
+import { Signupconnection } from './Signupconnection.d';
+declare const isConnect: (x: unknown) => x is Connect;
+declare const isConnectionstate: (x: unknown) => x is Connectionstate;
+declare const isDisconnect: (x: unknown) => x is Disconnect;
+declare const isSignupconnection: (x: unknown) => x is Signupconnection;
+export { Connect, isConnect };
+export { Connectionstate, isConnectionstate };
+export { Disconnect, isDisconnect };
+export { Signupconnection, isSignupconnection };
