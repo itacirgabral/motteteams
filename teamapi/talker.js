@@ -13,7 +13,7 @@ const {
   setTimeout,
 } = require('timers/promises')
 
-const { client: redis, mkbotkey, mkcacapakey, panoptickey } = require('@gmapi/redispack')
+const { client: redis, mkbotkey, mkcacapakey, panopticbotkey } = require('@gmapi/redispack')
 const QRCode = require('qrcode')
 
 const hardid = process.env.HARDID
@@ -104,11 +104,11 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const shard = `${orgid}_${teamid}`
 
         if (isTeams && isAdd) {
-          const temBot = await redis.exists(mkbotkey({ shard }))
+          const hadBot = await redis.exists(mkbotkey({ shard }))
 
           const adaptiveCard = textBig.expand({
             $root: {
-              text: `BOT instalado${temBot ? ' e pronto!' : ', falta configurar.'}`
+              text: `BOT instalado${hadBot ? ' e pronto!' : ', falta configurar.'}`
             }
           })
           const card = CardFactory.adaptiveCard(adaptiveCard)
@@ -168,30 +168,24 @@ class TeamsConversationBot extends TeamsActivityHandler {
             await context.sendActivity(message)
           } else if (cutarroba === 'qrcode') {
             console.log('qrcode')
-            const cacapakey = mkcacapakey()
-            const mitochondria = 'teamsapp_DEMO'
-            const webhook = undefined
+            const type = 'botCommandQRCODE'
 
             const teamid = context.activity.channelData.team.id
             const orgid = context.activity.channelData.tenant.id
-            const shard = `${orgid}.${teamid}`
+            const shard = `${orgid}_${teamid}`
             console.log(`shard=${shard}`)
 
             const botkey = mkbotkey({ shard })
-            const [adminId, plan] = await redis.hmget(botkey, 'adminId', 'plan')
+            const hadBot = await redis.exists(botkey)
 
-            if (!!adminId && plan === 'dev') {
-              if (adminId === teamid) {
-                await context.sendActivity(MessageFactory.text('Perai, nova conversa'))
-              } else {
-                console.log(`adminId=${adminId} teamid=${teamid}`)
-                await context.sendActivity(MessageFactory.text('Solicitação enviada para GSADMIN'))
-              }
+            if (hadBot) {
+              await Promise.all([
+                redis.xadd(panopticbotkey, '*', 'type', 'botCommandQRCODE', 'shard', shard),
+                context.sendActivity(MessageFactory.text('Solicitação enviada para GSADMIN'))
+              ])
             } else {
-              const textMessage = `Bot ${!!adminId ?? 'lost'}. Plan ${plan ?? 'free'}.`
-              await context.sendActivity(MessageFactory.text(textMessage))
+              await context.sendActivity(MessageFactory.text('Sem bots disponíves...'))
             }
-
           } else if (cutarroba === 'fim') {
             console.log('fim')
           } else if (cutarroba === 'fix') {

@@ -9,9 +9,10 @@ const {
     createBotFrameworkAuthenticationFromConfiguration,
     MessageFactory,
     TurnContext
-} = require('botbuilder');
+} = require('botbuilder')
+const { client: redis, panopticbotkey, trafficwand, Bread } = require('@gmapi/redispack')
+
 const { TeamsConversationBot } = require('./talker');
-const { setTimeout } = require('timers');
 
 const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
     MicrosoftAppId: process.env.MicrosoftAppId,
@@ -22,7 +23,6 @@ const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
 const botFrameworkAuthentication = createBotFrameworkAuthenticationFromConfiguration(null, credentialsFactory);
 
 const adapter = new CloudAdapter(botFrameworkAuthentication);
-
 adapter.onTurnError = async (context, error) => {
     console.log('\n [onTurnError] unhandled error:')
     console.dir(error)
@@ -122,4 +122,8 @@ server.get('/pah', async (req, res) => {
 
 /*
 9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1
+const cacapakey = mkcacapakey()
+const mitochondria = 'teamsapp_DEMO'
+const webhook = undefined
+const type = 'botCommandQRCODE'
 */

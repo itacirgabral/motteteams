@@ -60,3 +60,12 @@ task "server" {
 
 ## DOCKER
 - cat ./canister_password.log | docker login --username itacirgabral --password-stdin
+
+# bot key
+## equipe
+ - hardid:hlhlny83jghtfbtv
+ - bot:a9e299eb-5fa6-4173-8b91-8906bb8a7d92_19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2
+## canal
+ - hardid:hlhlny83jghtfbtv
+ - bot:a9e299eb-5fa6-4173-8b91-8906bb8a7d92_19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2
+ - atendid:
