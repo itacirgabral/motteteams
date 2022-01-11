@@ -90,7 +90,7 @@ server.get('/pah', async (req, res) => {
       channelData,
       activity: message
     }
-  
+
     console.log('pah 1')
     await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
       console.log('turnado')
@@ -99,7 +99,7 @@ server.get('/pah', async (req, res) => {
       console.dir(ref)
       console.log(JSON.stringify(ref, null, 2))
     })
-  
+
     console.log('pum')
     res.status(200)
     res.json({ status: 200, ok: true })
@@ -120,3 +120,6 @@ server.get('/pah', async (req, res) => {
   }
 })
 
+/*
+9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1
+*/

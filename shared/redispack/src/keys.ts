@@ -7,10 +7,10 @@ const hardid = process.env.HARDID || 'dev'
  *
  * @example
  * ```
- * "hardid:xyz:panoptic"
+ * "hardid:xyz:zap:panoptic"
  * ```
  */
-const panoptickey = `hardid:${hardid}:panoptic`
+const panoptickey = `hardid:${hardid}:zap:panoptic`
 
 /**
  * Chave onde as certidões de nascimento do condado são estodas.
@@ -21,7 +21,7 @@ const panoptickey = `hardid:${hardid}:panoptic`
  * "hardid:xyz:borns"
  * ```
  */
-const bornskey = `hardid:${hardid}:borns`
+const bornskey = `hardid:${hardid}:zap:borns`
 
 /**
  * Cria uma chave aleatória para
@@ -121,18 +121,6 @@ const mkattmetakey = function mkattmetakey ({ shard, attid }: { shard: string; a
   return `hardid:${hardid}:zap:${shard}:atende:${attid}:meta`
 }
 
-/**
- * Chave para marcar instância como pronta
- *
- * @example
- * ```
- * "hardid:xyz:bot:ijk:ready"
- * ```
- */
-const mkreadykey = function mkreadykey ({ shard }: { shard: string; }) {
-  return `hardid:${hardid}:bot:${shard}:ready`
-}
-
 const mkstatekey = function mkstatekey ({ shard }: { shard: string }) {
   return `hardid:${hardid}:zap:${shard}:state`
 }
@@ -161,6 +149,43 @@ const mkofifkey = function mkofifkey ({ shard }: { shard: string }) {
   return `hardid:${hardid}:zap:${shard}:ofif`
 }
 
+/**
+ * TEAMS BOT
+ */
+/**
+ * Chave principal de monitoramento e controle do condado.
+ * É um stream
+ *
+ * @example
+ * ```
+ * "hardid:xyz:bot:panoptic"
+ * ```
+ */
+const panopticbotkey = `hardid:${hardid}:bot:panoptic`
+
+/**
+  * Chave onde as certidões de nascimento do condado são estodas.
+  * É um set
+  *
+  * @example
+  * ```
+  * "hardid:xyz:bot:borns"
+  * ```
+  */
+const bornsbotkey = `hardid:${hardid}:bot:borns`
+
+/**
+ * Chave para marcar instância como pronta
+ *
+ * @example
+ * ```
+ * "hardid:xyz:bot:ijk"
+ * ```
+ */
+const mkbotkey = function mkreadykey ({ shard }: { shard: string; }) {
+  return `hardid:${hardid}:bot:${shard}`
+}
+
 export {
   panoptickey,
   bornskey,
@@ -171,7 +196,9 @@ export {
   mkattkey,
   mkattmetakey,
   mkstatekey,
-  mkreadykey,
+  mkbotkey,
+  panopticbotkey,
+  bornsbotkey,
   mkstmkey,
   mktskey,
   mkqrcodekey,

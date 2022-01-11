@@ -13,7 +13,7 @@ const {
   setTimeout,
 } = require('timers/promises')
 
-const { client: redis, mkreadykey, mkcacapakey, panoptickey } = require('@gmapi/redispack')
+const { client: redis, mkbotkey, mkcacapakey, panoptickey } = require('@gmapi/redispack')
 const QRCode = require('qrcode')
 
 const hardid = process.env.HARDID
@@ -62,21 +62,18 @@ class TeamsConversationBot extends TeamsActivityHandler {
       super();
 
       this.onConversationUpdate(async (context, next) => {
-        console.log('onConversationUpdate')
         const isTeams = context.activity.channelId === 'msteams'
         const isAdd = context.activity.channelData.eventType === 'teamMemberAdded'
         const isGSADMIN = context.activity.channelData.team.name === 'GSADMIN'
 
-        const cid = context.activity.conversation.id
-        const teamid = cid.slice(cid.indexOf(':') + 1).split('@thread.tacv2')[0]
+        const teamid = context.activity.channelData.team.id
         const orgid = context.activity.channelData.tenant.id
-        const shard = `${orgid}.${teamid}`
-        console.log(`botEquipe=${shard}`)
+        const shard = `${orgid}_${teamid}`
+        console.log(`bot=${shard}`)
 
         if (isTeams && isAdd && isGSADMIN) {
-          const readykey = mkreadykey({ shard })
+          const botkey = mkbotkey({ shard })
 
-          // sintetic minimal channelData
           const channelData = {
             teamsChannelId: context.activity.channelData.team.id,
             teamsTeamId: context.activity.channelData.team.id,
@@ -88,11 +85,10 @@ class TeamsConversationBot extends TeamsActivityHandler {
             },
             eventType: undefined
           }
-          const admin = JSON.stringify(channelData)
-          const adminId = channelData.teamsChannelId
+          const adminref = JSON.stringify(channelData)
 
-          console.log(`libera o admin ${shard}`)
-          await redis.hset(readykey, 'admin', admin, 'adminId', adminId)
+          console.log(`Criando ${botkey} porque é GSADMIN`)
+          await redis.set(botkey, adminref)
         }
 
         await next()
@@ -102,19 +98,17 @@ class TeamsConversationBot extends TeamsActivityHandler {
         console.log('onInstallationUpdate')
         const isTeams = context.activity.channelId === 'msteams'
         const isAdd = context.activity.action === 'add'
-        
-        const cid = context.activity.conversation.id
-        const teamid = cid.slice(cid.indexOf(':') + 1).split('@thread.tacv2')[0]
+
+        const teamid = context.activity.channelData.team.id
         const orgid = context.activity.channelData.tenant.id
-        const shard = `${orgid}.${teamid}`
+        const shard = `${orgid}_${teamid}`
 
         if (isTeams && isAdd) {
-          const readykey = mkreadykey({ shard })
-          const isReady = await redis.hexists(readykey, 'admin')
+          const temBot = await redis.exists(mkbotkey({ shard }))
 
           const adaptiveCard = textBig.expand({
             $root: {
-              text: `BOT instalado${isReady ? ' e pronto!' : ', falta configurar.'}` 
+              text: `BOT instalado${temBot ? ' e pronto!' : ', falta configurar.'}`
             }
           })
           const card = CardFactory.adaptiveCard(adaptiveCard)
@@ -170,7 +164,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
             })
             const card = CardFactory.adaptiveCard(adaptiveCard)
             const message = MessageFactory.attachment(card)
-            
+
             await context.sendActivity(message)
           } else if (cutarroba === 'qrcode') {
             console.log('qrcode')
@@ -178,21 +172,19 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const mitochondria = 'teamsapp_DEMO'
             const webhook = undefined
 
-            //          19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2;messageid=1641843296187
-            const cid = context.activity.conversation.id
-            const teamid = cid.slice(cid.indexOf(':') + 1).split('@thread.tacv2')[0]
+            const teamid = context.activity.channelData.team.id
             const orgid = context.activity.channelData.tenant.id
             const shard = `${orgid}.${teamid}`
             console.log(`shard=${shard}`)
 
-            const readykey = mkreadykey({ shard })
-            const [adminId, plan] = await redis.hmget(readykey, 'adminId', 'plan')
+            const botkey = mkbotkey({ shard })
+            const [adminId, plan] = await redis.hmget(botkey, 'adminId', 'plan')
 
             if (!!adminId && plan === 'dev') {
-              if (adminId === cid.split(';messageid=')[0]) {
+              if (adminId === teamid) {
                 await context.sendActivity(MessageFactory.text('Perai, nova conversa'))
               } else {
-                console.log(`adminId=${adminId} cid=${cid}`)
+                console.log(`adminId=${adminId} teamid=${teamid}`)
                 await context.sendActivity(MessageFactory.text('Solicitação enviada para GSADMIN'))
               }
             } else {
