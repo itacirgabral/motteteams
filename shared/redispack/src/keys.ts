@@ -194,7 +194,7 @@ const mkattkey = function mkattkey ({ shard, attid }: { shard: string; attid: st
  * ```
  */
 const mkattmetakey = function mkattmetakey ({ shard, attid }: { shard: string; attid: string }) {
-  return `hardid:${hardid}:zap:${shard}:atende:${attid}:meta`
+  return `hardid:${hardid}:bot:${shard}:atende:${attid}:meta`
 }
 
 export {
