@@ -17,10 +17,10 @@ const stream2bread = function stream2bread ({ log }: { log: Array<string>}): Bre
   return bread
 }
 
-const trafficwand = function trafficwand ({ redis, streamkey }: { redis: Redis, streamkey: string }) {
+const trafficwand = function trafficwand ({ redis, streamkey, replay = false }: { redis: Redis, streamkey: string, replay?: boolean }) {
   return new Observable<Bread>(subscriber => {
     const redisBlock = redis.duplicate()
-    let lastlogid = '$'
+    let lastlogid = replay ? '0' : '$'
     ;(async () => {
       while (true) {
         const stream = await redisBlock.xread('BLOCK', 0, 'STREAMS', streamkey, lastlogid)
