@@ -12,7 +12,7 @@ const {
 } = require('botbuilder')
 const { client: redis, panopticbotkey, trafficwand, Bread } = require('@gmapi/redispack')
 
-const { TeamsConversationBot } = require('./talker');
+const { TeamsConversationBot } = require('./reactivebot');
 
 const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
     MicrosoftAppId: process.env.MicrosoftAppId,
