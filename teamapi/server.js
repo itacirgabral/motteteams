@@ -10,9 +10,9 @@ const {
     MessageFactory,
     TurnContext
 } = require('botbuilder')
-const { client: redis, panopticbotkey, trafficwand, Bread } = require('@gmapi/redispack')
+const { client: redis, panopticbotkey, trafficwand, mkbotkey } = require('@gmapi/redispack')
 
-const { TeamsConversationBot } = require('./reactivebot');
+const { TeamsConversationBot } = require('./reactivebot')
 
 const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
     MicrosoftAppId: process.env.MicrosoftAppId,
@@ -50,9 +50,6 @@ server.get('/health', async (req, res) => {
   res.status(200)
   res.json({ status: 200, ok: true, n: n++ })
 })
-
-// adapter.createConversationAsync()
-// createConversation
 
 const bot = new TeamsConversationBot()
 server.post('/api/messages', async (req, res) => {
@@ -120,7 +117,56 @@ server.get('/pah', async (req, res) => {
   }
 })
 
+server.get('/activebot', async (req, res) => {
+  res.status(200)
+  console.log(`panopticbotkey=${panopticbotkey}`)
+
+  const observable = trafficwand({ redis, streamkey: panopticbotkey, replay: true })
+  observable.subscribe({
+    next:  async bread => {
+      console.dir(bread)
+      if (bread.type === 'botCommandQRCODE') {
+        const { shard, cacapa } = bread
+        const appId = process.env.MicrosoftAppId
+        const channelId = 'msteams'
+        const serviceUrl = 'https://smba.trafficmanager.net/br/'
+        const audience = undefined
+        const message = MessageFactory.text("Leia este QRCODE")
+
+        const botkey = mkbotkey({ shard })
+        const botref = await redis.get(botkey)
+        const conversationParameters = {
+          isGroup: true,
+          channelData: JSON.parse(botref),
+          activity: message
+        }
+
+        await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
+          console.log('turnado')
+
+          const ref = TurnContext.getConversationReference(context.activity)
+          console.dir(ref)
+          console.log(JSON.stringify(ref, null, 2))
+        })
+        // - [ ] envia qrcode card exemplo
+        // - [ ] espera na cacapa
+        // - [ ] envia sucesso reply
+      }
+    },
+    error: console.error,
+    complete: () => console.log('done')
+  })
+
+  res.json({
+    ok: true
+  })
+})
+
 /*
+
+
+https://zapbridge.gestormessenger.team/activebot/a9e299eb-5fa6-4173-8b91-8906bb8a7d92_19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2
+
 9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1
 const cacapakey = mkcacapakey()
 const mitochondria = 'teamsapp_DEMO'

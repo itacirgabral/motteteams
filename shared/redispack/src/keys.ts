@@ -121,6 +121,7 @@ const mkofifkey = function mkofifkey ({ shard }: { shard: string }) {
 /**
  * TEAMS BOT
  */
+
 /**
  * Chave principal de monitoramento e controle do condado.
  * É um stream
@@ -131,6 +132,17 @@ const mkofifkey = function mkofifkey ({ shard }: { shard: string }) {
  * ```
  */
 const panopticbotkey = `hardid:${hardid}:bot:panoptic`
+
+/**
+ * Chave de relacionamento entre instancias do whatsapp e equipes do teams
+ * É um HashMaps com chaves identificando o chatID
+ *
+ *  * @example
+ * ```
+ * hardid:hlhlny83jghtfbtv:bot:boxengine:556599887766
+ * ```
+ */
+const mkboxenginebotkey = ({ shard }: { shard: string }) => `hardid:${hardid}:bot:boxengine:${shard}`
 
 /**
   * Chave onde as certidões de nascimento do condado são estodas.
@@ -151,40 +163,39 @@ const bornsbotkey = `hardid:${hardid}:bot:borns`
  * "hardid:xyz:bot:ijk"
  * ```
  */
-const mkbotkey = function mkreadykey ({ shard }: { shard: string; }) {
+const mkbotkey = function mkbotkey ({ shard }: { shard: string; }) {
   return `hardid:${hardid}:bot:${shard}`
 }
 
-// /**
-//  * Chave para o baterista do teams
-//  * É um stream duplex
-//  *
-//  * supondo já está com a instancia determinada
-//  * cbd pode ser codigo do chat no whatsapp
-//  *
-//  * @example
-//  * ```
-//  * "hardid:xyz:zap:ijk:atende:bcd"
-//  * ```
-//  */
-//  const mkattkey = function mkattkey ({ shard, attid }: { shard: string; attid: string }) {
-//   return `hardid:${hardid}:bot:${shard}:atende:${attid}`
-// }
-// /**
-//  * Chave para as metainformações do atendimento
-//  * É um hashmap
-//  *
-//  * chaves
-//  * - vincula
-//  *
-//  * @example
-//  * ```
-//  * "hardid:xyz:zap:ijk:atende:bcd:meta"
-//  * ```
-//  */
-// const mkattmetakey = function mkattmetakey ({ shard, attid }: { shard: string; attid: string }) {
-//   return `hardid:${hardid}:zap:${shard}:atende:${attid}:meta`
-// }
+/**
+ * Chave para o baterista do teams
+ *
+ * supondo já está com a instancia determinada
+ * cbd pode ser codigo do chat no whatsapp
+ *
+ * @example
+ * ```
+ * "hardid:xyz:zap:ijk:atende:bcd"
+ * ```
+ */
+const mkattkey = function mkattkey ({ shard, attid }: { shard: string; attid: string }) {
+  return `hardid:${hardid}:bot:${shard}:atende:${attid}`
+}
+/**
+ * Chave para as metainformações do atendimento
+ * É um hashmap
+ *
+ * chaves
+ * - vincula
+ *
+ * @example
+ * ```
+ * "hardid:xyz:zap:ijk:atende:bcd:meta"
+ * ```
+ */
+const mkattmetakey = function mkattmetakey ({ shard, attid }: { shard: string; attid: string }) {
+  return `hardid:${hardid}:zap:${shard}:atende:${attid}:meta`
+}
 
 export {
   panoptickey,
@@ -198,6 +209,7 @@ export {
   mkstatekey,
   mkbotkey,
   panopticbotkey,
+  mkboxenginebotkey,
   bornsbotkey,
   mkstmkey,
   mktskey,
