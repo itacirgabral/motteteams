@@ -4,13 +4,30 @@ require('dotenv').config({
 
 const restify = require('restify');
 const {
+    CardFactory,
     CloudAdapter,
     ConfigurationServiceClientCredentialFactory,
     createBotFrameworkAuthenticationFromConfiguration,
     MessageFactory,
     TurnContext
 } = require('botbuilder')
-const { client: redis, panopticbotkey, trafficwand, mkbotkey } = require('@gmapi/redispack')
+const { client: redis, panopticbotkey, trafficwand, mkbotkey, mkattkey, mkattmetakey } = require('@gmapi/redispack')
+
+const ACData = require('adaptivecards-templating')
+const QRCode = require('qrcode')
+const image64T = new ACData.Template({
+  type: 'AdaptiveCard',
+  body: [{
+    type: 'TextBlock',
+    text: 'QR Code',
+    'wrap': true
+  },{
+    type: 'Image',
+    url: '${url}'
+  }],
+  $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+  version: '1.3'
+})
 
 const { TeamsConversationBot } = require('./reactivebot')
 
@@ -120,7 +137,6 @@ server.get('/pah', async (req, res) => {
 server.get('/activebot', async (req, res) => {
   res.status(200)
   console.log(`panopticbotkey=${panopticbotkey}`)
-
   const observable = trafficwand({ redis, streamkey: panopticbotkey, replay: true })
   observable.subscribe({
     next:  async bread => {
@@ -131,7 +147,14 @@ server.get('/activebot', async (req, res) => {
         const channelId = 'msteams'
         const serviceUrl = 'https://smba.trafficmanager.net/br/'
         const audience = undefined
-        const message = MessageFactory.text("Leia este QRCODE")
+
+        const urlData64 = await QRCode.toDataURL("Código bem louco vindo do whatsapp")
+        const adaptiveCard = image64T.expand({
+          $root: {
+            url: urlData64          }
+        })
+        const card = CardFactory.adaptiveCard(adaptiveCard)
+        const message = MessageFactory.attachment(card)
 
         const botkey = mkbotkey({ shard })
         const botref = await redis.get(botkey)
@@ -144,7 +167,19 @@ server.get('/activebot', async (req, res) => {
         await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
           console.log('turnado')
 
+          // salvar referencia da mensagem no canal pra responder depois
           const ref = TurnContext.getConversationReference(context.activity)
+          const attid = ref.activityId
+          const attkey = mkattkey({ shard, attid })
+          const attmetakey = mkattmetakey({ shard, attid })
+          const pipeline = redis.pipeline()
+          pipeline.xadd(attkey, '*', 'type', 'botCommandQRCODE', 'data', JSON.stringify({
+            pareceBom: true
+          }))
+          pipeline.xlen(attkey)
+          pipeline.hsetnx(attmetakey, 'status', JSON.stringify({ stage: 0 }))
+          await pipeline.exec()
+
           console.dir(ref)
           console.log(JSON.stringify(ref, null, 2))
         })
