@@ -8,7 +8,10 @@ docker-compose -f docker-compose.redis.yml up -d
 
 # CLOUDFLARED
 - `cloudflared tunnel --hostname hLHlNy83jgHTfBTV.gestormessenger.team --url localhost:3000 --name hLHlNy83jgHTfBTV`
-- `cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name zapbot`
+- `cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name lenovo`
+
+## alfabot
+- `cloudflared tunnel --hostname alfabot.gestormessenger.team --url localhost:3978 --name lenovo`
 
 # HASH
 - ./consul.sh
