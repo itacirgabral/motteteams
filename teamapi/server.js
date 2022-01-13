@@ -74,19 +74,23 @@ server.post('/api/messages', async (req, res) => {
   await adapter.process(req, res, (context) => bot.run(context))
 })
 
-let crosref
 let replyQty = 1
+let lastAttmetakey
 server.get('/pah', async (req, res) => {
-  if (crosref) {
-    console.log('pah')
-    const ref = crosref
+  console.log('pah')
+
+  res.status(200)
+  if (lastAttmetakey) {
+    const refJSON = await redis.hget(lastAttmetakey, 'ref')
+    const ref = JSON.parse(refJSON)
+
     await adapter.continueConversationAsync(process.env.MicrosoftAppId, ref, async turnContext => {
       await turnContext.sendActivity(MessageFactory.text(`Resposta ${replyQty++} pra thread`))
-      res.status(200)
       res.json({ replyQty })
     })
+
   } else {
-    console.log('no crossref')
+    res.json({ noTo: true })
   }
 })
 
@@ -130,16 +134,16 @@ server.get('/activebot', async (req, res) => {
           const attkey = mkattkey({ shard, attid })
           const attmetakey = mkattmetakey({ shard, attid })
 
-          crosref = ref
+          lastAttmetakey = attmetakey
           console.log(`attmetakey=${attmetakey}`)
 
-          // const pipeline = redis.pipeline()
-          // pipeline.xadd(attkey, '*', 'type', 'QRCODE')
-          // pipeline.xlen(attkey)
-          // pipeline.hsetnx(attmetakey, 'ref', JSON.stringify(ref), 'status', 'unsee')
-          // await pipeline.exec()
+          const pipeline = redis.pipeline()
+          pipeline.xadd(attkey, '*', 'type', 'QRCODE')
+          pipeline.xlen(attkey)
+          pipeline.hsetnx(attmetakey, 'ref', JSON.stringify(ref))
+          await pipeline.exec()
 
-          // console.log('ref de atendimento salva, proto pras respostas')
+          console.log('\nref de atendimento salva, proto pras respostas\n')
         })
         // - [ ] envia qrcode card exemplo
         // - [ ] espera na cacapa
