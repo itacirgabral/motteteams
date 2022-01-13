@@ -166,9 +166,9 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const message = MessageFactory.attachment(card)
 
             await context.sendActivity(message)
-          } else if (cutarroba === 'qrcode') {
-            console.log('qrcode')
-            const type = 'botCommandQRCODE'
+          } else if (cutarroba === 'conectar') {
+            console.log('conectar')
+            const type = 'botCommandConectar'
 
             const teamid = context.activity.channelData.team.id
             const orgid = context.activity.channelData.tenant.id
@@ -179,9 +179,10 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const hadBot = await redis.exists(botkey)
 
             if (hadBot) {
+              const textMessage = `Solicitação enviada para [GSADMIN](https://teams.microsoft.com/l/team/${teamid}/conversations?tenantId=${orgid}) PEGA O CELULAR!!!`
               await Promise.all([
                 redis.xadd(panopticbotkey, '*', 'type', 'botCommandQRCODE', 'shard', shard),
-                context.sendActivity(MessageFactory.text('Solicitação enviada para GSADMIN'))
+                context.sendActivity(MessageFactory.text(textMessage))
               ])
             } else {
               await context.sendActivity(MessageFactory.text('Sem bots disponíves...'))
