@@ -74,69 +74,26 @@ server.post('/api/messages', async (req, res) => {
   await adapter.process(req, res, (context) => bot.run(context))
 })
 
-let first = false
-
+let crosref
+let replyQty = 1
 server.get('/pah', async (req, res) => {
-  console.log('pah')
-
-  if (first) {
-    // first = !first
-    const appId = process.env.MicrosoftAppId
-    const channelId = 'msteams'
-    const serviceUrl = 'https://smba.trafficmanager.net/br/'
-    const audience = undefined
-    const message = MessageFactory.text("Vou mandar um QRCODE")
-    const channelData = {
-      "teamsChannelId": "19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2",
-      "teamsTeamId": "19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2",
-      "team": {
-        "id": "19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2"
-      },
-      "tenant": {
-        "id": "a9e299eb-5fa6-4173-8b91-8906bb8a7d92"
-      },
-      "channel": {
-        "id": "19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2"
-      }
-    }
-    const conversationParameters = {
-      isGroup: true,
-      channelData,
-      activity: message
-    }
-
-    console.log('pah 1')
-    await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
-      console.log('turnado')
-
-      const ref = TurnContext.getConversationReference(context.activity)
-      console.dir(ref)
-      console.log(JSON.stringify(ref, null, 2))
-    })
-
-    console.log('pum')
-    res.status(200)
-    res.json({ status: 200, ok: true })
-  } else {
-    const ref = {
-      "activityId": "19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2;messageid=1641866695072",
-      "conversation": {
-        "id": "19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2;messageid=1641866695072",
-        "isGroup": true
-      },
-      "channelId": "msteams",
-      "serviceUrl": "https://smba.trafficmanager.net/br/"
-    }
-
+  if (crosref) {
+    console.log('pah')
+    const ref = crosref
     await adapter.continueConversationAsync(process.env.MicrosoftAppId, ref, async turnContext => {
-      await turnContext.sendActivity(MessageFactory.text('Resposta pra thread'))
+      await turnContext.sendActivity(MessageFactory.text(`Resposta ${replyQty++} pra thread`))
+      res.status(200)
+      res.json({ replyQty })
     })
+  } else {
+    console.log('no crossref')
   }
 })
 
 server.get('/activebot', async (req, res) => {
   res.status(200)
   console.log(`panopticbotkey=${panopticbotkey}`)
+  
   const observable = trafficwand({ redis, streamkey: panopticbotkey, replay: true })
   observable.subscribe({
     next:  async bread => {
@@ -167,21 +124,22 @@ server.get('/activebot', async (req, res) => {
         await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
           console.log('turnado')
 
-          // salvar referencia da mensagem no canal pra responder depois
+          // salvar referencia da conversa no canal pra responder depois
           const ref = TurnContext.getConversationReference(context.activity)
           const attid = ref.activityId
           const attkey = mkattkey({ shard, attid })
           const attmetakey = mkattmetakey({ shard, attid })
-          const pipeline = redis.pipeline()
-          pipeline.xadd(attkey, '*', 'type', 'botCommandQRCODE', 'data', JSON.stringify({
-            pareceBom: true
-          }))
-          pipeline.xlen(attkey)
-          pipeline.hsetnx(attmetakey, 'status', JSON.stringify({ stage: 0 }))
-          await pipeline.exec()
 
-          console.dir(ref)
-          console.log(JSON.stringify(ref, null, 2))
+          crosref = ref
+          console.log(`attmetakey=${attmetakey}`)
+
+          // const pipeline = redis.pipeline()
+          // pipeline.xadd(attkey, '*', 'type', 'QRCODE')
+          // pipeline.xlen(attkey)
+          // pipeline.hsetnx(attmetakey, 'ref', JSON.stringify(ref), 'status', 'unsee')
+          // await pipeline.exec()
+
+          // console.log('ref de atendimento salva, proto pras respostas')
         })
         // - [ ] envia qrcode card exemplo
         // - [ ] espera na cacapa

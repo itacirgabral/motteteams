@@ -168,7 +168,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
             await context.sendActivity(message)
           } else if (cutarroba === 'conectar') {
             console.log('conectar')
-            const type = 'botCommandConectar'
+            const type = 'botCommandQRCODE'
 
             const teamid = context.activity.channelData.team.id
             const orgid = context.activity.channelData.tenant.id
@@ -181,7 +181,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
             if (hadBot) {
               const textMessage = `Solicitação enviada para [GSADMIN](https://teams.microsoft.com/l/team/${teamid}/conversations?tenantId=${orgid}) PEGA O CELULAR!!!`
               await Promise.all([
-                redis.xadd(panopticbotkey, '*', 'type', 'botCommandQRCODE', 'shard', shard),
+                redis.xadd(panopticbotkey, '*', 'type', type, 'shard', shard),
                 context.sendActivity(MessageFactory.text(textMessage))
               ])
             } else {
