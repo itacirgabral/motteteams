@@ -85,8 +85,9 @@ server.get('/pah', async (req, res) => {
     const ref = JSON.parse(refJSON)
 
     await adapter.continueConversationAsync(process.env.MicrosoftAppId, ref, async turnContext => {
-      await turnContext.sendActivity(MessageFactory.text(`Resposta ${replyQty++} pra thread`))
+      await turnContext.sendActivity(MessageFactory.text(`Resposta ${replyQty} pra thread`))
       res.json({ replyQty })
+      replyQty++
     })
 
   } else {
@@ -101,8 +102,8 @@ server.get('/activebot', async (req, res) => {
   const observable = trafficwand({ redis, streamkey: panopticbotkey, replay: true })
   observable.subscribe({
     next:  async bread => {
-      console.dir(bread)
       if (bread.type === 'botCommandQRCODE') {
+        console.log('botCommandQRCODE')
         const { shard, cacapa } = bread
         const appId = process.env.MicrosoftAppId
         const channelId = 'msteams'
@@ -118,7 +119,7 @@ server.get('/activebot', async (req, res) => {
         const message = MessageFactory.attachment(card)
 
         const botkey = mkbotkey({ shard })
-        const botref = await redis.get(botkey)
+        const botref = await redis.hget(botkey, 'ref')
         const conversationParameters = {
           isGroup: true,
           channelData: JSON.parse(botref),
@@ -126,7 +127,7 @@ server.get('/activebot', async (req, res) => {
         }
 
         await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
-          console.log('turnado')
+          console.log('CARD CONVERSA OK')
 
           // salvar referencia da conversa no canal pra responder depois
           const ref = TurnContext.getConversationReference(context.activity)
