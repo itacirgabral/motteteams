@@ -8,4 +8,5 @@
 - [botbuilder](https://github.com/microsoft/botbuilder-samples)
 
 # teams bot
-- cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name zapbot
+- cloudflared tunnel --hostname betabot.gestormessenger.team --url localhost:3978 --name betaorgbot
+- cloudflared tunnel --hostname alfabot.gestormessenger.team --url localhost:3978 --name alfakitbot
