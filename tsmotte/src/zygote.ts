@@ -1,7 +1,7 @@
 import { fork } from 'child_process'
-import { writeFileSync, renameSync } from 'fs'
+import { writeFileSync, renameSync, existsSync, rmSync } from 'fs'
 import baileys, { BufferJSON, SignalDataTypeMap, WABrowserDescription, initAuthCreds, proto } from '@adiwajshing/baileys-md'
-import { client as redis, mkwebhookkey, bornskey } from '@gmapi/redispack'
+import { client as redis, bornskey } from '@gmapi/redispack'
 import { Signupconnection } from '@gmapi/types'
 import { makeCountyToken } from './jwt'
 
@@ -96,41 +96,55 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
         const auth = cacapa
         const jwt = makeCountyToken({ shard: me })
 
-        renameSync(zygotetempcreds, `./auth_info_multi.${me}.json`)
-
         const timestamp = (new Date()).toLocaleString('pt-BR')
-        const birth: Birth = {
-          type: 'jwt',
-          mitochondria,
-          shard: me,
-          jwt,
-          timestamp,
-          qrcode: lastQrcode,
-          auth
-        }
-        const birthcert = JSON.stringify(birth)
+        const newFileName = `./auth_info_multi/${me}.json`
+        const isNotNew = existsSync(newFileName)
+        if (isNotNew) {
+          const birth: Birth = {
+            type: 'jwt',
+            mitochondria,
+            shard: 'nops',
+            jwt,
+            timestamp,
+            qrcode: lastQrcode,
+            auth
+          }
 
-        const pipeline = redis.pipeline()
-        pipeline.sadd(bornskey, birthcert)
-        // pipeline.lpush(lastQrcode, birthcert)
-        if (url) {
-          pipeline.hset(mkwebhookkey({ shard: me }), 'main', url)
-        }
+          rmSync(zygotetempcreds)
 
-        pipeline.rpush(cacapa, JSON.stringify(birthcert))
-        pipeline.expire(cacapa, 90)
-
-        Promise.all([
-          pipeline.exec(),
-          // got.post(url, {
-          //   json: birth,
-          // }).catch(console.error)
-        ]).then(() => {
           if (process.send) {
             process.send(birth)
           }
           res(birth)
-        })
+        } else {
+          renameSync(zygotetempcreds, newFileName)
+
+          const birth: Birth = {
+            type: 'jwt',
+            mitochondria,
+            shard: me,
+            jwt,
+            timestamp,
+            qrcode: lastQrcode,
+            auth
+          }
+          const birthcert = JSON.stringify(birth)
+
+          const pipeline = redis.pipeline()
+          pipeline.sadd(bornskey, birthcert)
+          pipeline.rpush(cacapa, JSON.stringify(birthcert))
+          pipeline.expire(cacapa, 90)
+
+          pipeline.exec().then(() => {
+            if (process.send) {
+              process.send(birth)
+            }
+            res(birth)
+          })
+        }
+
+
+
       } else if(update.qr) {
         lastQrcode = update.qr || ''
         const response = {
