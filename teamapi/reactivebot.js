@@ -88,7 +88,10 @@ class TeamsConversationBot extends TeamsActivityHandler {
           const adminref = JSON.stringify(channelData)
 
           console.log(`Criando ${botkey} porque é GSADMIN`)
-          await redis.hmset(botkey, 'ref', adminref, 'plan', 'free')
+          await Promise.all([
+            redis.hsetnx(botkey, 'ref', adminref),
+            redis.hsetnx(botkey, 'plan', 'free')
+          ])
         }
 
         await next()
