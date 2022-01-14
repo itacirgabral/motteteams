@@ -2,7 +2,9 @@ require('dotenv').config({
   path: require('path').join(__dirname, '.env')
 });
 
-const restify = require('restify');
+const hardid = process.env.HARDID
+
+const restify = require('restify')
 const {
     CardFactory,
     CloudAdapter,
@@ -11,7 +13,7 @@ const {
     MessageFactory,
     TurnContext
 } = require('botbuilder')
-const { client: redis, panopticbotkey, trafficwand, mkbotkey, mkattkey, mkattmetakey } = require('@gmapi/redispack')
+const { client: redis, panoptickey, panopticbotkey, trafficwand, mkbotkey, mkattkey, mkattmetakey, mkcacapakey } = require('@gmapi/redispack')
 
 const ACData = require('adaptivecards-templating')
 const QRCode = require('qrcode')
@@ -68,9 +70,11 @@ server.get('/health', async (req, res) => {
   res.json({ status: 200, ok: true, n: n++ })
 })
 
+// reactive bot
 const bot = new TeamsConversationBot()
 server.post('/api/messages', async (req, res) => {
-  console.log(`<<\n${JSON.stringify(req.body)}\n>>`)
+  console.log(`<< /api/messages >>`)
+  console.dir(req.body)
   await adapter.process(req, res, (context) => bot.run(context))
 })
 
@@ -95,69 +99,76 @@ server.get('/pah', async (req, res) => {
   }
 })
 
-server.get('/activebot', async (req, res) => {
-  res.status(200)
-  console.log(`panopticbotkey=${panopticbotkey}`)
-  
-  const observable = trafficwand({ redis, streamkey: panopticbotkey, replay: true })
-  observable.subscribe({
-    next:  async bread => {
-      if (bread.type === 'botCommandQRCODE') {
-        console.log('botCommandQRCODE')
-        const { shard, cacapa } = bread
-        const appId = process.env.MicrosoftAppId
-        const channelId = 'msteams'
-        const serviceUrl = 'https://smba.trafficmanager.net/br/'
-        const audience = undefined
+// active bot
+const replay = false
+const observable = trafficwand({ redis, streamkey: panopticbotkey, replay })
+observable.subscribe({
+  next:  async bread => {
+    if (bread.type === 'botCommandQRCODE') {
+      console.log('botCommandQRCODE')
+      const { shard, cacapa } = bread
+      const appId = process.env.MicrosoftAppId
+      const channelId = 'msteams'
+      const serviceUrl = 'https://smba.trafficmanager.net/br/'
+      const audience = undefined
 
-        const urlData64 = await QRCode.toDataURL("Código bem louco vindo do whatsapp")
-        const adaptiveCard = image64T.expand({
-          $root: {
-            url: urlData64          }
-        })
-        const card = CardFactory.adaptiveCard(adaptiveCard)
-        const message = MessageFactory.attachment(card)
+      const mitochondria = 'TEAMSBOT'
+      const type = 'signupconnection'
+      const cacapaListResponse = mkcacapakey()
+      const instancia = '556584469827'
+      const url = ' '
+      await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', instancia, 'mitochondria', mitochondria, 'cacapa', cacapaListResponse, 'url', url)
 
-        const botkey = mkbotkey({ shard })
-        const botref = await redis.hget(botkey, 'ref')
-        const conversationParameters = {
-          isGroup: true,
-          channelData: JSON.parse(botref),
-          activity: message
+      // espera na caçapa pelo código
+      const listResponde = await redis.blpop(cacapaListResponse, 40)
+      const listDate = JSON.parse(listResponde[1])
+      console.dir(listDate)
+
+      const urlData64 = await QRCode.toDataURL(listDate.qr)
+
+      const adaptiveCard = image64T.expand({
+        $root: {
+          url: urlData64
         }
+      })
+      const card = CardFactory.adaptiveCard(adaptiveCard)
+      const message = MessageFactory.attachment(card)
 
-        await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
-          console.log('CARD CONVERSA OK')
-
-          // salvar referencia da conversa no canal pra responder depois
-          const ref = TurnContext.getConversationReference(context.activity)
-          const attid = ref.activityId
-          const attkey = mkattkey({ shard, attid })
-          const attmetakey = mkattmetakey({ shard, attid })
-
-          lastAttmetakey = attmetakey
-          console.log(`attmetakey=${attmetakey}`)
-
-          const pipeline = redis.pipeline()
-          pipeline.xadd(attkey, '*', 'type', 'QRCODE')
-          pipeline.xlen(attkey)
-          pipeline.hsetnx(attmetakey, 'ref', JSON.stringify(ref))
-          await pipeline.exec()
-
-          console.log('\nref de atendimento salva, proto pras respostas\n')
-        })
-        // - [ ] envia qrcode card exemplo
-        // - [ ] espera na cacapa
-        // - [ ] envia sucesso reply
+      const botkey = mkbotkey({ shard })
+      const botref = await redis.hget(botkey, 'ref')
+      const conversationParameters = {
+        isGroup: true,
+        channelData: JSON.parse(botref),
+        activity: message
       }
-    },
-    error: console.error,
-    complete: () => console.log('done')
-  })
 
-  res.json({
-    ok: true
-  })
+      await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
+        console.log('CARD CONVERSA OK')
+
+        // salvar referencia da conversa no canal pra responder depois
+        const ref = TurnContext.getConversationReference(context.activity)
+        const attid = ref.activityId
+        const attkey = mkattkey({ shard, attid })
+        const attmetakey = mkattmetakey({ shard, attid })
+
+        lastAttmetakey = attmetakey
+        console.log(`attmetakey=${attmetakey}`)
+
+        const pipeline = redis.pipeline()
+        pipeline.xadd(attkey, '*', 'type', 'QRCODE')
+        pipeline.xlen(attkey)
+        pipeline.hsetnx(attmetakey, 'ref', JSON.stringify(ref))
+        await pipeline.exec()
+
+        console.log('\nref de atendimento salva, proto pras respostas\n')
+      })
+      // - [ ] envia qrcode card exemplo
+      // - [ ] espera na cacapa
+      // - [ ] envia sucesso reply
+    }
+  },
+  error: console.error,
+  complete: () => console.log('done')
 })
 
 /*

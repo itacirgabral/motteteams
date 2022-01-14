@@ -71,7 +71,7 @@ const saveSignup = (filename: string) => {
 
 const zygote = function zygote (signupconnection: Signupconnection): Promise<Birth> {
   return new Promise((res, rej) => {
-    const { mitochondria, /*shard,*/ url, cacapa } = signupconnection
+    const { mitochondria, /*shard, url,*/ cacapa } = signupconnection
     const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95']
     let lastQrcode = ''
 

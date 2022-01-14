@@ -180,7 +180,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
 
             const botkey = mkbotkey({ shard })
             const plan = await redis.hget(botkey, 'plan')
-            if (plan && plan !=='free') {
+            if (plan && plan === 'dev') {
               const textMessage = `Solicitação enviada para [GSADMIN](https://teams.microsoft.com/l/team/${teamid}/conversations?tenantId=${orgid}) PEGA O CELULAR!!!`
               await Promise.all([
                 redis.xadd(panopticbotkey, '*', 'type', type, 'shard', shard),

@@ -334,7 +334,7 @@ const wacPC = async (connectionSwitch: ConnectionSwitch) => {
             shard,
             cacapa,
             // ignore 2x :s
-            auth: `./auth_info_multi.${shard}.json`
+            auth: `./auth_info_multi/${shard}.json`
           }
         })
 
