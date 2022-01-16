@@ -10,10 +10,10 @@ import { patchpanel } from './patchpanel'
 
 type ConnectionSwitch = Connect | Disconnect | Connectionstate
 
-const coudhdbUrl = process.env.COUCHDB_URL || 'http://localhost:5984'
-console.log(`coudhdbUrl=${coudhdbUrl}`)
-const couch = nano(coudhdbUrl)
-const jsonStore = couch.db.use('gestormessenger')
+// const coudhdbUrl = process.env.COUCHDB_URL || 'http://localhost:5984'
+// console.log(`coudhdbUrl=${coudhdbUrl}`)
+// const couch = nano(coudhdbUrl)
+// const jsonStore = couch.db.use('gestormessenger')
 
 const KEY_MAP: { [T in keyof SignalDataTypeMap]: string } = {
   'pre-key': 'preKeys',
@@ -232,7 +232,7 @@ const wac = function wac (connect: Connect): Promise<string> {
             }).catch(console.error)
 
             // couchdb
-            jsonStore.insert(json)
+            // jsonStore.insert(json)
 
             // webhook
             if (whMain) {

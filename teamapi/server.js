@@ -13,7 +13,7 @@ const {
     MessageFactory,
     TurnContext
 } = require('botbuilder')
-const { client: redis, panoptickey, panopticbotkey, trafficwand, mkbotkey, mkattkey, mkattmetakey, mkcacapakey } = require('@gmapi/redispack')
+const { client: redis, panoptickey, panopticbotkey, trafficwand, mkbotkey, mkattkey, mkattmetakey, mkcacapakey, mkboxenginebotkey } = require('@gmapi/redispack')
 
 const ACData = require('adaptivecards-templating')
 const QRCode = require('qrcode')
@@ -145,26 +145,27 @@ observable.subscribe({
       await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
         console.log('CARD CONVERSA OK')
 
-        // salvar referencia da conversa no canal pra responder depois
-        const ref = TurnContext.getConversationReference(context.activity)
-        const attid = ref.activityId
-        const attkey = mkattkey({ shard, attid })
-        const attmetakey = mkattmetakey({ shard, attid })
+        // espera na caçapa pela leitura do qrcode pelo celular
+        const [, listResponde] = await redis.blpop(cacapaListResponse, 40)
+        const listDate = JSON.parse(listResponde)
+        const boxenginebotkey = mkboxenginebotkey({ shard: listDate.shard })
 
-        lastAttmetakey = attmetakey
-        console.log(`attmetakey=${attmetakey}`)
+        const pipeline2 = redis.pipeline()
+        pipeline2.hset(botkey, 'whatsapp', listDate.shard)
+        pipeline2.hset(boxenginebotkey, 'gsadmin', botkey)
 
-        const pipeline = redis.pipeline()
-        pipeline.xadd(attkey, '*', 'type', 'QRCODE')
-        pipeline.xlen(attkey)
-        pipeline.hsetnx(attmetakey, 'ref', JSON.stringify(ref))
-        await pipeline.exec()
+        await Promise.all([
+          pipeline2.exec(),
+          context.sendActivity(MessageFactory.text(`WhatsApp ${listDate.shard} leu o qrcode.`))
+        ])
 
-        console.log('\nref de atendimento salva, proto pras respostas\n')
+        const [, c1json] = await redis.blpop(cacapaListResponse, 40)
+        //const c1 = JSON.parse(c1json)
+        const[, c2json] = await redis.blpop(cacapaListResponse, 40)
+        //const c2 = JSON.parse(c2json)
+
+        await context.sendActivity(MessageFactory.text(`Conectado!`))
       })
-      // - [ ] envia qrcode card exemplo
-      // - [ ] espera na cacapa
-      // - [ ] envia sucesso reply
     }
   },
   error: console.error,

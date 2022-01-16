@@ -179,13 +179,17 @@ class TeamsConversationBot extends TeamsActivityHandler {
             console.log(`shard=${shard}`)
 
             const botkey = mkbotkey({ shard })
-            const plan = await redis.hget(botkey, 'plan')
+            const[plan, whatsapp] = await redis.hmget(botkey, 'plan', 'whatsapp')
             if (plan && plan === 'dev') {
-              const textMessage = `Solicitação enviada para [GSADMIN](https://teams.microsoft.com/l/team/${teamid}/conversations?tenantId=${orgid}) PEGA O CELULAR!!!`
-              await Promise.all([
-                redis.xadd(panopticbotkey, '*', 'type', type, 'shard', shard),
-                context.sendActivity(MessageFactory.text(textMessage))
-              ])
+              if (whatsapp) {
+                context.sendActivity(MessageFactory.text('Já tem. Verificando conexão...'))
+              } else {
+                const textMessage = `Solicitação enviada para [GSADMIN](https://teams.microsoft.com/l/team/${teamid}/conversations?tenantId=${orgid}) PEGA O CELULAR!!!`
+                await Promise.all([
+                  redis.xadd(panopticbotkey, '*', 'type', type, 'shard', shard),
+                  context.sendActivity(MessageFactory.text(textMessage))
+                ])
+              }
             } else {
               await context.sendActivity(MessageFactory.text('Sem bots disponíves...'))
             }
