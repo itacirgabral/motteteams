@@ -132,7 +132,7 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
 
           const pipeline = redis.pipeline()
           pipeline.sadd(bornskey, birthcert)
-          pipeline.rpush(cacapa, JSON.stringify(birthcert))
+          pipeline.rpush(cacapa, birthcert)
           pipeline.expire(cacapa, 90)
 
           pipeline.exec().then(() => {
