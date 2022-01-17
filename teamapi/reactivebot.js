@@ -9,10 +9,6 @@ const {
 } = require('botbuilder');
 const ACData = require('adaptivecards-templating');
 
-const {
-  setTimeout,
-} = require('timers/promises')
-
 const { client: redis, mkbotkey, mkcacapakey, panopticbotkey } = require('@gmapi/redispack')
 const QRCode = require('qrcode')
 
@@ -146,7 +142,8 @@ class TeamsConversationBot extends TeamsActivityHandler {
               TeamsInfo.getMember(context, context.activity.from.id),
               TeamsInfo.getTeamDetails(context, context.activity.channelData.teamsTeamId),
               TeamsInfo.getTeamChannels(context, context.activity.channelData.teamsTeamId),
-              TeamsInfo.getTeamMembers(context, context.activity.channelData.teamsTeamId)
+              TeamsInfo.getTeamMembers(context, context.activity.channelData.teamsTeamId),
+              context.sendActivity(MessageFactory.text('Buscando pelo extrato'))
             ])
             const activity = context.activity
             const info = {
@@ -171,28 +168,36 @@ class TeamsConversationBot extends TeamsActivityHandler {
             await context.sendActivity(message)
           } else if (cutarroba === 'conectar') {
             console.log('conectar')
-            const type = 'botCommandQRCODE'
+            await context.sendActivity(MessageFactory.text('Buscando pelo whatsapp associado'))
 
+            console.log('pre3')
             const teamid = context.activity.channelData.team.id
             const orgid = context.activity.channelData.tenant.id
             const shard = `${orgid}_${teamid}`
-            console.log(`shard=${shard}`)
 
             const botkey = mkbotkey({ shard })
             const[plan, whatsapp] = await redis.hmget(botkey, 'plan', 'whatsapp')
-            if (plan && plan === 'dev') {
-              if (whatsapp) {
-                context.sendActivity(MessageFactory.text('Já tem. Verificando conexão...'))
-              } else {
-                const textMessage = `Solicitação enviada para [GSADMIN](https://teams.microsoft.com/l/team/${teamid}/conversations?tenantId=${orgid}) PEGA O CELULAR!!!`
-                await Promise.all([
-                  redis.xadd(panopticbotkey, '*', 'type', type, 'shard', shard),
-                  context.sendActivity(MessageFactory.text(textMessage))
-                ])
-              }
+
+            let textMessage
+            if (whatsapp) {
+              textMessage = `${whatsapp} Mandando conectar`
+            } else if (plan === 'free') {
+              textMessage = 'Sem bots no momento'
             } else {
-              await context.sendActivity(MessageFactory.text('Sem bots disponíves...'))
+              textMessage = `Solicitação enviada para [GSADMIN](https://teams.microsoft.com/l/team/${
+                teamid
+              }/conversations?tenantId=${
+                orgid
+              }) PEGA O CELULAR!!!`
+
+              setTimeout(() => {
+                const type = 'botCommandQRCODE'
+                redis.xadd(panopticbotkey, '*', 'type', type, 'shard', shard)
+              }, 0)
             }
+
+            await context.sendActivity(MessageFactory.text(textMessage))
+            console.log('pos3')
           } else if (cutarroba === 'fim') {
             console.log('fim')
           } else if (cutarroba === 'fix') {
@@ -204,6 +209,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
           console.log(`cutarroba=${cutarroba}`)
         }
 
+        console.log('message next')
         await next()
       })
   }
