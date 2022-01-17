@@ -4,7 +4,7 @@ import got from 'got'
 import nano from 'nano'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, AuthenticationState  } from '@adiwajshing/baileys-md'
-import { client as redis, mkbookphonekey, mkwebhookkey, mkattkey, mkattmetakey } from '@gmapi/redispack'
+import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 
@@ -205,75 +205,13 @@ const wac = function wac (connect: Connect): Promise<string> {
 
           const [whMain, whTeams, whSpy] = await webhookP
 
+          const pipeline = redis.pipeline()
           cleanMessage.forEach(json => {
-            // redis atendimento
-            const attid = json.from
-            // mkattkey, mkattmetakey
-            const attkey = mkattkey({
-              shard: connect.shard,
-              attid
-            })
-            const attmetakey = mkattmetakey({
-              shard: connect.shard,
-              attid
-            })
-            // salvar no redis, sem duplicar
-            const pipeline = redis.pipeline()
-            pipeline.xadd(attkey, '*', 'type', 'zapfront', 'data', JSON.stringify(json))
-            pipeline.xlen(attkey)
-            pipeline.hsetnx(attmetakey, 'status', JSON.stringify({ stage: 0 }))
-
-            pipeline.exec().then(([[err0, _xid], [err1, attlen], [err2, isFirst]]) => {
-              if (isFirst) {
-                console.log(`iniciando atendimento ${connect.shard}:${attid}`)
-              } else {
-                console.log(`${attlen}-ésima de ${connect.shard}:${attid}`)
-              }
-            }).catch(console.error)
-
-            // couchdb
-            // jsonStore.insert(json)
-
-            // webhook
-            if (whMain) {
-              got.post(whMain, {
-                json
-              }).catch(console.error)
-            }
-
-            //teams
-            if (whTeams) {
-              got.post({
-                url: whTeams,
-                json: {
-                  type: 'message',
-                  attachments: [{
-                    contentType: 'application/vnd.microsoft.card.adaptive',
-                    contentUrl: null,
-                    content:{
-                      $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
-                      type: 'AdaptiveCard',
-                      version: '1.2',
-                      body:[{
-                        type: 'RichTextBlock',
-                        inlines: [{
-                          type: 'TextRun',
-                          text: JSON.stringify(json, null, 2)
-                        }]
-                      }]
-                    }
-                  }]
-                }
-              })
-            }
-
-            // extra webhook
-            if (whSpy) {
-              got.post(whSpy, {
-                json
-              }).catch(console.error)
-            }
+            const type = 'zaphook'
+            const data = JSON.stringify(json)
+            pipeline.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
           })
+          await pipeline.exec()
 
           // TODO
           // [x] salvar no redis

@@ -150,9 +150,12 @@ observable.subscribe({
         const listDate = JSON.parse(listResponde)
         const boxenginebotkey = mkboxenginebotkey({ shard: listDate.shard })
 
+        // listDate.shard whatsapp, vem do l push pop
+        // shard team bot instalação
+
         const pipeline2 = redis.pipeline()
         pipeline2.hset(botkey, 'whatsapp', listDate.shard)
-        pipeline2.hset(boxenginebotkey, 'gsadmin', botkey)
+        pipeline2.hset(boxenginebotkey, 'gsadmin', shard)
 
         await Promise.all([
           pipeline2.exec(),
@@ -166,6 +169,30 @@ observable.subscribe({
 
         await context.sendActivity(MessageFactory.text(`Conectado!`))
       })
+    } else if (bread.type === 'zaphook') {
+      const hook = JSON.parse(bread.data)
+      const attid = `${bread.whatsapp}/${hook.from}`
+      const boxenginebotkey = mkboxenginebotkey({ shard: bread.whatsapp })
+
+      const [gsadminId, subchannelId] = await redis.hmget(boxenginebotkey, 'gsadmin', bread.data.from)
+
+      const attkey = mkattkey({ shard: gsadminId, attid })
+      const attmetakey = mkattmetakey({ shard: gsadminId, attid })
+      
+      const pipeline = redis.pipeline()
+      pipeline.xadd(attkey, '*', 'type', 'zapfront', 'data', JSON.stringify(hook))
+      pipeline.xlen(attkey)
+      pipeline.hsetnx(attmetakey, 'status', JSON.stringify({ stage: 0 }))
+      
+      pipeline.exec().then(([[err0, _xid], [err1, attlen], [err2, isFirst]]) => {
+        if (isFirst) {
+          console.log(`iniciando atendimento ${gsadminId}:${attid}`)
+        } else {
+          console.log(`${attlen}-ésima de ${gsadminId}:${attid}`)
+        }
+      }).catch(console.error)
+
+      console.dir({ hook })
     }
   },
   error: console.error,
