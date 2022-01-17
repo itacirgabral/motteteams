@@ -11,7 +11,7 @@ docker-compose -f docker-compose.redis.yml up -d
 - `cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name lenovo`
 
 ## alfabot
-- `cloudflared tunnel --hostname alfabot.gestormessenger.team --url localhost:3978 --name alfabot`
+- `cloudflared tunnel --hostname alfabot.gestormessenger.team --url localhost:3978 --name alfanotebot`
 
 # HASH
 - ./consul.sh
@@ -72,3 +72,7 @@ task "server" {
  - hardid:hlhlny83jghtfbtv
  - bot:a9e299eb-5fa6-4173-8b91-8906bb8a7d92_19:9QpYcadzIqX4rNhoaZ3lRyTaLIaHoURuUR3A2RHpr0U1@thread.tacv2
  - atendid:
+
+ ```
+ XADD hardid:hlhlny83jghtfbtv:zap:panoptic * hardid hlhlny83jghtfbtv type connect shard 556584469827 cacapa random123
+ ```
