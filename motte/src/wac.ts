@@ -166,7 +166,7 @@ const wac = function wac (connect: Connect): Promise<string> {
 
           const pipeline = redis.pipeline()
           cleanMessage.forEach(json => {
-            if (!json.nada) {
+            if (!json.nada && json.from !== 'status') {
               const type = 'zaphook'
               const data = JSON.stringify(json)
               pipeline.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
