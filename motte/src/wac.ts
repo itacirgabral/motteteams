@@ -1,5 +1,5 @@
 import { fork } from 'child_process'
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, rmSync } from 'fs'
 import got from 'got'
 import nano from 'nano'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
@@ -125,54 +125,13 @@ const wac = function wac (connect: Connect): Promise<string> {
       })
       socket.ev.on ('connection.update', async ({ connection, lastDisconnect }) => {
         console.log(`connection.update ${connection}`)
-        console.dir({ lastDisconnect })
+        console.dir({ connection, lastDisconnect })
         const [whMain, whTeams, whSpy] = await webhookP
-        if (connection || lastDisconnect) {
-          if (whMain) {
-            got.post(whMain, {
-              json: {
-                connection,
-                lastDisconnect
-              }
-            }).catch(console.error)
-          }
-          if (whTeams) {
-            got.post({
-              url: whTeams,
-              json: {
-                type: 'message',
-                attachments: [{
-                  contentType: 'application/vnd.microsoft.card.adaptive',
-                  contentUrl: null,
-                  content:{
-                    $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
-                    type: 'AdaptiveCard',
-                    version: '1.2',
-                    body:[{
-                      type: 'RichTextBlock',
-                      inlines: [{
-                        type: 'TextRun',
-                        text: JSON.stringify({
-                          connection,
-                          lastDisconnect
-                        })
-                      }]
-                    }]
-                  }
-                }]
-              }
-            })
-          }
-          // extra webhook
-          if (whSpy) {
-            got.post(whSpy, {
-              json: {
-                connection,
-                lastDisconnect
-              }
-            }).catch(console.error)
-          }
-        }
+        console.log(JSON.stringify(lastDisconnect, null, 2))
+        // Property 'data' does not exist on type 'Error'.
+        // if (lastDisconnect?.error) {
+        //   console.dir(lastDisconnect.error)
+        // }
       })
       socket.ev.on ('contacts.upsert', async () => {
         console.log('contacts.upsert')
@@ -207,9 +166,11 @@ const wac = function wac (connect: Connect): Promise<string> {
 
           const pipeline = redis.pipeline()
           cleanMessage.forEach(json => {
-            const type = 'zaphook'
-            const data = JSON.stringify(json)
-            pipeline.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
+            if (!json.nada) {
+              const type = 'zaphook'
+              const data = JSON.stringify(json)
+              pipeline.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
+            }
           })
           await pipeline.exec()
 
