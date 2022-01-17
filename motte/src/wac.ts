@@ -277,6 +277,8 @@ const wacPC = async (connectionSwitch: ConnectionSwitch) => {
           console.log('wacP exit')
           console.dir(el)
         })
+      } else {
+        console.log("JÁ TÁ CONECTADO")
       }
       break
     case 'connectionstate':

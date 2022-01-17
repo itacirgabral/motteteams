@@ -74,7 +74,7 @@ server.get('/health', async (req, res) => {
 const bot = new TeamsConversationBot()
 server.post('/api/messages', async (req, res) => {
   console.log(`<< /api/messages >>`)
-  console.dir(req.body)
+  // console.dir(req.body)
   await adapter.process(req, res, (context) => bot.run(context))
 })
 
@@ -143,8 +143,6 @@ observable.subscribe({
       }
 
       await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
-        console.log('CARD CONVERSA OK')
-
         // espera na caçapa pela leitura do qrcode pelo celular
         const [, listResponde] = await redis.blpop(cacapaListResponse, 40)
         const listDate = JSON.parse(listResponde)
@@ -174,19 +172,19 @@ observable.subscribe({
       const attid = `${bread.whatsapp}/${hook.from}`
       const boxenginebotkey = mkboxenginebotkey({ shard: bread.whatsapp })
 
-      const [gsadminId, subchannelId] = await redis.hmget(boxenginebotkey, 'gsadmin', bread.data.from)
+      console.log(`attid=${attid}`)
 
+      const [gsadminId, subchannelId] = await redis.hmget(boxenginebotkey, 'gsadmin', bread.data.from)
       const attkey = mkattkey({ shard: gsadminId, attid })
       const attmetakey = mkattmetakey({ shard: gsadminId, attid })
-      
+
       const pipeline = redis.pipeline()
       pipeline.xadd(attkey, '*', 'type', 'zapfront', 'data', JSON.stringify(hook))
       pipeline.hsetnx(attmetakey, 'status', JSON.stringify({ stage: 0 }))
       pipeline.hget(attmetakey, 'ref')
-      
+
       const [[err0, _xid], [err2, isFirst], [err3, refJSON]] = await pipeline.exec()
       if (isFirst) {
-        console.log(`iniciando atendimento ${gsadminId}:${attid}`)
         const appId = process.env.MicrosoftAppId
         const channelId = 'msteams'
         const serviceUrl = 'https://smba.trafficmanager.net/br/'
@@ -194,6 +192,7 @@ observable.subscribe({
 
         const botkey = mkbotkey({ shard: gsadminId})
         const botref = await redis.hget(botkey, 'ref')
+
         const conversationParameters = {
           isGroup: true,
           channelData: JSON.parse(botref),
@@ -209,7 +208,6 @@ observable.subscribe({
         await adapter.continueConversationAsync(process.env.MicrosoftAppId, ref, async turnContext => {
           await turnContext.sendActivity(MessageFactory.text(JSON.stringify(hook, null, 2)))
         })
-
       }
     }
   },

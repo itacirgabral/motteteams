@@ -166,11 +166,10 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const message = MessageFactory.attachment(card)
 
             await context.sendActivity(message)
-          } else if (cutarroba === 'conectar') {
-            console.log('conectar')
+          } else if (cutarroba === 'qrcode') {
+            console.log('qrcode')
             await context.sendActivity(MessageFactory.text('Buscando pelo whatsapp associado'))
 
-            console.log('pre3')
             const teamid = context.activity.channelData.team.id
             const orgid = context.activity.channelData.tenant.id
             const shard = `${orgid}_${teamid}`
@@ -197,7 +196,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
             }
 
             await context.sendActivity(MessageFactory.text(textMessage))
-            console.log('pos3')
           } else if (cutarroba === 'fim') {
             console.log('fim')
           } else if (cutarroba === 'fix') {
@@ -208,8 +206,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
         } else {
           console.log(`cutarroba=${cutarroba}`)
         }
-
-        console.log('message next')
         await next()
       })
   }

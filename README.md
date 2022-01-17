@@ -11,7 +11,8 @@ docker-compose -f docker-compose.redis.yml up -d
 - `cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name lenovo`
 
 ## alfabot
-- `cloudflared tunnel --hostname alfabot.gestormessenger.team --url localhost:3978 --name alfanotebot`
+- `cloudflared tunnel --hostname alfabot.gestormessenger.team --url localhost:3978 --name alfanotebot -f`
+- `cloudflared tunnel --hostname alfabot.gestormessenger.team --url localhost:3978 --name alfaorgabot -f`
 
 # HASH
 - ./consul.sh
