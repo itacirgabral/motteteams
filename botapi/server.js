@@ -181,18 +181,36 @@ observable.subscribe({
       
       const pipeline = redis.pipeline()
       pipeline.xadd(attkey, '*', 'type', 'zapfront', 'data', JSON.stringify(hook))
-      pipeline.xlen(attkey)
       pipeline.hsetnx(attmetakey, 'status', JSON.stringify({ stage: 0 }))
+      pipeline.hget(attmetakey, 'ref')
       
-      pipeline.exec().then(([[err0, _xid], [err1, attlen], [err2, isFirst]]) => {
-        if (isFirst) {
-          console.log(`iniciando atendimento ${gsadminId}:${attid}`)
-        } else {
-          console.log(`${attlen}-ésima de ${gsadminId}:${attid}`)
-        }
-      }).catch(console.error)
+      const [[err0, _xid], [err2, isFirst], [err3, refJSON]] = await pipeline.exec()
+      if (isFirst) {
+        console.log(`iniciando atendimento ${gsadminId}:${attid}`)
+        const appId = process.env.MicrosoftAppId
+        const channelId = 'msteams'
+        const serviceUrl = 'https://smba.trafficmanager.net/br/'
+        const audience = undefined
 
-      console.dir({ hook })
+        const botkey = mkbotkey({ shard: gsadminId})
+        const botref = await redis.hget(botkey, 'ref')
+        const conversationParameters = {
+          isGroup: true,
+          channelData: JSON.parse(botref),
+          activity: MessageFactory.text(`${attid}\n${JSON.stringify(hook, null, 2)}`)
+        }
+
+        await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async turnContext => {
+          const ref = TurnContext.getConversationReference(turnContext.activity)
+          await redis.hset(attmetakey, 'ref', JSON.stringify(ref))
+        })
+      } else {
+        const ref = JSON.parse(refJSON)
+        await adapter.continueConversationAsync(process.env.MicrosoftAppId, ref, async turnContext => {
+          await turnContext.sendActivity(MessageFactory.text(JSON.stringify(hook, null, 2)))
+        })
+
+      }
     }
   },
   error: console.error,
