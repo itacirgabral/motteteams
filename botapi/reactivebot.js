@@ -133,8 +133,10 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const text = context.activity.text.trim()
         console.log(`text=${text}`)
 
-        const cutarroba = text.slice(text.indexOf(' ') + 1).trim()
-        const isCommand = cutarroba.lastIndexOf(' ') === -1
+        const firstBlank = text.indexOf(' ')
+        const secondBlank = text.indexOf(' ', text.indexOf(' ') + 1)
+        const cutarroba = secondBlank === -1 ? text.slice(firstBlank + 1) : text.slice(firstBlank + 1, secondBlank)
+        const isCommand = cutarroba.indexOf(' ') === -1
         if (isCommand) {
           if (cutarroba === 'extrato') {
             console.log('extrato')
@@ -200,15 +202,21 @@ class TeamsConversationBot extends TeamsActivityHandler {
             }
 
             await context.sendActivity(MessageFactory.text(textMessage))
-          } else if (cutarroba === 'fim') {
-            console.log('fim')
+          } else if (cutarroba === 'respondercomtextosimples:') {
+            console.log('respondercomtextosimples:')
+            // - [ ] descobrir pra quem tá respondendo
+            // - [ ] enviar comando no redis e avisar no canal
+
+            console.log('context.activity.conversation')
+            console.log(JSON.stringify(context.activity.conversation, null, 2))
+
           } else if (cutarroba === 'fix') {
             console.log('fix')
           } else {
-            console.log('nenhum comando')
+            console.log(`nenhum comando para ${cutarroba}`)
           }
         } else {
-          console.log(`cutarroba=${cutarroba}`)
+          console.log(`text=${text}`)
         }
         await next()
       })
