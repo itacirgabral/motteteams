@@ -9,7 +9,7 @@ const {
 } = require('botbuilder');
 const ACData = require('adaptivecards-templating');
 
-const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptickey } = require('@gmapi/redispack')
+const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptickey, mkboxenginebotkey } = require('@gmapi/redispack')
 const QRCode = require('qrcode')
 
 const hardid = process.env.HARDID
@@ -207,8 +207,21 @@ class TeamsConversationBot extends TeamsActivityHandler {
             // - [ ] descobrir pra quem tá respondendo
             // - [ ] enviar comando no redis e avisar no canal
 
-            console.log('context.activity.conversation')
-            console.log(JSON.stringify(context.activity.conversation, null, 2))
+            const boxenginebotkey = mkboxenginebotkey({
+              shard: context.activity.conversation.id
+            })
+
+            const boxenginebot = await redis.hmget(boxenginebotkey, 'whatsapp', 'chat')
+            console.dir(boxenginebot)
+            const [whatsapp, chat] = boxenginebot
+            await context.sendActivity(MessageFactory.text(`respondendo em whatsapp=${whatsapp} para o chat=${chat}`))
+
+            setTimeout(async () => {
+
+            const type = 'respondercomtextosimples'
+            console.log(`panoptickey=${panoptickey} shard=${whatsapp} chat=${chat}`)
+            await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'chat', chat)
+            }, 0)
 
           } else if (cutarroba === 'fix') {
             console.log('fix')

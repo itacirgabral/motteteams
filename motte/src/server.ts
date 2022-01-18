@@ -61,6 +61,13 @@ const mkServer = function mkServer () {
               })
             }
             break
+          case 'respondercomtextosimples':
+            // BUG SEM VALIDAÇÃO
+            // qual whats
+            // qual destinatário
+            // qual mensagem
+            console.log('respondercomtextosimples')
+            break
           default:
             console.log('redis:stream -> switch ?')
             console.error(bread)

@@ -13,7 +13,17 @@ const {
     MessageFactory,
     TurnContext
 } = require('botbuilder')
-const { client: redis, panoptickey, panopticbotkey, trafficwand, mkbotkey, mkattkey, mkattmetakey, mkcacapakey, mkboxenginebotkey } = require('@gmapi/redispack')
+const {
+  client: redis,
+  panoptickey,
+  panopticbotkey,
+  trafficwand,
+  mkbotkey,
+  mkattkey,
+  mkattmetakey,
+  mkcacapakey,
+  mkboxenginebotkey
+} = require('@gmapi/redispack')
 
 const ACData = require('adaptivecards-templating')
 const QRCode = require('qrcode')
@@ -115,7 +125,11 @@ observable.subscribe({
       const mitochondria = 'TEAMSBOT'
       const type = 'signupconnection'
       const cacapaListResponse = mkcacapakey()
+
+      // bug
       const instancia = '556584469827'
+      // PRECISA BUSCAR O WHATSAPP DA EQUIPE
+
       const url = ' '
       await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', instancia, 'mitochondria', mitochondria, 'cacapa', cacapaListResponse, 'url', url)
 
@@ -201,7 +215,11 @@ observable.subscribe({
 
         await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async turnContext => {
           const ref = TurnContext.getConversationReference(turnContext.activity)
-          await redis.hset(attmetakey, 'ref', JSON.stringify(ref))
+          const boxenginebotkey = mkboxenginebotkey({ shard: ref.activityId })
+          const pipeline = redis.pipeline()
+          pipeline.hmset(boxenginebotkey, 'whatsapp', bread.whatsapp, 'chat', hook.from) // const attid = `${bread.whatsapp}/${hook.from}`
+          pipeline.hset(attmetakey, 'ref', JSON.stringify(ref))
+          await pipeline.exec()
         })
       } else {
         const ref = JSON.parse(refJSON)
