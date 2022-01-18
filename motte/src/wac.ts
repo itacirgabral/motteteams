@@ -3,10 +3,20 @@ import { readFileSync, writeFileSync, rmSync } from 'fs'
 import got from 'got'
 import nano from 'nano'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
-import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, AuthenticationState  } from '@adiwajshing/baileys-md'
+import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, AuthenticationState, WASocket } from '@adiwajshing/baileys-md'
 import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
+
+
+let whatsappsocket: WASocket
+process.on('message', (message) => {
+  console.log(process.env.SERVICE || 'MAIN')
+  console.dir(message)
+  console.dir(whatsappsocket.sendMessage)
+  // const id = 'abcd@s.whatsapp.net'
+  // const sentMsg  = await sock.sendMessage(id, { text: 'oh hello there' })
+})
 
 interface SendTextMessage {
   type: "sendTextMessage";
@@ -136,12 +146,12 @@ const wac = function wac (connect: Connect): Promise<string> {
       socket.ev.on ('connection.update', async ({ connection, lastDisconnect }) => {
         console.log(`connection.update ${connection}`)
         console.dir({ connection, lastDisconnect })
-        const [whMain, whTeams, whSpy] = await webhookP
-        console.log(JSON.stringify(lastDisconnect, null, 2))
-        // Property 'data' does not exist on type 'Error'.
-        // if (lastDisconnect?.error) {
-        //   console.dir(lastDisconnect.error)
-        // }
+        // const [whMain, whTeams, whSpy] = await webhookP
+
+        // deixa o socket servido pro IPC fácil
+        if(!whatsappsocket && connection === 'open') {
+          whatsappsocket = socket
+        }
       })
       socket.ev.on ('contacts.upsert', async () => {
         console.log('contacts.upsert')
@@ -318,7 +328,22 @@ const wacPC = async (connectionActions: ConnectionActions) => {
       }
       break
     case 'sendTextMessage':
-      console.dir(connectionActions)
+      if (patchpanel.has(connectionActions.shard)) {
+        console.log(`patchpanel[${connectionActions.shard}]`)
+        const { type, hardid, shard, to, msg, cacapa } = connectionActions
+        const blueCable = patchpanel.get(shard)
+        const wacP = blueCable.wacP
+        wacP.send({
+          type,
+          hardid,
+          shard,
+          to,
+          msg,
+          cacapa
+        })
+      } else {
+        console.log('sendTextMessage não tá conectado')
+      }
       break
   }
 }

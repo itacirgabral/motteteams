@@ -6,10 +6,6 @@ import { wac } from './wac'
 
 const isMain = !process.env.SERVICE
 
-process.on('message', (message) => {
-  console.log(`MAIN <- ${message}`)
-})
-
 // Pocesso principal
 if (isMain) {
   console.log('isMain')
@@ -40,7 +36,7 @@ if (isMain) {
    * INICIA NOVO PROCESSO
    * PARA CADASTRAR NOVA CONEXÃO
    */
-  
+
   // Recuperando variáveis na ENV
   const signupconnection: Signupconnection = {
     type: 'signupconnection',
