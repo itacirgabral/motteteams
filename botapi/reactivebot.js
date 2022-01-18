@@ -9,7 +9,7 @@ const {
 } = require('botbuilder');
 const ACData = require('adaptivecards-templating');
 
-const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptictkey } = require('@gmapi/redispack')
+const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptickey } = require('@gmapi/redispack')
 const QRCode = require('qrcode')
 
 const hardid = process.env.HARDID
@@ -180,7 +180,8 @@ class TeamsConversationBot extends TeamsActivityHandler {
             let textMessage
             if (whatsapp) {
               const type = 'connect'
-              redis.xadd(panoptictkey, '*', 'type', type, 'shard', shard, 'cacapa', 'random123')
+              console.log(`panoptickey=${panoptickey} shard=${whatsapp}`)
+              redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'cacapa', 'random123')
               // TODO enviar para panoptictBOTkey
               textMessage = `${whatsapp} Mandando conectar`
             } else if (plan === 'free') {
