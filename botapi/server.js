@@ -126,12 +126,11 @@ observable.subscribe({
       const type = 'signupconnection'
       const cacapaListResponse = mkcacapakey()
 
-      // bug
-      const instancia = '556584469827'
-      // PRECISA BUSCAR O WHATSAPP DA EQUIPE
+      const botkey = mkbotkey({ shard })
+      const whatsapp = await redis.hget(botkey, 'whatsapp')
 
       const url = ' '
-      await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', instancia, 'mitochondria', mitochondria, 'cacapa', cacapaListResponse, 'url', url)
+      await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'mitochondria', mitochondria, 'cacapa', cacapaListResponse, 'url', url)
 
       // espera na caçapa pelo código
       const listResponde = await redis.blpop(cacapaListResponse, 40)
@@ -148,7 +147,8 @@ observable.subscribe({
       const card = CardFactory.adaptiveCard(adaptiveCard)
       const message = MessageFactory.attachment(card)
 
-      const botkey = mkbotkey({ shard })
+      // criado em cima para pegar o zap da equipe
+      // const botkey = mkbotkey({ shard })
       const botref = await redis.hget(botkey, 'ref')
       const conversationParameters = {
         isGroup: true,
