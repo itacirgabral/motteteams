@@ -13,6 +13,10 @@ process.on('message', (message) => {
 // Pocesso principal
 if (isMain) {
   console.log('isMain')
+  /**
+   * INICIA NOVO PROCESSO
+   * PRINCIPAL DO CONDADO
+   */
   const { inBound } = mkServer()
 
   const healthPort = Number(process.env.HEALT_PORT) || 8538
@@ -32,6 +36,11 @@ if (isMain) {
   // Serviço Novo QR CODE
 } else if (process.env.SERVICE === 'zygote') {
   console.log('isZygote')
+  /**
+   * INICIA NOVO PROCESSO
+   * PARA CADASTRAR NOVA CONEXÃO
+   */
+  
   // Recuperando variáveis na ENV
   const signupconnection: Signupconnection = {
     type: 'signupconnection',
@@ -60,7 +69,10 @@ if (isMain) {
     })
     .catch(console.error)
 } else if (process.env.SERVICE === 'wac') {
-  console.log('isWAC')
+  /**
+   * INICIA NOVO PROCESSO
+   * PARA MANTER UMA CONEXÃO
+   */
 
   const connect: Connect = {
     type: 'connect',

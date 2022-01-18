@@ -8,7 +8,16 @@ import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey } from '@
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 
-type ConnectionSwitch = Connect | Disconnect | Connectionstate
+interface SendTextMessage {
+  type: "sendTextMessage";
+  hardid: string;
+  shard: string;
+  message: string;
+  cacapa: string;
+}
+
+
+type ConnectionActions = Connect | Disconnect | Connectionstate | SendTextMessage
 
 // const coudhdbUrl = process.env.COUCHDB_URL || 'http://localhost:5984'
 // console.log(`coudhdbUrl=${coudhdbUrl}`)
@@ -212,16 +221,16 @@ const wac = function wac (connect: Connect): Promise<string> {
 
       // socket.fetchPrivacySettings()
     } else {
-      rej("connectionSwitch.type === 'connect' && isConnect(connectionSwitch)")
+      rej("connectionActions.type === 'connect' && isConnect(connectionActions)")
     }
   })
 }
 
-const wacPC = async (connectionSwitch: ConnectionSwitch) => {
-  switch (connectionSwitch.type) {
+const wacPC = async (connectionActions: ConnectionActions) => {
+  switch (connectionActions.type) {
     case 'connect':
-      if (isConnAdm.isConnect(connectionSwitch) && !patchpanel.has(connectionSwitch.shard)) {
-        const { type, hardid, shard, cacapa } = connectionSwitch
+      if (isConnAdm.isConnect(connectionActions) && !patchpanel.has(connectionActions.shard)) {
+        const { type, hardid, shard, cacapa } = connectionActions
         console.log('wacPC connect')
 
         const wacP = fork('./src/index', {
@@ -237,7 +246,7 @@ const wacPC = async (connectionSwitch: ConnectionSwitch) => {
           }
         })
 
-        patchpanel.set(connectionSwitch.shard, {
+        patchpanel.set(connectionActions.shard, {
           connected: false,
           connecting: true,
           wacP
@@ -245,7 +254,7 @@ const wacPC = async (connectionSwitch: ConnectionSwitch) => {
 
         wacP.on('close', el => {
           console.log('wacP close')
-          patchpanel.delete(connectionSwitch.shard)
+          patchpanel.delete(connectionActions.shard)
           console.dir(el)
         })
         wacP.on('disconnect',  () => {
@@ -283,8 +292,8 @@ const wacPC = async (connectionSwitch: ConnectionSwitch) => {
       break
     case 'connectionstate':
       console.log('wacPC connectionstate')
-      if (isConnAdm.isConnectionstate(connectionSwitch)) {
-        const { type, shard, hardid, cacapa } = connectionSwitch
+      if (isConnAdm.isConnectionstate(connectionActions)) {
+        const { type, shard, hardid, cacapa } = connectionActions
         if (patchpanel.has(shard)) {
           const blueCable = patchpanel.get(shard)
           console.log(`connectionstate=${blueCable?.connected ? 'connected' : 'connecting'}`)
@@ -294,9 +303,9 @@ const wacPC = async (connectionSwitch: ConnectionSwitch) => {
       }
       break
     case 'disconnect':
-      if (isConnAdm.isDisconnect(connectionSwitch)) {
+      if (isConnAdm.isDisconnect(connectionActions)) {
         // mata processo
-        const { type, hardid, shard, cacapa } = connectionSwitch
+        const { type, hardid, shard, cacapa } = connectionActions
         if (patchpanel.has(shard)) {
           const blueCable = patchpanel.get(shard)
           if (blueCable && (blueCable.connected || blueCable.connecting)) {

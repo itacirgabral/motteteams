@@ -99,17 +99,20 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
         const timestamp = (new Date()).toLocaleString('pt-BR')
         const newFileName = `./auth_info_multi/${me}.json`
         const isNotNew = existsSync(newFileName)
+        
+        // está tentando sobreescrever
         if (isNotNew) {
           const birth: Birth = {
             type: 'jwt',
             mitochondria,
-            shard: 'nops',
+            shard: 'nops',// retorna dizendo que deu errado
             jwt,
             timestamp,
             qrcode: lastQrcode,
             auth
           }
 
+          // remove o arquivo temporário
           rmSync(zygotetempcreds)
 
           if (process.send) {
@@ -222,7 +225,6 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
 
   })
 }
-
 
 const zygotePC = function zygotePC (signupconnection: Signupconnection): Promise<Birth> {
   return new Promise((res, rej) => {
