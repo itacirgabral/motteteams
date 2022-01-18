@@ -212,15 +212,15 @@ class TeamsConversationBot extends TeamsActivityHandler {
             })
 
             const boxenginebot = await redis.hmget(boxenginebotkey, 'whatsapp', 'chat')
-            console.dir(boxenginebot)
             const [whatsapp, chat] = boxenginebot
-            await context.sendActivity(MessageFactory.text(`respondendo em whatsapp=${whatsapp} para o chat=${chat}`))
+            const msg = text.slice(text.indexOf(' ', text.indexOf(' ') + 1) + 1)
+            await context.sendActivity(MessageFactory.text(`respondendo pelo whatsapp=${whatsapp} para o chat=${chat} a mensagem=${msg}`))
 
             setTimeout(async () => {
 
             const type = 'respondercomtextosimples'
-            console.log(`panoptickey=${panoptickey} shard=${whatsapp} chat=${chat}`)
-            await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'chat', chat)
+            await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'chat', chat, 'msg', msg)
+            // console.log(`panoptickey=${panoptickey} shard=${whatsapp} chat=${chat} msg=${msg}`)
             }, 0)
 
           } else if (cutarroba === 'fix') {
