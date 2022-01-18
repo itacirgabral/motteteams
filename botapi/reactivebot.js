@@ -204,8 +204,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
             await context.sendActivity(MessageFactory.text(textMessage))
           } else if (cutarroba === 'respondercomtextosimples:') {
             console.log('respondercomtextosimples:')
-            // - [ ] descobrir pra quem tá respondendo
-            // - [ ] enviar comando no redis e avisar no canal
 
             const boxenginebotkey = mkboxenginebotkey({
               shard: context.activity.conversation.id
@@ -217,10 +215,9 @@ class TeamsConversationBot extends TeamsActivityHandler {
             await context.sendActivity(MessageFactory.text(`respondendo pelo whatsapp=${whatsapp} para o chat=${chat} a mensagem=${msg}`))
 
             setTimeout(async () => {
-
-            const type = 'respondercomtextosimples'
-            await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'to', chat, 'msg', msg, 'cacap', 'random123')
-            // console.log(`panoptickey=${panoptickey} shard=${whatsapp} chat=${chat} msg=${msg}`)
+              const type = 'respondercomtextosimples'
+              await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'to', chat, 'msg', msg, 'cacap', 'random123')
+              // console.log(`panoptickey=${panoptickey} shard=${whatsapp} chat=${chat} msg=${msg}`)
             }, 0)
 
           } else if (cutarroba === 'fix') {

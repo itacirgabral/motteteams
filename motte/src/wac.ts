@@ -4,18 +4,25 @@ import got from 'got'
 import nano from 'nano'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, AuthenticationState, WASocket } from '@adiwajshing/baileys-md'
-import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey } from '@gmapi/redispack'
+import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, Bread } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 
 
 let whatsappsocket: WASocket
-process.on('message', (message) => {
+process.on('message', async (message: Bread) => {
   console.log(process.env.SERVICE || 'MAIN')
   console.dir(message)
   console.dir(whatsappsocket.sendMessage)
-  // const id = 'abcd@s.whatsapp.net'
-  // const sentMsg  = await sock.sendMessage(id, { text: 'oh hello there' })
+
+  if (message.type === 'sendTextMessage' && !!whatsappsocket) {
+    const { to, msg, cacapa } = message
+    const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
+    const id = `${to}@${posfix}`
+    console.log(`id=${id}`)
+    const sentmessage = await whatsappsocket.sendMessage(id, { text: msg })
+    // console.dir({ sentmessage })
+  }
 })
 
 interface SendTextMessage {
