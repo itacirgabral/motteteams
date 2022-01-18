@@ -76,4 +76,5 @@ task "server" {
 
  ```
  XADD hardid:hlhlny83jghtfbtv:zap:panoptic * hardid hlhlny83jghtfbtv type connect shard 556584469827 cacapa random123
+ XADD hardid:hlhlny83jghtfbtv:zap:panoptic * hardid hlhlny83jghtfbtv type respondercomtextosimples shard 556584469827 to 556599375661 msg "Olá você" cacapa random123
  ```

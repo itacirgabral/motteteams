@@ -219,7 +219,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
             setTimeout(async () => {
 
             const type = 'respondercomtextosimples'
-            await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'chat', chat, 'msg', msg)
+            await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'to', chat, 'msg', msg, 'cacap', 'random123')
             // console.log(`panoptickey=${panoptickey} shard=${whatsapp} chat=${chat} msg=${msg}`)
             }, 0)
 

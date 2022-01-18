@@ -12,7 +12,8 @@ interface SendTextMessage {
   type: "sendTextMessage";
   hardid: string;
   shard: string;
-  message: string;
+  to: string;
+  msg: string;
   cacapa: string;
 }
 
@@ -315,6 +316,9 @@ const wacPC = async (connectionActions: ConnectionActions) => {
           }
         }
       }
+      break
+    case 'sendTextMessage':
+      console.dir(connectionActions)
       break
   }
 }

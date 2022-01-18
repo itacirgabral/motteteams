@@ -62,11 +62,19 @@ const mkServer = function mkServer () {
             }
             break
           case 'respondercomtextosimples':
-            // BUG SEM VALIDAÇÃO
-            // qual whats
-            // qual destinatário
-            // qual mensagem
             console.log('respondercomtextosimples')
+            /**
+             * GAMBIARRA PRO THIAGO
+             * APRESENTAR QUINTA FEIRA
+             */
+            wacPC({
+              type: 'sendTextMessage',
+              hardid: bread.hardid,
+              shard: bread.shard,
+              to: bread.to,
+              msg: bread.msg,
+              cacapa: bread.cacapa
+            })
             break
           default:
             console.log('redis:stream -> switch ?')
