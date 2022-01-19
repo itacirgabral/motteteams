@@ -9,8 +9,9 @@ const {
 } = require('botbuilder');
 const ACData = require('adaptivecards-templating');
 
-const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptickey, mkboxenginebotkey } = require('@gmapi/redispack')
-const QRCode = require('qrcode')
+const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptickey, mkboxenginebotkey, mkattkey, mkattmetakey } = require('@gmapi/redispack')
+const QRCode = require('qrcode');
+const { Contains } = require('adaptive-expressions/lib/builtinFunctions');
 
 const hardid = process.env.HARDID
 
@@ -223,8 +224,43 @@ class TeamsConversationBot extends TeamsActivityHandler {
             } else {
               await context.sendActivity(MessageFactory.text('Esta conversa já foi encerrada'))
             }
-          } else if (cutarroba === 'fix') {
-            console.log('fix')
+          } else if (cutarroba === 'finalizar') {
+            console.log('finalizar')
+
+            await context.sendActivity(MessageFactory.text('Ok humano, finalizar-lo-ei'))
+            const conversationId = context.activity.conversation.id
+
+            const teamid = context.activity.channelData.team.id
+            const orgid = context.activity.channelData.tenant.id
+            const shard = `${orgid}_${teamid}`
+
+            console.dir(context.activity)
+
+            setTimeout(async () => {
+              const boxenginebotkey = mkboxenginebotkey({
+                shard: conversationId
+              })
+
+              const boxenginebot = await redis.hmget(boxenginebotkey, 'whatsapp', 'chat')
+              const [whatsapp, chat] = boxenginebot
+              const attid = `${whatsapp}/${chat}`
+
+              const attkey = mkattkey({
+                shard,
+                attid
+              })
+              const attmetakey = mkattmetakey({
+                shard,
+                attid
+              })
+
+              const result = await redis
+                .multi()
+                .del(boxenginebotkey)
+                .del(attkey)
+                .del(attmetakey)
+                .exec()
+            }, 0)
           } else {
             console.log(`nenhum comando para ${cutarroba}`)
           }
