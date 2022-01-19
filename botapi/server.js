@@ -109,6 +109,11 @@ server.get('/pah', async (req, res) => {
   }
 })
 
+const appId = process.env.MicrosoftAppId
+const channelId = 'msteams'
+const serviceUrl = 'https://smba.trafficmanager.net/br/'
+const audience = undefined
+
 // active bot
 const replay = false
 const observable = trafficwand({ redis, streamkey: panopticbotkey, replay })
@@ -117,10 +122,6 @@ observable.subscribe({
     if (bread.type === 'botCommandQRCODE') {
       console.log('botCommandQRCODE')
       const { shard, cacapa } = bread
-      const appId = process.env.MicrosoftAppId
-      const channelId = 'msteams'
-      const serviceUrl = 'https://smba.trafficmanager.net/br/'
-      const audience = undefined
 
       const mitochondria = 'TEAMSBOT'
       const type = 'signupconnection'
@@ -174,12 +175,12 @@ observable.subscribe({
           context.sendActivity(MessageFactory.text(`WhatsApp [${listDate.shard}](https://wa.me/${listDate.shard}) leu o qrcode.`))
         ])
 
-        const [, c1json] = await redis.blpop(cacapaListResponse, 40)
-        //const c1 = JSON.parse(c1json)
-        const[, c2json] = await redis.blpop(cacapaListResponse, 40)
-        //const c2 = JSON.parse(c2json)
-
-        await context.sendActivity(MessageFactory.text(`Conectado!`))
+        // dar essa noticia pelo avisador geral no toggle do baileys
+        // const [, c1json] = await redis.blpop(cacapaListResponse, 40)
+        // //const c1 = JSON.parse(c1json)
+        // const[, c2json] = await redis.blpop(cacapaListResponse, 40)
+        // //const c2 = JSON.parse(c2json)
+        // await context.sendActivity(MessageFactory.text(`Conectado!`))
       })
     } else if (bread.type === 'zaphook') {
       const hook = JSON.parse(bread.data)
@@ -227,6 +228,24 @@ observable.subscribe({
           await turnContext.sendActivity(MessageFactory.text(JSON.stringify(hook, null, 2)))
         })
       }
+    } else if (bread.type === 'zuckershark') {
+      const connection = bread.connection
+      const whatsapp = bread.whatsapp
+      const boxenginebotkey = mkboxenginebotkey({ shard: whatsapp })
+
+      const orgaid_teamid = await redis.hget(boxenginebotkey, 'gsadmin')
+      const botkey = mkbotkey({ shard: orgaid_teamid })
+
+      const botref = await redis.hget(botkey, 'ref')
+      const conversationParameters = {
+        isGroup: true,
+        channelData: JSON.parse(botref),
+        activity: MessageFactory.text(`${whatsapp} ${connection}`)
+      }
+
+      await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
+        //
+      })
     }
   },
   error: console.error,

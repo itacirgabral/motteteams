@@ -155,6 +155,12 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.dir({ connection, lastDisconnect })
         // const [whMain, whTeams, whSpy] = await webhookP
 
+        if (connection) {
+          panopticbotkey
+          const type = 'zuckershark'
+          await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
+        }
+
         // deixa o socket servido pro IPC fácil
         if(!whatsappsocket && connection === 'open') {
           whatsappsocket = socket
@@ -164,7 +170,6 @@ const wac = function wac (connect: Connect): Promise<string> {
           //
           const err = lastDisconnect.error
           const data = lastDisconnect.date
-          console.log(JSON.stringify({ err, data }, null, 2))
 
           const err2 = err as any
           const statusCode = err2?.output?.statusCode
