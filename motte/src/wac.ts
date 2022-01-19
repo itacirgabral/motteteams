@@ -159,6 +159,15 @@ const wac = function wac (connect: Connect): Promise<string> {
         if(!whatsappsocket && connection === 'open') {
           whatsappsocket = socket
         }
+
+        if (connection === 'close') {
+          //
+          const err = lastDisconnect.error
+          const data = lastDisconnect.date
+          console.log(JSON.stringify({ err, data }, null, 2))
+          console.log('## process.exit(1) ##')
+          process.exit(1)
+        }
       })
       socket.ev.on ('contacts.upsert', async () => {
         console.log('contacts.upsert')
