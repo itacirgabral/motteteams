@@ -212,14 +212,17 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const boxenginebot = await redis.hmget(boxenginebotkey, 'whatsapp', 'chat')
             const [whatsapp, chat] = boxenginebot
             const msg = text.slice(text.indexOf(' ', text.indexOf(' ') + 1) + 1)
-            await context.sendActivity(MessageFactory.text(`respondendo pelo whatsapp=${whatsapp} para o chat=${chat} a mensagem=${msg}`))
 
-            setTimeout(async () => {
-              const type = 'respondercomtextosimples'
-              await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'to', chat, 'msg', msg, 'cacap', 'random123')
-              // console.log(`panoptickey=${panoptickey} shard=${whatsapp} chat=${chat} msg=${msg}`)
-            }, 0)
-
+            if (!!whatsapp && !!chat) {
+              await context.sendActivity(MessageFactory.text(`respondendo pelo whatsapp=${whatsapp} para o chat=${chat} a mensagem=${msg}`))
+              setTimeout(async () => {
+                const type = 'respondercomtextosimples'
+                await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'to', chat, 'msg', msg, 'cacap', 'random123')
+                // console.log(`panoptickey=${panoptickey} shard=${whatsapp} chat=${chat} msg=${msg}`)
+              }, 0)
+            } else {
+              await context.sendActivity(MessageFactory.text('Esta conversa já foi encerrada'))
+            }
           } else if (cutarroba === 'fix') {
             console.log('fix')
           } else {
