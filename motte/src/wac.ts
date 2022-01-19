@@ -4,7 +4,7 @@ import got from 'got'
 import nano from 'nano'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, AuthenticationState, WASocket } from '@adiwajshing/baileys-md'
-import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, Bread } from '@gmapi/redispack'
+import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 
@@ -165,6 +165,26 @@ const wac = function wac (connect: Connect): Promise<string> {
           const err = lastDisconnect.error
           const data = lastDisconnect.date
           console.log(JSON.stringify({ err, data }, null, 2))
+
+          const err2 = err as any
+          const statusCode = err2?.output?.statusCode
+          if (statusCode === 401) {
+            console.log(`apagando ${connect.auth}`)
+            rmSync(connect.auth)
+            const boxenginebotkey = mkboxenginebotkey({
+              shard: connect.shard
+            })
+
+            const orgid_teamid = await redis.hget(boxenginebotkey, 'gsadmin')
+            const botkey = mkbotkey({
+              shard: orgid_teamid
+            })
+            await redis
+              .pipeline()
+              .hdel(botkey, 'whatsapp')
+              .del(boxenginebotkey)
+          }
+
           console.log('## process.exit(1) ##')
           process.exit(1)
         }
