@@ -171,7 +171,7 @@ observable.subscribe({
 
         await Promise.all([
           pipeline2.exec(),
-          context.sendActivity(MessageFactory.text(`WhatsApp ${listDate.shard} leu o qrcode.`))
+          context.sendActivity(MessageFactory.text(`WhatsApp [${listDate.shard}](https://wa.me/${listDate.shard}) leu o qrcode.`))
         ])
 
         const [, c1json] = await redis.blpop(cacapaListResponse, 40)
