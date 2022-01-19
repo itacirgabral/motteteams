@@ -134,11 +134,15 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const text = context.activity.text.trim()
         console.log(`text=${text}`)
 
+        const orgid = context.activity?.channelData?.tenant?.id
+        const teamid = context.activity?.channelData?.team?.id
+        const isTeamChannel = !!orgid && !!teamid
+
         const firstBlank = text.indexOf(' ')
         const secondBlank = text.indexOf(' ', text.indexOf(' ') + 1)
         const cutarroba = secondBlank === -1 ? text.slice(firstBlank + 1) : text.slice(firstBlank + 1, secondBlank)
         const isCommand = cutarroba.indexOf(' ') === -1
-        if (isCommand) {
+        if (isTeamChannel && isCommand) {
           if (cutarroba === 'extrato') {
             console.log('extrato')
             const [memberInfo, teamsInfo, teamsChannels, teamsMembers] = await Promise.all([
@@ -173,8 +177,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
             console.log('qrcode')
             await context.sendActivity(MessageFactory.text('Buscando pelo whatsapp associado'))
 
-            const teamid = context.activity.channelData.team.id
-            const orgid = context.activity.channelData.tenant.id
             const shard = `${orgid}_${teamid}`
 
             const botkey = mkbotkey({ shard })
