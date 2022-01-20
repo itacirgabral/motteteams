@@ -97,6 +97,72 @@ const capaAtendimentoTemplate = new ACData.Template({
   '$schema': 'http://adaptivecards.io/schemas/adaptive-card.json',
   'version': '1.3'
 })
+const mensagemAtendimentoTemplate = new ACData.Template({
+  "type": "AdaptiveCard",
+  "body": [
+      {
+          "type": "FactSet",
+          "facts": [
+              {
+                  "title": "Tipo",
+                  "value": "${type}"
+              },
+              {
+                  "title": "Resposta",
+                  "value": "${reply}"
+              },
+              {
+                  "title": "Encaminhado",
+                  "value": "${forward}"
+              }
+          ],
+          "height": "stretch",
+          "separator": true
+      },
+      {
+          "type": "RichTextBlock",
+          "inlines": [
+              {
+                  "type": "TextRun",
+                  "text": "${text}"
+              }
+          ],
+          "spacing": "Small",
+          "separator": true,
+          "height": "stretch"
+      }
+  ]
+})
+
+const takeText = (hook) => {
+  let text
+  switch (hook.type) {
+    case 'textMessage':
+      text = hook.msg
+      break
+    case 'locationMessage':
+      text = hook.description
+      break
+    case 'contactMessage':
+      text = hook.vcard
+      break
+    case 'imageMessage':
+      text = hook.caption
+      break
+    case 'videoMessage':
+      text = hook.caption
+      break
+    case 'documentMessage':
+      text = hook.filename
+      break
+    case 'audioMessage':
+      text = `${hook.seconds}s`
+      break
+    default:
+      text = ''
+  }
+  return text
+}
 
 const appId = process.env.MicrosoftAppId
 const channelId = 'msteams'
@@ -219,7 +285,19 @@ const it = observable.subscribe({
           const ref = TurnContext.getConversationReference(turnContext.activity)
           const boxenginebotkey = mkboxenginebotkey({ shard: ref.activityId })
 
-          await turnContext.sendActivity(MessageFactory.text(JSON.stringify(hook, null, 2)))
+          const text = takeText(hook)
+
+          const adaptiveCard = mensagemAtendimentoTemplate.expand({
+            $root: {
+              type: hook.type,
+              reply: hook.reply ? 'sim' : 'não',
+              forward: hook.forward ? 'sim' : 'não',
+              text
+          }})
+          const card = CardFactory.adaptiveCard(adaptiveCard)
+          const message = MessageFactory.attachment(card)
+
+          await turnContext.sendActivity(message)
 
           const pipeline = redis.pipeline()
           pipeline.hmset(boxenginebotkey, 'whatsapp', bread.whatsapp, 'chat', hook.from) // const attid = `${bread.whatsapp}/${hook.from}`
@@ -229,7 +307,18 @@ const it = observable.subscribe({
       } else {
         const ref = JSON.parse(refJSON)
         await adapter.continueConversationAsync(process.env.MicrosoftAppId, ref, async turnContext => {
-          await turnContext.sendActivity(MessageFactory.text(JSON.stringify(hook, null, 2)))
+          const text = takeText(hook)
+          const adaptiveCard = mensagemAtendimentoTemplate.expand({
+            $root: {
+              type: hook.type,
+              reply: hook.reply ? 'sim' : 'não',
+              forward: hook.forward ? 'sim' : 'não',
+              text
+          }})
+          const card = CardFactory.adaptiveCard(adaptiveCard)
+          const message = MessageFactory.attachment(card)
+
+          await turnContext.sendActivity(message)
         })
       }
     } else if (bread.type === 'zuckershark') {
