@@ -29,14 +29,8 @@ const {
 const { TeamsConversationBot } = require('./reactivebot')
 const activebot = require('./activebot')
 
-const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
-    MicrosoftAppId: process.env.MicrosoftAppId,
-    MicrosoftAppPassword: process.env.MicrosoftAppPassword,
-    MicrosoftAppType: process.env.MicrosoftAppType,
-    MicrosoftAppTenantId: process.env.MicrosoftAppTenantId
-})
-const botFrameworkAuthentication = createBotFrameworkAuthenticationFromConfiguration(null, credentialsFactory)
-const adapter = new CloudAdapter(botFrameworkAuthentication);
+const adapter = require('./msteamsAdapter')
+
 adapter.onTurnError = async (context, error) => {
     console.log('\n [onTurnError] unhandled error:')
     console.dir(error)
