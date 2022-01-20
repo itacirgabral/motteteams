@@ -10,6 +10,14 @@ const {
   mkboxenginebotkey
 } = require('@gmapi/redispack')
 
+const {
+  CardFactory,
+  MessageFactory,
+  TurnContext
+} = require('botbuilder')
+
+const adapter = require('./msteamsAdapter')
+
 const ACData = require('adaptivecards-templating')
 const QRCode = require('qrcode')
 
@@ -25,6 +33,69 @@ const image64T = new ACData.Template({
   }],
   $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
   version: '1.3'
+})
+
+const capaAtendimentoTemplate = new ACData.Template({
+  'type': 'AdaptiveCard',
+  'body': [
+      {
+          'type': 'TextBlock',
+          'weight': 'Bolder',
+          'size': 'Medium',
+          'text': '${title}'
+      },
+      {
+          'type': 'ColumnSet',
+          'columns': [
+              {
+                  'type': 'Column',
+                  'items': [
+                      {
+                          'type': 'Image',
+                          'style': 'Person',
+                          'url': 'https://app.gestorsistemas.com/assets/icons/icon-192x192.png',
+                          'size': 'Small'
+                      }
+                  ],
+                  'width': 'auto'
+              },
+              {
+                  'type': 'Column',
+                  'items': [
+                      {
+                          'type': 'TextBlock',
+                          'weight': 'Bolder',
+                          'wrap': true,
+                          'text': '${subtitle}'
+                      },
+                      {
+                          'type': 'TextBlock',
+                          'spacing': 'None',
+                          'isSubtle': true,
+                          'wrap': true,
+                          'text': 'Em 01/01/2022 00:00:00'
+                      }
+                  ],
+                  'width': 'stretch'
+              }
+          ]
+      },
+      {
+          'type': 'FactSet',
+          'facts': [
+              {
+                  'title': 'Whatsapp:',
+                  'value': '${whatsapp}'
+              },
+              {
+                  'title': 'Documento:',
+                  'value': '${documento}'
+              }
+          ]
+      }
+  ],
+  '$schema': 'http://adaptivecards.io/schemas/adaptive-card.json',
+  'version': '1.3'
 })
 
 const appId = process.env.MicrosoftAppId
@@ -126,15 +197,30 @@ const it = observable.subscribe({
         const botkey = mkbotkey({ shard: gsadminId})
         const botref = await redis.hget(botkey, 'ref')
 
+        const adaptiveCard = capaAtendimentoTemplate.expand({
+          $root: {
+            title: bread.whatsapp,
+            subtitle: hook.from,
+            whatsapp: '+55-65-9999-9999',
+            documento: '00.000.000/0000-00'
+          }
+        })
+        const card = CardFactory.adaptiveCard(adaptiveCard)
+        const message = MessageFactory.attachment(card)
+
         const conversationParameters = {
           isGroup: true,
           channelData: JSON.parse(botref),
-          activity: MessageFactory.text(`${attid}\n${JSON.stringify(hook, null, 2)}`)
+          //activity: MessageFactory.text(`${attid}\n${JSON.stringify(hook, null, 2)}`)
+          activity: message
         }
 
         await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async turnContext => {
           const ref = TurnContext.getConversationReference(turnContext.activity)
           const boxenginebotkey = mkboxenginebotkey({ shard: ref.activityId })
+
+          await turnContext.sendActivity(MessageFactory.text(JSON.stringify(hook, null, 2)))
+
           const pipeline = redis.pipeline()
           pipeline.hmset(boxenginebotkey, 'whatsapp', bread.whatsapp, 'chat', hook.from) // const attid = `${bread.whatsapp}/${hook.from}`
           pipeline.hset(attmetakey, 'ref', JSON.stringify(ref))
