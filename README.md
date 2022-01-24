@@ -78,3 +78,9 @@ task "server" {
  XADD hardid:hlhlny83jghtfbtv:zap:panoptic * hardid hlhlny83jghtfbtv type connect shard 556584469827 cacapa random123
  XADD hardid:hlhlny83jghtfbtv:zap:panoptic * hardid hlhlny83jghtfbtv type respondercomtextosimples shard 556584469827 to 556599375661 msg "Olá você" cacapa random123
  ```
+
+## ssh redis
+This will open a tunnel from the remote port 6379 (redis standard) to your local port 9999.
+```
+ssh -L 9999:localhost:6379 [remoteuser]@[remotehost]
+```
