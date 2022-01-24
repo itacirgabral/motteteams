@@ -6,7 +6,7 @@
     "types": "npx ts-node src/schema/build.ts",
     "docs": "npx typedoc && npx http-server docs",
     "dev": "npx node-dev -r dotenv/config src/index.ts",
-    "start": "npx ts-node -r dotenv/config src/index.ts",
+    "start": "node -r dotenv/config dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
