@@ -176,11 +176,10 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
     socket.ev.on ('chats.delete', id => {
       console.log(`chats.delete ${id}`)
     })
-    socket.ev.on ('chats.set', ({ chats, messages }) => {
+    socket.ev.on ('chats.set', ({ chats }) => {
       console.log('chats.set')
       console.dir({
-        chats,
-        messages
+        chats
       })
     })
     socket.ev.on ('chats.update', partialChat => {
@@ -202,10 +201,6 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
     socket.ev.on ('groups.update', partialGroupInfo => {
       console.log('groups.update')
       console.dir(partialGroupInfo)
-    })
-    socket.ev.on ('message-info.update', messageInfo => {
-      console.log('message-info.update')
-      console.dir(messageInfo)
     })
     socket.ev.on ('messages.delete', (idxs) => {
       console.log('messages.delete')

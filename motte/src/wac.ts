@@ -135,7 +135,7 @@ const wac = function wac (connect: Connect): Promise<string> {
       socket.ev.on ('chats.delete', id => {
         console.log(`chats.delete ${id}`)
       })
-      socket.ev.on ('chats.set', ({ chats, messages }) => {
+      socket.ev.on ('chats.set', ({ chats }) => {
         console.log('chats.set')
 
         const pipeline = redis.pipeline()
@@ -205,10 +205,10 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.log('groups.update')
         console.dir(partialGroupInfo)
       })
-      socket.ev.on ('message-info.update', messageInfo => {
-        console.log('message-info.update')
-        console.dir(messageInfo)
-      })
+      // socket.ev.on ('message-info.update', messageInfo => {
+      //   console.log('message-info.update')
+      //   console.dir(messageInfo)
+      // })
       socket.ev.on ('messages.delete', (idxs) => {
         console.log('messages.delete')
         console.dir(idxs)
@@ -239,7 +239,7 @@ const wac = function wac (connect: Connect): Promise<string> {
           // [x] salvar no redis
           // [x] salvar no couchdb
           // [ ] salvar nos minio
-        } else if (type === 'prepend') {
+        } else if (type === 'append') {
           const chatMessages = messages
             .filter(el => !el.messageStubType)
             .filter(el => !el.status)
@@ -263,8 +263,6 @@ const wac = function wac (connect: Connect): Promise<string> {
             }
             await pipeline.exec()
           }
-        } else if (type === 'append') {
-          //
         }
       })
       socket.ev.on ('presence.update', ({ id, presences }) => {
