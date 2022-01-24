@@ -40,17 +40,6 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
-  couchdb:
-    image: couchdb
-    restart: unless-stopped
-    volumes:
-      - couchdbdata:/opt/couchdb/data
-    ports:
-      - "5984:5984"
-    environment:
-      COUCHDB_USER: admin
-      COUCHDB_PASSWORD: wntqaUSDder0WkD0qKM9wM4YodgrLoQu
-      NODENAME: mainjsondb
 volumes:
   redisdata:
     external: true

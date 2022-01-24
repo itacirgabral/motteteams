@@ -1,0 +1,8 @@
+version: '3.5'
+services:
+  botappi:
+    build: ./botappi
+    ports:
+      - "3979:3979"
+    environment:
+      PORT: "3979"

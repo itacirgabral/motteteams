@@ -1,7 +1,6 @@
 import { fork } from 'child_process'
 import { readFileSync, writeFileSync, rmSync } from 'fs'
 import got from 'got'
-import nano from 'nano'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, AuthenticationState, WASocket } from '@adiwajshing/baileys-md'
 import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey } from '@gmapi/redispack'
@@ -36,11 +35,6 @@ interface SendTextMessage {
 
 
 type ConnectionActions = Connect | Disconnect | Connectionstate | SendTextMessage
-
-// const coudhdbUrl = process.env.COUCHDB_URL || 'http://localhost:5984'
-// console.log(`coudhdbUrl=${coudhdbUrl}`)
-// const couch = nano(coudhdbUrl)
-// const jsonStore = couch.db.use('gestormessenger')
 
 const KEY_MAP: { [T in keyof SignalDataTypeMap]: string } = {
   'pre-key': 'preKeys',
