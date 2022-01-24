@@ -2,8 +2,6 @@ require('dotenv').config({
   path: require('path').join(__dirname, '.env')
 });
 
-const hardid = process.env.HARDID
-
 const restify = require('restify')
 const {
     CardFactory,

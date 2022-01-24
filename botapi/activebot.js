@@ -21,6 +21,8 @@ const adapter = require('./msteamsAdapter')
 const ACData = require('adaptivecards-templating')
 const QRCode = require('qrcode')
 
+const hardid = process.env.HARDID
+
 const image64T = new ACData.Template({
   type: 'AdaptiveCard',
   body: [{
