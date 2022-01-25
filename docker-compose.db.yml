@@ -8,6 +8,16 @@ services:
       - redisdata:/data
     ports:
       - "6379:6379"
+  botappi:
+    build:
+      context: ./botapi
+      # dockerfile: ./botapi/Dockerfile
+    ports:
+      - "3979:3979"
+    environment:
+      PORT: "3979"
+    command:
+      ['npm', 'start']
   # redisinsight:
   #   image: redislabs/redisinsight
   #   restart: unless-stopped

@@ -6,3 +6,5 @@ services:
       - "3979:3979"
     environment:
       PORT: "3979"
+    commands:
+      ['npm', 'start']

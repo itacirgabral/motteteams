@@ -3,10 +3,11 @@
     "version": "1.0.0",
     "description": "Teams whatsapp integration",
     "author": "itacirgabral",
-    "main": "server.js",
+    "main": "src/index.js",
+    "bin": "src/index.js",
     "scripts": {
-        "start": "node ./server.js",
-        "watch": "npx node-dev ./server.js",
+        "start": "node ./src/index.js",
+        "watch": "npx node-dev ./src/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "tunnel": "cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name zapbot --config ./cloudflarer.cert.json"
     },
