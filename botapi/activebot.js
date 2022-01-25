@@ -135,6 +135,49 @@ const mensagemAtendimentoTemplate = new ACData.Template({
       }
   ]
 })
+const mensagemMidiaAtendimentoTemplate = new ACData.Template({
+  "type": "AdaptiveCard",
+  "body": [
+      {
+          "type": "FactSet",
+          "facts": [
+              {
+                  "title": "Tipo",
+                  "value": "${type}"
+              },
+              {
+                  "title": "Resposta",
+                  "value": "${reply}"
+              },
+              {
+                  "title": "Encaminhado",
+                  "value": "${forward}"
+              }
+          ],
+          "height": "stretch",
+          "separator": true
+      },
+      {
+          "type": "RichTextBlock",
+          "inlines": [
+              {
+                  "type": "TextRun",
+                  "text": "${text}"
+              }
+          ],
+          "spacing": "Small",
+          "separator": true,
+          "height": "stretch"
+      }
+  ],
+  "actions": [
+    {
+        "type": "Action.OpenUrl",
+        "title": "Download",
+        "url": "${url}"
+    }
+  ]
+})
 
 const takeText = (hook) => {
   let text
@@ -165,6 +208,7 @@ const takeText = (hook) => {
   }
   return text
 }
+const midiaMessage = ['imageMessage', 'videoMessage', 'documentMessage', 'audioMessage']
 
 const appId = process.env.MicrosoftAppId
 const channelId = 'msteams'
@@ -245,6 +289,7 @@ const it = observable.subscribe({
       const boxenginebotkey = mkboxenginebotkey({ shard: bread.whatsapp })
 
       console.log(`attid=${attid}`)
+      console.log(JSON.stringify(hook, null, 2))
 
       const [gsadminId, subchannelId] = await redis.hmget(boxenginebotkey, 'gsadmin', bread.data.from)
       const attkey = mkattkey({ shard: gsadminId, attid })
@@ -289,13 +334,26 @@ const it = observable.subscribe({
 
           const text = takeText(hook)
 
-          const adaptiveCard = mensagemAtendimentoTemplate.expand({
-            $root: {
-              type: hook.type,
-              reply: hook.reply ? 'sim' : 'não',
-              forward: hook.forward ? 'sim' : 'não',
-              text
-          }})
+          let adaptiveCard
+          if (midiaMessage.includes(hook.type)) {
+            adaptiveCard = mensagemMidiaAtendimentoTemplate.expand({
+              $root: {
+                type: hook.type,
+                reply: hook.reply ? 'sim' : 'não',
+                forward: hook.forward ? 'sim' : 'não',
+                text,
+                url: 'https://minio.gestormessenger.team/orgid/teamid/wid'
+            }})
+
+          } else {
+            adaptiveCard = mensagemAtendimentoTemplate.expand({
+              $root: {
+                type: hook.type,
+                reply: hook.reply ? 'sim' : 'não',
+                forward: hook.forward ? 'sim' : 'não',
+                text
+            }})
+          }
           const card = CardFactory.adaptiveCard(adaptiveCard)
           const message = MessageFactory.attachment(card)
 
@@ -310,13 +368,27 @@ const it = observable.subscribe({
         const ref = JSON.parse(refJSON)
         await adapter.continueConversationAsync(process.env.MicrosoftAppId, ref, async turnContext => {
           const text = takeText(hook)
-          const adaptiveCard = mensagemAtendimentoTemplate.expand({
-            $root: {
-              type: hook.type,
-              reply: hook.reply ? 'sim' : 'não',
-              forward: hook.forward ? 'sim' : 'não',
-              text
-          }})
+
+          let adaptiveCard
+          if (midiaMessage.includes(hook.type)) {
+            adaptiveCard = mensagemMidiaAtendimentoTemplate.expand({
+              $root: {
+                type: hook.type,
+                reply: hook.reply ? 'sim' : 'não',
+                forward: hook.forward ? 'sim' : 'não',
+                text,
+                url: `https://file.gestormessenger.team/${hook.wid}`
+            }})
+
+          } else {
+            adaptiveCard = mensagemAtendimentoTemplate.expand({
+              $root: {
+                type: hook.type,
+                reply: hook.reply ? 'sim' : 'não',
+                forward: hook.forward ? 'sim' : 'não',
+                text
+            }})
+          }
           const card = CardFactory.adaptiveCard(adaptiveCard)
           const message = MessageFactory.attachment(card)
 

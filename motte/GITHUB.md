@@ -99,7 +99,7 @@ const zygotePC = function zygotePC (signupconnection: Signupconnection): Promise
   // (...)
   return new Promise((res, rej) => {
     const { userAccount, webhook } = signupconnection
-    const zgt = fork('./src/index', {
+    const zgt = fork('./dist/index', {
       env: {
         ...process.env,
         SERVICE: 'zygote',

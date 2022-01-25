@@ -1,5 +1,6 @@
 import { fork } from 'child_process'
 import { readFileSync, writeFileSync, rmSync } from 'fs'
+import path from 'path'
 import got from 'got'
 import fs from 'fs'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
@@ -240,22 +241,22 @@ const wac = function wac (connect: Connect): Promise<string> {
               pipeline.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
 
               if (midiaMessage.includes(json.type)) {
-                console.log(`é pra baixar idx=${idx}`)
-                console.log(JSON.stringify(messages[idx], null, 2))
+                console.log(`é pra baixar wid=${json.wid}`)
+                // console.log(JSON.stringify(messages[idx], null, 2))
 
                 const original = messages[idx]?.message[json.type]
                 if (original) {
                   const stream = await downloadContentFromMessage(original, midiaMessageMap[json.type])
-                  stream.pipe(fs.createWriteStream(String(Math.random())))
-                }
 
+                  const filename = path.join(__dirname, '..', '..', 'uploads', json.wid)
+                  console.log(`filename=${filename}`)
+                  stream.pipe(fs.createWriteStream(filename))
+                }
               }
 
             }
           })
           await pipeline.exec()
-
-
 
           // [ ] salvar nos minio
         } else if (type === 'append') {
