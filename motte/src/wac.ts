@@ -1,13 +1,20 @@
 import { fork } from 'child_process'
 import { readFileSync, writeFileSync, rmSync } from 'fs'
 import got from 'got'
-import nano from 'nano'
+import fs from 'fs'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
-import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, AuthenticationState, WASocket } from '@adiwajshing/baileys-md'
+import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, downloadContentFromMessage, WASocket } from '@adiwajshing/baileys-md'
 import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 
+const midiaMessage = ['imageMessage', 'videoMessage', 'documentMessage', 'audioMessage']
+const midiaMessageMap = {
+  imageMessage: 'image',
+  videoMessage: 'video',
+  documentMessage: 'document',
+  audioMessage: 'audio'
+}
 
 let whatsappsocket: WASocket
 process.on('message', async (message: Bread) => {
@@ -226,18 +233,30 @@ const wac = function wac (connect: Connect): Promise<string> {
           const [whMain, whTeams, whSpy] = await webhookP
 
           const pipeline = redis.pipeline()
-          cleanMessage.forEach(json => {
+          cleanMessage.forEach(async (json, idx) => {
             if (!json.nada && json.from !== 'status') {
               const type = 'zaphook'
               const data = JSON.stringify(json)
               pipeline.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
+
+              if (midiaMessage.includes(json.type)) {
+                console.log(`é pra baixar idx=${idx}`)
+                console.log(JSON.stringify(messages[idx], null, 2))
+
+                const original = messages[idx]?.message[json.type]
+                if (original) {
+                  const stream = await downloadContentFromMessage(original, midiaMessageMap[json.type])
+                  stream.pipe(fs.createWriteStream(String(Math.random())))
+                }
+
+              }
+
             }
           })
           await pipeline.exec()
 
-          // TODO
-          // [x] salvar no redis
-          // [x] salvar no couchdb
+
+
           // [ ] salvar nos minio
         } else if (type === 'append') {
           const chatMessages = messages
@@ -263,6 +282,9 @@ const wac = function wac (connect: Connect): Promise<string> {
             }
             await pipeline.exec()
           }
+        } else {
+          console.log('any ')
+          console.log(JSON.stringify({ messages, type }, null, 2))
         }
       })
       socket.ev.on ('presence.update', ({ id, presences }) => {
