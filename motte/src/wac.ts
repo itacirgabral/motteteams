@@ -283,7 +283,7 @@ const wacPC = async (connectionActions: ConnectionActions) => {
         const { type, hardid, shard, cacapa } = connectionActions
         console.log('wacPC connect')
 
-        const wacP = fork('./src/index', {
+        const wacP = fork('./dist/index', {
           env: {
             ...process.env,
             SERVICE: 'wac',
