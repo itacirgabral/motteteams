@@ -241,15 +241,11 @@ const wac = function wac (connect: Connect): Promise<string> {
               pipeline.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
 
               if (midiaMessage.includes(json.type)) {
-                console.log(`é pra baixar wid=${json.wid}`)
-                // console.log(JSON.stringify(messages[idx], null, 2))
-
                 const original = messages[idx]?.message[json.type]
                 if (original) {
                   const stream = await downloadContentFromMessage(original, midiaMessageMap[json.type])
 
                   const filename = path.join(__dirname, '..', '..', 'uploads', json.wid)
-                  console.log(`filename=${filename}`)
                   stream.pipe(fs.createWriteStream(filename))
                 }
               }

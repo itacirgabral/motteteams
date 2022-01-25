@@ -289,7 +289,7 @@ const it = observable.subscribe({
       const boxenginebotkey = mkboxenginebotkey({ shard: bread.whatsapp })
 
       console.log(`attid=${attid}`)
-      console.log(JSON.stringify(hook, null, 2))
+      // console.log(JSON.stringify(hook, null, 2))
 
       const [gsadminId, subchannelId] = await redis.hmget(boxenginebotkey, 'gsadmin', bread.data.from)
       const attkey = mkattkey({ shard: gsadminId, attid })
