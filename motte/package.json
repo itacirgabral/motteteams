@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "build": "npx tsc",
-    "dev": "npx node-dev -r dotenv/config src/index.ts",
-    "start": "node -r dotenv/config dist/index.js",
+    "dev": "npx ts-node -r dotenv/config src/index.ts",
+    "start": "tsc && node -r dotenv/config dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -20,7 +20,7 @@
     "fluent-json-schema": "^3.0.1",
     "got": "^11.8.2",
     "jsonwebtoken": "^8.5.1",
-    "minio": "^7.0.19",
+    "minio": "^7.0.26",
     "nano": "^9.0.5",
     "prom-client": "^14.0.1",
     "rxjs": "^7.4.0"
