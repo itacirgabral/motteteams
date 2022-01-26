@@ -45,8 +45,11 @@ const downloadJsonButton = new ACData.Template({
   version: '1.3'
 })
 
-const reserva = new ACData.Template({
+const reservaTemplate = new ACData.Template({
   type: 'AdaptiveCard',
+  msteams: {
+    width: "Full"
+  },
   body: [
     {
         type: "TextBlock",
@@ -76,7 +79,12 @@ const reserva = new ACData.Template({
   actions: [
     {
         type: "Action.Submit",
-        title: "Reservar"
+        title: "Reservar",
+        data: {
+          msteams: {
+              type: "task/fetch"
+          }
+      }
     }
   ],
   $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
@@ -294,7 +302,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
             }, 0)
           } else if (cutarroba === 'reservar') {
             console.log('reservar')
-            const adaptiveCard = reserva.expand()
+            const adaptiveCard = reservaTemplate.expand()
             const card = CardFactory.adaptiveCard(adaptiveCard)
             const message = MessageFactory.attachment(card)
             await context.sendActivity(message)
@@ -307,8 +315,29 @@ class TeamsConversationBot extends TeamsActivityHandler {
         await next()
       })
   }
-  handleAdaptiveCardAction(context) {
-    console.log(JSON.stringify(context), null, 2)
+
+  handleTeamsTaskModuleFetch(context, taskModuleRequest) {
+    console.log('handleTeamsTaskModuleFetch')
+    //console.log(JSON.stringify(taskModuleRequest, null, 2))
+    // https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-actions?tabs=json#adaptive-cards-actions
+
+    return {
+      task: {
+        type: 'continue',
+        value: {
+          card: CardFactory.adaptiveCard({
+            version: '1.3',
+            type: 'AdaptiveCard',
+            body: [
+              {
+                type: 'TextBlock',
+                text: 'Providenciarei'
+              }
+            ]
+          })
+        }
+      }
+    }
   }
 }
 
