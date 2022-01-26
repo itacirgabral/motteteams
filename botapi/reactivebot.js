@@ -26,15 +26,6 @@ const textBig = new ACData.Template({
   $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
   version: '1.3'
 })
-const image64T = new ACData.Template({
-  type: 'AdaptiveCard',
-  body: [{
-    type: 'Image',
-    url: '${url}'
-  }],
-  $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
-  version: '1.3'
-})
 const downloadJsonButton = new ACData.Template({
   type: 'AdaptiveCard',
   body: [{
@@ -48,6 +39,44 @@ const downloadJsonButton = new ACData.Template({
         "title": "Download",
         "iconUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPOyiihETr7PTfqdd_1DPMJmGHv_ALrhLcYXHCCzmd3_UKcnCyE0_7OPfFRNJSLjjyTWY&usqp=CAU",
         'url': '${url}'
+    }
+  ],
+  $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+  version: '1.3'
+})
+
+const reserva = new ACData.Template({
+  type: 'AdaptiveCard',
+  body: [
+    {
+        type: "TextBlock",
+        text: "Escolha abaixo qual chat deve ter suas mensagens sincronizadas com este canal",
+        wrap: true
+    },
+    {
+        type: "Input.ChoiceSet",
+        choices: [
+            {
+                title: "Administrativo",
+                value: "adm"
+            },
+            {
+                title: "Apenas Mensagens de Grupos",
+                value: "grp"
+            },
+            {
+                title: "Mensagens",
+                value: "tds"
+            }
+        ],
+        placeholder: "CHAT",
+        id: "chatlist"
+    }
+  ],
+  actions: [
+    {
+        type: "Action.Submit",
+        title: "Reservar"
     }
   ],
   $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
@@ -131,7 +160,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
       })
 
       this.onMessage(async (context, next) => {
-        const text = context.activity.text.trim()
+        const text = context.activity?.text?.trim() ?? ''
         console.log(`text=${text}`)
 
         const orgid = context.activity?.channelData?.tenant?.id
@@ -263,6 +292,12 @@ class TeamsConversationBot extends TeamsActivityHandler {
                 .del(attmetakey)
                 .exec()
             }, 0)
+          } else if (cutarroba === 'reservar') {
+            console.log('reservar')
+            const adaptiveCard = reserva.expand()
+            const card = CardFactory.adaptiveCard(adaptiveCard)
+            const message = MessageFactory.attachment(card)
+            await context.sendActivity(message)
           } else {
             console.log(`nenhum comando para ${cutarroba}`)
           }
@@ -271,6 +306,9 @@ class TeamsConversationBot extends TeamsActivityHandler {
         }
         await next()
       })
+  }
+  handleAdaptiveCardAction(context) {
+    console.log(JSON.stringify(context), null, 2)
   }
 }
 
