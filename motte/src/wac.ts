@@ -233,6 +233,8 @@ const wac = function wac (connect: Connect): Promise<string> {
 
           const [whMain, whTeams, whSpy] = await webhookP
 
+          const mreadreceipts = []
+
           const pipeline = redis.pipeline()
           cleanMessage.forEach(async (json, idx) => {
             if (!json.nada && json.from !== 'status') {
@@ -240,19 +242,28 @@ const wac = function wac (connect: Connect): Promise<string> {
               const data = JSON.stringify(json)
               pipeline.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
 
+              const jidfrom = json.from.length > 14 ? `${json.from}@g.us` : `${json.from}@s.whatsapp.net`
+              const participant = json.author ? `${json.author}@s.whatsapp.net` : undefined
+              mreadreceipts.push(socket.sendReadReceipt(jidfrom, participant, [json.wid]))
+
               if (midiaMessage.includes(json.type)) {
                 const original = messages[idx]?.message[json.type]
                 if (original) {
-                  const stream = await downloadContentFromMessage(original, midiaMessageMap[json.type])
-
+                  setTimeout(() => {
+                  const streamP = downloadContentFromMessage(original, midiaMessageMap[json.type])
                   const filename = path.join(__dirname, '..', '..', 'uploads', json.wid)
-                  stream.pipe(fs.createWriteStream(filename))
+                  streamP.then(stream => stream.pipe(fs.createWriteStream(filename)))
+                  }, 0)
                 }
               }
 
             }
           })
-          await pipeline.exec()
+
+          await Promise.all([
+            ...mreadreceipts,// notifica o whatsapp que lemos as mensagens
+            pipeline.exec()// envia pro teams as novas mensagens
+          ])
 
           // [ ] salvar nos minio
         } else if (type === 'append') {
