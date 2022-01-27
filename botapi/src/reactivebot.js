@@ -10,8 +10,7 @@ const {
 const ACData = require('adaptivecards-templating');
 
 const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptickey, mkboxenginebotkey, mkattkey, mkattmetakey } = require('@gmapi/redispack')
-const QRCode = require('qrcode');
-const { Contains } = require('adaptive-expressions/lib/builtinFunctions');
+const QRCode = require('qrcode')
 
 const hardid = process.env.HARDID
 
@@ -78,11 +77,40 @@ const reservaTemplate = new ACData.Template({
   ],
   actions: [
     {
-        type: "Action.Submit",
-        title: "Reservar",
-        data: {
-          msteams: {
-              type: "task/fetch"
+      type: "Action.Submit",
+      title: "Reservar",
+      data: {
+        msteams: {
+          type: "task/fetch"
+        }
+      }
+    }
+  ],
+  $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+  version: '1.3'
+})
+
+const loginTemplate = new ACData.Template({
+  type: 'AdaptiveCard',
+  msteams: {
+    width: "Full"
+  },
+  body: [
+    {
+      "type": "TextBlock",
+      "size": "Medium",
+      "weight": "Bolder",
+      "text": "Preciso do seu login, clique no botão abaixo:"
+    }
+  ],
+  actions: [
+    {
+      "type": "Action.Submit",
+      "title": "login",
+      "data": {
+          "msteams": {
+              "type": "signin",
+              "value": "https://signin.com"
           }
       }
     }
@@ -181,6 +209,12 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const isCommand = cutarroba.indexOf(' ') === -1
         if (isTeamChannel && isCommand) {
           if (cutarroba === 'extrato') {
+            console.log('extrato')
+            const adaptiveCard = loginTemplate.expand()
+            const card = CardFactory.adaptiveCard(adaptiveCard)
+            const message = MessageFactory.attachment(card)
+            await context.sendActivity(message)
+          } else if (cutarroba === 'extrato_backup') {
             console.log('extrato')
             const [memberInfo, teamsInfo, teamsChannels, teamsMembers] = await Promise.all([
               TeamsInfo.getMember(context, context.activity.from.id),
