@@ -99,7 +99,7 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
         const timestamp = (new Date()).toLocaleString('pt-BR')
         const newFileName = `./auth_info_multi/${me}.json`
         const isNotNew = existsSync(newFileName)
-        
+
         // está tentando sobreescrever
         if (isNotNew) {
           const birth: Birth = {
@@ -224,7 +224,7 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
 const zygotePC = function zygotePC (signupconnection: Signupconnection): Promise<Birth> {
   return new Promise((res, rej) => {
     const { type, hardid, mitochondria, shard, url, cacapa } = signupconnection
-    const zgt = fork('./src/index', {
+    const zgt = fork('./dist/index', {
       env: {
         ...process.env,
         SERVICE: 'zygote',
