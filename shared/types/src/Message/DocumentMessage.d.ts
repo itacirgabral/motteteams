@@ -11,6 +11,7 @@ export interface DocumentMessage {
   mimetype: string;
   bytes: string;
   filename: string;
+  url?: string;
   author?: string;
   reply?: string;
   forward?: boolean;
