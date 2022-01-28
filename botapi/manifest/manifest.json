@@ -1,0 +1,72 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.11/MicrosoftTeams.schema.json",
+  "version": "1.1.3",
+  "manifestVersion": "1.11",
+  "id": "1170dd10-6e6b-43c8-930a-97320387f8830",
+  "packageName": "com.package.name",
+  "name": {
+    "short": "GB",
+    "full": "Gestor Messenger Teams APP"
+  },
+  "developer": {
+    "name": "Gestor Sistemas",
+    "mpnId": "6470173",
+    "websiteUrl": "https://gestormessenger.team/",
+    "privacyUrl": "https://gestormessenger.team/#/privacy",
+    "termsOfUseUrl": "https://gestormessenger.team/#/termsofuse"
+  },
+  "description": {
+    "short": "WhatsApp Bridge ALFA",
+    "full": "Gestor Messenger Teams. Manager multiple whatsapp chats inside channel's message threads."
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#007869",
+  "bots": [
+    {
+      "botId": "9d47cf0f-f218-478b-93dd-5bb4e7363de8",
+      "scopes": [
+        "personal",
+        "team"
+      ],
+      "commandLists": [
+        {
+          "commands": [
+            {
+              "title": "extrato",
+              "description": "Informações"
+            },
+            {
+              "title": "finalizar",
+              "description": "Termina esta conversa"
+            },
+            {
+              "title": "qrcode",
+              "description": "Reconecta ao WhatsApp ou gera novo QRCode"
+            },
+            {
+              "title": "reservar",
+              "description": "Vincula grupo ou contato neste canal"
+            },
+            {
+              "title": "respondercomtextosimples:",
+              "description": "A mensagem que será enviada para o whatsapp"
+            }
+          ],
+          "scopes": [
+            "team"
+          ]
+        }
+      ],
+      "isNotificationOnly": false,
+      "supportsFiles": true
+    }
+  ],
+  "validDomains": [],
+  "devicePermissions": [
+    "notifications",
+    "openExternal"
+  ]
+}
