@@ -199,6 +199,8 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const text = context.activity?.text?.trim() ?? ''
         console.log(`text=${text}`)
 
+        
+
         const orgid = context.activity?.channelData?.tenant?.id
         const teamid = context.activity?.channelData?.team?.id
         const isTeamChannel = !!orgid && !!teamid
@@ -208,13 +210,13 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const cutarroba = secondBlank === -1 ? text.slice(firstBlank + 1) : text.slice(firstBlank + 1, secondBlank)
         const isCommand = cutarroba.indexOf(' ') === -1
         if (isTeamChannel && isCommand) {
-          if (cutarroba === 'extrato') {
-            console.log('extrato')
+          if (cutarroba === 'login') {
+            console.log('login')
             const adaptiveCard = loginTemplate.expand()
             const card = CardFactory.adaptiveCard(adaptiveCard)
             const message = MessageFactory.attachment(card)
             await context.sendActivity(message)
-          } else if (cutarroba === 'extrato_backup') {
+          } else if (cutarroba === 'extrato') {
             console.log('extrato')
             const [memberInfo, teamsInfo, teamsChannels, teamsMembers] = await Promise.all([
               TeamsInfo.getMember(context, context.activity.from.id),
@@ -341,6 +343,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const message = MessageFactory.attachment(card)
             await context.sendActivity(message)
           } else {
+            console.dir(context.activity.attachments)
             console.log(`nenhum comando para ${cutarroba}`)
           }
         } else {
