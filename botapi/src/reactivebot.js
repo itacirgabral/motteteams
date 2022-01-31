@@ -351,6 +351,12 @@ class TeamsConversationBot extends TeamsActivityHandler {
         }
         await next()
       })
+
+      this.onTokenResponseEvent(async (context, next) => {
+        console.log('SsoBot onTokenResponseEvent')
+        // await this.dialog.run(context, this.dialogState)
+        await next()
+    });
   }
 
   handleTeamsTaskModuleFetch(context, taskModuleRequest) {
@@ -375,6 +381,13 @@ class TeamsConversationBot extends TeamsActivityHandler {
         }
       }
     }
+  }
+
+  async handleTeamsSigninVerifyState(context, query) {
+    console.log("SsoBot handleTeamsSigninVerifyState")
+  }
+  async handleTeamsSigninTokenExchange(context, query) {
+    console.log("SsoBot handleTeamsSigninTokenExchange")
   }
 }
 

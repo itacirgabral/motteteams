@@ -1,38 +1,48 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.11/MicrosoftTeams.schema.json",
-  "version": "1.1.3",
   "manifestVersion": "1.11",
-  "id": "1170dd10-6e6b-43c8-930a-97320387f8830",
-  "packageName": "com.package.name",
+  "id": "a01f8290-8127-11ec-8f7b-e906a5d0342e",
+  "version": "0.0.1",
+  "packageName": "gestormessenger",
   "name": {
-    "short": "GB",
+    "short": "GM",
     "full": "Gestor Messenger Teams APP"
   },
   "developer": {
     "name": "Gestor Sistemas",
     "mpnId": "6470173",
-    "websiteUrl": "https://gestormessenger.team/",
-    "privacyUrl": "https://gestormessenger.team/#/privacy",
-    "termsOfUseUrl": "https://gestormessenger.team/#/termsofuse"
+    "websiteUrl": "https://alfabot.gestormessenger.team",
+    "privacyUrl": "https://alfabot.gestormessenger.team/privacy.html",
+    "termsOfUseUrl": "https://alfabot.gestormessenger.team/tou.html"
   },
   "description": {
-    "short": "WhatsApp Bridge ALFA",
-    "full": "Gestor Messenger Teams. Manager multiple whatsapp chats inside channel's message threads."
+    "short": "WhatsApp Bridge",
+    "full": "Gestor Messenger Teams manages multiple whatsapp chats inside channel's message threads."
   },
   "icons": {
     "outline": "outline.png",
     "color": "color.png"
   },
   "accentColor": "#007869",
+  "configurableTabs": [],
+  "staticTabs": [],
   "bots": [
     {
-      "botId": "9d47cf0f-f218-478b-93dd-5bb4e7363de8",
+      "botId": "de788039-604f-49e0-9545-34dff1e455a9",
+      "needsChannelSelector": true,
+      "supportsCalling": false,
+      "supportsVideo": false,
+      "supportsFiles": true,
+      "isNotificationOnly": false,
       "scopes": [
-        "personal",
-        "team"
+        "team",
+        "personal"
       ],
       "commandLists": [
         {
+          "scopes": [
+            "team"
+          ],
           "commands": [
             {
               "title": "extrato",
@@ -47,26 +57,35 @@
               "description": "Reconecta ao WhatsApp ou gera novo QRCode"
             },
             {
-              "title": "reservar",
-              "description": "Vincula grupo ou contato neste canal"
-            },
-            {
               "title": "respondercomtextosimples:",
               "description": "A mensagem que será enviada para o whatsapp"
+            },
+            {
+              "title": "reserva",
+              "description": "Vincula grupo ou contato neste canal"
             }
-          ],
-          "scopes": [
-            "team"
           ]
         }
-      ],
-      "isNotificationOnly": false,
-      "supportsFiles": true
+      ]
     }
   ],
-  "validDomains": [],
+  "connectors": [],
+  "composeExtensions": [],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
   "devicePermissions": [
     "notifications",
     "openExternal"
-  ]
+  ],
+  "validDomains": [
+    "alfabot.gestormessenger.team",
+    "token.botframework.com"
+  ],
+  "webApplicationInfo": {
+    "id": "de788039-604f-49e0-9545-34dff1e455a9",
+    "resource": "api://botid-de788039-604f-49e0-9545-34dff1e455a9"
+  },
+  "showLoadingIndicator": false
 }
