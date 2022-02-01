@@ -1,9 +1,9 @@
 {
-  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.11/MicrosoftTeams.schema.json",
-  "manifestVersion": "1.11",
-  "id": "a01f8290-8127-11ec-8f7b-e906a5d0342e",
-  "version": "0.0.1",
-  "packageName": "gestormessenger",
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.12/MicrosoftTeams.schema.json",
+  "version": "1.0.0",
+  "manifestVersion": "1.12",
+  "id": "64187adc-f9e5-433a-9b3f-a7d5b8335e5c",
+  "packageName": "com.package.name",
   "name": {
     "short": "GM",
     "full": "Gestor Messenger Teams APP"
@@ -11,9 +11,9 @@
   "developer": {
     "name": "Gestor Sistemas",
     "mpnId": "6470173",
-    "websiteUrl": "https://alfabot.gestormessenger.team",
-    "privacyUrl": "https://alfabot.gestormessenger.team/privacy.html",
-    "termsOfUseUrl": "https://alfabot.gestormessenger.team/tou.html"
+    "websiteUrl": "https://gestormessenger.team/",
+    "privacyUrl": "https://gestormessenger.team/privacy",
+    "termsOfUseUrl": "https://gestormessenger.team/termsofuse"
   },
   "description": {
     "short": "WhatsApp Bridge",
@@ -24,20 +24,17 @@
     "color": "color.png"
   },
   "accentColor": "#007869",
-  "configurableTabs": [],
-  "staticTabs": [],
   "bots": [
     {
       "botId": "de788039-604f-49e0-9545-34dff1e455a9",
-      "needsChannelSelector": true,
-      "supportsCalling": false,
-      "supportsVideo": false,
-      "supportsFiles": true,
-      "isNotificationOnly": false,
       "scopes": [
         "team",
         "personal"
       ],
+      "isNotificationOnly": false,
+      "supportsCalling": false,
+      "supportsVideo": false,
+      "supportsFiles": true,
       "commandLists": [
         {
           "scopes": [
@@ -65,19 +62,20 @@
               "description": "Vincula grupo ou contato neste canal"
             }
           ]
+        },
+        {
+          "scopes": [
+            "personal"
+          ],
+          "commands": [
+            {
+              "title": "setup",
+              "description": "Inicia processo de instalação"
+            }
+          ]
         }
       ]
     }
-  ],
-  "connectors": [],
-  "composeExtensions": [],
-  "permissions": [
-    "identity",
-    "messageTeamMembers"
-  ],
-  "devicePermissions": [
-    "notifications",
-    "openExternal"
   ],
   "validDomains": [
     "alfabot.gestormessenger.team",
@@ -86,6 +84,5 @@
   "webApplicationInfo": {
     "id": "de788039-604f-49e0-9545-34dff1e455a9",
     "resource": "api://botid-de788039-604f-49e0-9545-34dff1e455a9"
-  },
-  "showLoadingIndicator": false
+  }
 }
