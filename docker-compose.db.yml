@@ -14,6 +14,7 @@ services:
     environment:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: admin678
+      MINIO_DOMAIN: files.gestormessenger.team
     command: ['server', '/data', '--console-address', ':9001']
     volumes:
       - miniodata:/data
