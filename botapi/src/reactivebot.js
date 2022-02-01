@@ -199,17 +199,17 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const text = context.activity?.text?.trim() ?? ''
         console.log(`text=${text}`)
 
-        
-
         const orgid = context.activity?.channelData?.tenant?.id
         const teamid = context.activity?.channelData?.team?.id
-        const isTeamChannel = !!orgid && !!teamid
 
+        const isChannel = context.activity.conversation.conversationType === 'channel'
+        const isPersonal = context.activity.conversation.conversationType === 'personal'
         const firstBlank = text.indexOf(' ')
         const secondBlank = text.indexOf(' ', text.indexOf(' ') + 1)
         const cutarroba = secondBlank === -1 ? text.slice(firstBlank + 1) : text.slice(firstBlank + 1, secondBlank)
         const isCommand = cutarroba.indexOf(' ') === -1
-        if (isTeamChannel && isCommand) {
+
+        if (isCommand && isChannel) {
           if (cutarroba === 'login') {
             console.log('login')
             const adaptiveCard = loginTemplate.expand()
@@ -346,9 +346,20 @@ class TeamsConversationBot extends TeamsActivityHandler {
             console.dir(context.activity.attachments)
             console.log(`nenhum comando para ${cutarroba}`)
           }
+        } else if (isCommand && isPersonal) {
+          if (cutarroba === 'help') {
+            const message = MessageFactory.text('Olá humano. Não compreendo!')
+            await context.sendActivity(message)
+          } else {
+            console.dir(context.activity.attachments)
+            console.log(`nenhum comando para ${cutarroba}`)
+          }
+
         } else {
           console.log(`text=${text}`)
         }
+
+        // AWAIT NEXT FOL ALL
         await next()
       })
 
