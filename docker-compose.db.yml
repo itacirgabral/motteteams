@@ -8,6 +8,20 @@ services:
       - redisdata:/data
     ports:
       - "6379:6379"
+  minio:
+    image: minio/minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin678
+    command: ['server', '/data', '--console-address', ':9001']
+    volumes:
+      - miniodata:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
 volumes:
   redisdata:
+    external: true
+  miniodata:
     external: true
