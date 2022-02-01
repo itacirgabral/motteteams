@@ -342,7 +342,7 @@ const it = observable.subscribe({
                 reply: hook.reply ? 'sim' : 'não',
                 forward: hook.forward ? 'sim' : 'não',
                 text,
-                url: 'https://minio.gestormessenger.team/orgid/teamid/wid'
+                url: hook.url
             }})
 
           } else {
@@ -377,7 +377,7 @@ const it = observable.subscribe({
                 reply: hook.reply ? 'sim' : 'não',
                 forward: hook.forward ? 'sim' : 'não',
                 text,
-                url: `https://file.gestormessenger.team/${hook.wid}`
+                url: hook.url
             }})
 
           } else {

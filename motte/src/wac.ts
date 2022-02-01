@@ -264,7 +264,7 @@ const wac = function wac (connect: Connect): Promise<string> {
                       break;
                   }
                   const objectName = `${connect.shard}/${json.from}/${json.timestamp}_${json.wid}${ext}`
-                  const metaData = { 'Content-Type': json.mimetype as string }
+                  const metaData = { 'Content-Type': json.mimetype }
 
                   allwait.push(new Promise((res, rej) => {
                     minio.putObject(bucketName, objectName, stream, null, metaData, (err, data) => {
