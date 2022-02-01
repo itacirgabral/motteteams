@@ -230,76 +230,73 @@ const wac = function wac (connect: Connect): Promise<string> {
 
           const [whMain, whTeams, whSpy] = await webhookP
 
-          const mreadreceipts = []
+          const allwait = []
 
-          const pipeline = redis.pipeline()
           cleanMessage.forEach(async (json, idx) => {
             if (!json.nada && json.from !== 'status') {
               const type = 'zaphook'
               const data = JSON.stringify(json)
-              pipeline.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
+              // redis.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
 
               const jidfrom = json.from.length > 14 ? `${json.from}@g.us` : `${json.from}@s.whatsapp.net`
               const participant = json.author ? `${json.author}@s.whatsapp.net` : undefined
-              mreadreceipts.push(socket.sendReadReceipt(jidfrom, participant, [json.wid]))
+              allwait.push(socket.sendReadReceipt(jidfrom, participant, [json.wid]))
 
               if (midiaMessage.includes(json.type)) {
+                // fragile message[json.type]
                 const original = messages[idx]?.message[json.type]
                 if (original) {
-                  console.dir(JSON.stringify(original, null, 2))
-                  setTimeout(() => {
-                  const streamP = downloadContentFromMessage(original, midiaMessageMap[json.type])
-                  streamP.then(stream => {
-                    const bucketName = process.env.MINIO_BUCKET
-                    let ext
-                    switch (json.type) {
-                      case 'audioMessage':
-                        ext = '.ogg'
-                        break;
-                      case 'imageMessage':
-                        ext = '.jpeg'
-                        break;
-                      case 'videoMessage':
-                        ext = '.mp4'
-                        break;
-                      case 'documentMessage':
-                        ext = `_${json.filename}`
-                        break;
-                    }
-                    const objectName = `${connect.shard}/${json.from}/${json.timestamp}_${json.wid}${ext}`
-                    const metaData = { 'Content-Type': json.mimetype as string }
-                    console.dir({
-                      bucketName,
-                      objectName,
-                      metaData
-                    })
+                  const bucketName = process.env.MINIO_BUCKET
+                  const stream = await downloadContentFromMessage(original, midiaMessageMap[json.type])
+                  let ext
+                  switch (json.type) {
+                    case 'audioMessage':
+                      ext = '.ogg'
+                      break;
+                    case 'imageMessage':
+                      ext = '.jpeg'
+                      break;
+                    case 'videoMessage':
+                      ext = '.mp4'
+                      break;
+                    case 'documentMessage':
+                      ext = `_${json.filename}`
+                      break;
+                  }
+                  const objectName = `${connect.shard}/${json.from}/${json.timestamp}_${json.wid}${ext}`
+                  const metaData = { 'Content-Type': json.mimetype as string }
 
+                  allwait.push(new Promise((res, rej) => {
                     minio.putObject(bucketName, objectName, stream, null, metaData, (err, data) => {
                       if(!err) {
-                        console.dir(data)
-                        minio.presignedGetObject(bucketName, objectName, (err, data) => {
+                        minio.presignedGetObject(bucketName, objectName, (err, url) => {
                           if(!err) {
-                            console.dir(data)
+                            const data = JSON.stringify({
+                              ...json,
+                              url
+                            })
+                            res(redis.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard))
                           } else {
-                            console.error(err)
+                            rej(err)
                           }
                         })
                       } else {
-                        console.error(err)
+                        rej(err)
                       }
                     })
-                  })
-                  }, 0)
+                  }))
+
+
                 }
+              } else {
+                const data = JSON.stringify(json)
+                allwait.push(redis.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard))
               }
 
             }
           })
 
-          await Promise.all([
-            ...mreadreceipts,// notifica o whatsapp que lemos as mensagens
-            pipeline.exec()// envia pro teams as novas mensagens
-          ])
+          await Promise.all(allwait)
 
           // [ ] salvar nos minio
         } else if (type === 'append') {
