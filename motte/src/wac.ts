@@ -45,11 +45,6 @@ interface SendTextMessage {
 
 type ConnectionActions = Connect | Disconnect | Connectionstate | SendTextMessage
 
-// const coudhdbUrl = process.env.COUCHDB_URL || 'http://localhost:5984'
-// console.log(`coudhdbUrl=${coudhdbUrl}`)
-// const couch = nano(coudhdbUrl)
-// const jsonStore = couch.db.use('gestormessenger')
-
 const KEY_MAP: { [T in keyof SignalDataTypeMap]: string } = {
   'pre-key': 'preKeys',
   'session': 'sessions',

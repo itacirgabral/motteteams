@@ -10,3 +10,13 @@
 # teams bot
 - cloudflared tunnel --hostname betabot.gestormessenger.team --url localhost:3978 --name betaorgbot
 - cloudflared tunnel --hostname alfabot.gestormessenger.team --url localhost:3978 --name alfakitbot
+
+# docker build
+```
+verdaccio -l 0.0.0.0:4873
+```
+```
+docker build -t cloud.canister.io:5000/itacirgabral/botapi ./
+docker run cloud.canister.io:5000/itacirgabral/botapi
+docker push cloud.canister.io:5000/itacirgabral/botapi
+```

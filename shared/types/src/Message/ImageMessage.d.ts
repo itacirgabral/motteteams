@@ -11,6 +11,7 @@ export interface ImageMessage {
   mimetype: string;
   bytes: string;
   caption: string;
+  url?: string;
   author?: string;
   reply?: string;
   forward?: boolean;

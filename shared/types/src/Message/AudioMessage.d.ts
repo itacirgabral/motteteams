@@ -10,6 +10,7 @@ export interface AudioMessage {
   timestamp: string;
   mimetype: string;
   bytes: string;
+  url?: string;
   author?: string;
   reply?: string;
   forward?: boolean;

@@ -13,6 +13,7 @@ export interface VideoMessage {
   seconds: string;
   loop: boolean;
   caption: string;
+  url?: string;
   author?: string;
   reply?: string;
   forward?: boolean;

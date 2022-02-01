@@ -8,7 +8,6 @@ services:
       - redisdata:/data
     ports:
       - "6379:6379"
-
 volumes:
   redisdata:
     external: true

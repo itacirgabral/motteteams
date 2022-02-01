@@ -10,8 +10,7 @@ const {
 const ACData = require('adaptivecards-templating');
 
 const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptickey, mkboxenginebotkey, mkattkey, mkattmetakey } = require('@gmapi/redispack')
-const QRCode = require('qrcode');
-const { Contains } = require('adaptive-expressions/lib/builtinFunctions');
+const QRCode = require('qrcode')
 
 const hardid = process.env.HARDID
 
@@ -78,11 +77,40 @@ const reservaTemplate = new ACData.Template({
   ],
   actions: [
     {
-        type: "Action.Submit",
-        title: "Reservar",
-        data: {
-          msteams: {
-              type: "task/fetch"
+      type: "Action.Submit",
+      title: "Reservar",
+      data: {
+        msteams: {
+          type: "task/fetch"
+        }
+      }
+    }
+  ],
+  $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+  version: '1.3'
+})
+
+const loginTemplate = new ACData.Template({
+  type: 'AdaptiveCard',
+  msteams: {
+    width: "Full"
+  },
+  body: [
+    {
+      "type": "TextBlock",
+      "size": "Medium",
+      "weight": "Bolder",
+      "text": "Preciso do seu login, clique no botão abaixo:"
+    }
+  ],
+  actions: [
+    {
+      "type": "Action.Submit",
+      "title": "login",
+      "data": {
+          "msteams": {
+              "type": "signin",
+              "value": "https://signin.com"
           }
       }
     }
@@ -171,6 +199,8 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const text = context.activity?.text?.trim() ?? ''
         console.log(`text=${text}`)
 
+        
+
         const orgid = context.activity?.channelData?.tenant?.id
         const teamid = context.activity?.channelData?.team?.id
         const isTeamChannel = !!orgid && !!teamid
@@ -180,7 +210,13 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const cutarroba = secondBlank === -1 ? text.slice(firstBlank + 1) : text.slice(firstBlank + 1, secondBlank)
         const isCommand = cutarroba.indexOf(' ') === -1
         if (isTeamChannel && isCommand) {
-          if (cutarroba === 'extrato') {
+          if (cutarroba === 'login') {
+            console.log('login')
+            const adaptiveCard = loginTemplate.expand()
+            const card = CardFactory.adaptiveCard(adaptiveCard)
+            const message = MessageFactory.attachment(card)
+            await context.sendActivity(message)
+          } else if (cutarroba === 'extrato') {
             console.log('extrato')
             const [memberInfo, teamsInfo, teamsChannels, teamsMembers] = await Promise.all([
               TeamsInfo.getMember(context, context.activity.from.id),
@@ -307,6 +343,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const message = MessageFactory.attachment(card)
             await context.sendActivity(message)
           } else {
+            console.dir(context.activity.attachments)
             console.log(`nenhum comando para ${cutarroba}`)
           }
         } else {
@@ -314,6 +351,12 @@ class TeamsConversationBot extends TeamsActivityHandler {
         }
         await next()
       })
+
+      this.onTokenResponseEvent(async (context, next) => {
+        console.log('SsoBot onTokenResponseEvent')
+        // await this.dialog.run(context, this.dialogState)
+        await next()
+    });
   }
 
   handleTeamsTaskModuleFetch(context, taskModuleRequest) {
@@ -338,6 +381,13 @@ class TeamsConversationBot extends TeamsActivityHandler {
         }
       }
     }
+  }
+
+  async handleTeamsSigninVerifyState(context, query) {
+    console.log("SsoBot handleTeamsSigninVerifyState")
+  }
+  async handleTeamsSigninTokenExchange(context, query) {
+    console.log("SsoBot handleTeamsSigninTokenExchange")
   }
 }
 

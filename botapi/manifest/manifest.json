@@ -1,0 +1,88 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.12/MicrosoftTeams.schema.json",
+  "version": "1.0.0",
+  "manifestVersion": "1.12",
+  "id": "64187adc-f9e5-433a-9b3f-a7d5b8335e5c",
+  "packageName": "com.package.name",
+  "name": {
+    "short": "GM",
+    "full": "Gestor Messenger Teams APP"
+  },
+  "developer": {
+    "name": "Gestor Sistemas",
+    "mpnId": "6470173",
+    "websiteUrl": "https://gestormessenger.team/",
+    "privacyUrl": "https://gestormessenger.team/privacy",
+    "termsOfUseUrl": "https://gestormessenger.team/termsofuse"
+  },
+  "description": {
+    "short": "WhatsApp Bridge",
+    "full": "Gestor Messenger Teams manages multiple whatsapp chats inside channel's message threads."
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#007869",
+  "bots": [
+    {
+      "botId": "de788039-604f-49e0-9545-34dff1e455a9",
+      "scopes": [
+        "team",
+        "personal"
+      ],
+      "isNotificationOnly": false,
+      "supportsCalling": false,
+      "supportsVideo": false,
+      "supportsFiles": true,
+      "commandLists": [
+        {
+          "scopes": [
+            "team"
+          ],
+          "commands": [
+            {
+              "title": "extrato",
+              "description": "Informações"
+            },
+            {
+              "title": "finalizar",
+              "description": "Termina esta conversa"
+            },
+            {
+              "title": "qrcode",
+              "description": "Reconecta ao WhatsApp ou gera novo QRCode"
+            },
+            {
+              "title": "respondercomtextosimples:",
+              "description": "A mensagem que será enviada para o whatsapp"
+            },
+            {
+              "title": "reserva",
+              "description": "Vincula grupo ou contato neste canal"
+            }
+          ]
+        },
+        {
+          "scopes": [
+            "personal"
+          ],
+          "commands": [
+            {
+              "title": "setup",
+              "description": "Inicia processo de instalação"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "validDomains": [
+    "alfabot.gestormessenger.team",
+    "token.botframework.com"
+  ],
+  "webApplicationInfo": {
+    "id": "de788039-604f-49e0-9545-34dff1e455a9",
+    "resource": "api://botid-de788039-604f-49e0-9545-34dff1e455a9"
+  }
+}
