@@ -8,6 +8,8 @@ import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalD
 import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
+import { minio } from './minio'
+import { error } from 'console'
 
 const midiaMessage = ['imageMessage', 'videoMessage', 'documentMessage', 'audioMessage']
 const midiaMessageMap = {
@@ -244,10 +246,49 @@ const wac = function wac (connect: Connect): Promise<string> {
               if (midiaMessage.includes(json.type)) {
                 const original = messages[idx]?.message[json.type]
                 if (original) {
+                  console.dir(JSON.stringify(original, null, 2))
                   setTimeout(() => {
                   const streamP = downloadContentFromMessage(original, midiaMessageMap[json.type])
-                  const filename = path.join(__dirname, '..', '..', 'uploads', json.wid)
-                  streamP.then(stream => stream.pipe(fs.createWriteStream(filename)))
+                  streamP.then(stream => {
+                    const bucketName = process.env.MINIO_BUCKET
+                    let ext
+                    switch (json.type) {
+                      case 'audioMessage':
+                        ext = '.ogg'
+                        break;
+                      case 'imageMessage':
+                        ext = '.jpeg'
+                        break;
+                      case 'videoMessage':
+                        ext = '.mp4'
+                        break;
+                      case 'documentMessage':
+                        ext = `_${json.filename}`
+                        break;
+                    }
+                    const objectName = `${connect.shard}/${json.from}/${json.timestamp}_${json.wid}${ext}`
+                    const metaData = { 'Content-Type': json.mimetype as string }
+                    console.dir({
+                      bucketName,
+                      objectName,
+                      metaData
+                    })
+
+                    minio.putObject(bucketName, objectName, stream, null, metaData, (err, data) => {
+                      if(!err) {
+                        console.dir(data)
+                        minio.presignedGetObject(bucketName, objectName, (err, data) => {
+                          if(!err) {
+                            console.dir(data)
+                          } else {
+                            console.error(err)
+                          }
+                        })
+                      } else {
+                        console.error(err)
+                      }
+                    })
+                  })
                   }, 0)
                 }
               }
