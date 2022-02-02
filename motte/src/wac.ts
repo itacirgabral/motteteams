@@ -1,15 +1,11 @@
 import { fork } from 'child_process'
 import { readFileSync, writeFileSync, rmSync } from 'fs'
-import path from 'path'
-import got from 'got'
-import fs from 'fs'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, downloadContentFromMessage, WASocket } from '@adiwajshing/baileys-md'
 import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 import { minio } from './minio'
-import { error } from 'console'
 
 const midiaMessage = ['imageMessage', 'videoMessage', 'documentMessage', 'audioMessage']
 const midiaMessageMap = {
@@ -25,13 +21,23 @@ process.on('message', async (message: Bread) => {
   console.dir(message)
   console.dir(whatsappsocket.sendMessage)
 
-  if (message.type === 'sendTextMessage' && !!whatsappsocket) {
-    const { to, msg, cacapa } = message
-    const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
-    const id = `${to}@${posfix}`
-    console.log(`id=${id}`)
-    const sentmessage = await whatsappsocket.sendMessage(id, { text: msg })
-    // console.dir({ sentmessage })
+  if (whatsappsocket) {
+    if (message.type === 'sendTextMessage') {
+      const { to, msg, cacapa } = message
+      const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
+      const id = `${to}@${posfix}`
+      console.log(`id=${id}`)
+      const sentmessage = await whatsappsocket.sendMessage(id, { text: msg })
+      // console.dir({ sentmessage })
+    } else if (message.type === 'sendReadReceipt') {
+      const { jidfrom, participant, wids } = message
+      // // whatsappsocket.sendReadReceipt(jidfrom, participant, [json.wid])
+
+    } else  if (message.type === 'sendPresenceAvailable') {
+      const { jidto } = message
+      // await whatsappsocket.sendPresenceUpdate('available', id)
+
+    }
   }
 })
 
@@ -431,7 +437,7 @@ const wacPC = async (connectionActions: ConnectionActions) => {
       break
     case 'sendTextMessage':
       if (patchpanel.has(connectionActions.shard)) {
-        console.log(`patchpanel[${connectionActions.shard}]`)
+        console.log(`patchpanel[${connectionActions.shard}] sendTextMessage`)
         const { type, hardid, shard, to, msg, cacapa } = connectionActions
         const blueCable = patchpanel.get(shard)
         const wacP = blueCable.wacP
@@ -445,6 +451,36 @@ const wacPC = async (connectionActions: ConnectionActions) => {
         })
       } else {
         console.log('sendTextMessage não tá conectado')
+      }
+      break
+    case 'sendReadReceipt':
+      if (patchpanel.has(connectionActions.shard)) {
+        console.log(`patchpanel[${connectionActions.shard}] sendReadReceipt`)
+        const { type, hardid, shard, jidfrom, participant, wids } = connectionActions
+        const blueCable = patchpanel.get(shard)
+        const wacP = blueCable.wacP
+        wacP.send({
+          type,
+          hardid,
+          shard,
+          jidfrom,
+          participant,
+          wids
+        })
+      }
+      break
+    case 'sendPresenceAvailable':
+      if (patchpanel.has(connectionActions.shard)) {
+        console.log(`patchpanel[${connectionActions.shard}] sendPresenceAvailable`)
+        const { type, hardid, shard, jidto } = connectionActions
+        const blueCable = patchpanel.get(shard)
+        const wacP = blueCable.wacP
+        wacP.send({
+          type,
+          hardid,
+          shard,
+          jidto
+        })
       }
       break
   }

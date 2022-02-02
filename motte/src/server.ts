@@ -76,6 +76,26 @@ const mkServer = function mkServer () {
               cacapa: bread.cacapa
             })
             break
+          case 'sendReadReceipt':
+            console.log('sendReadReceipt')
+            wacPC({
+              type: 'sendReadReceipt',
+              hardid: bread.hardid,
+              shard: bread.shard,
+              jidfrom: bread.jidfrom,
+              participant: bread.participant,
+              wids: bread.wids
+            })
+            break
+          case 'sendPresenceAvailable':
+            console.log('sendPresenceAvailable')
+            wacPC({
+              type: 'sendPresenceAvailable',
+              hardid: bread.hardid,
+              shard: bread.shard,
+              jidto: bread.jidto,
+            })
+            break
           default:
             console.log('redis:stream -> switch ?')
             console.error(bread)
