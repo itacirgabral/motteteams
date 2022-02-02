@@ -342,6 +342,25 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const card = CardFactory.adaptiveCard(adaptiveCard)
             const message = MessageFactory.attachment(card)
             await context.sendActivity(message)
+          } else if (cutarroba === 'allchats') {
+
+            // fix
+            // apenas novas conversas, não em respostas
+
+            const boxenginebotkey = mkboxenginebotkey({
+              shard: context.activity.conversation.id
+            })
+            const whatsapp = await redis.hget(boxenginebotkey, 'whatsapp')
+            if (whatsapp) {
+              const type = 'getallchats'
+              await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp)
+            }
+
+          } else if (cutarroba === 'chatinfo') {
+            const type = 'getchatinfo'
+            const chat = '556599375661'
+            await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'chat', chat)
+
           } else {
             console.dir(context.activity.attachments)
             console.log(`nenhum comando para ${cutarroba}`)

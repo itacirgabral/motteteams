@@ -438,6 +438,8 @@ const it = observable.subscribe({
       await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
         //
       })
+    } else if (bread.type === 'chatlistupdate') {
+      console.log('chatlistupdate')
     }
   },
   error: console.error,

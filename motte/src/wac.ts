@@ -18,9 +18,6 @@ const midiaMessageMap = {
 let whatsappsocket: WASocket
 process.on('message', async (message: Bread) => {
   console.log(process.env.SERVICE || 'MAIN')
-  console.dir(message)
-  console.dir(whatsappsocket.sendMessage)
-
   if (whatsappsocket) {
     if (message.type === 'sendTextMessage') {
       const { to, msg, cacapa } = message
@@ -41,6 +38,12 @@ process.on('message', async (message: Bread) => {
 
       await whatsappsocket.sendPresenceUpdate('available', jidto)
 
+    } else  if (message.type === 'getallchats') {
+      const type = 'chatlistupdate'
+      // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
+    } else  if (message.type === 'getchatinfo') {
+      const type = 'chatlistupdate'
+      // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
     }
   }
 })
@@ -171,7 +174,6 @@ const wac = function wac (connect: Connect): Promise<string> {
         // const [whMain, whTeams, whSpy] = await webhookP
 
         if (connection) {
-          panopticbotkey
           const type = 'zuckershark'
           await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
         }
@@ -488,6 +490,35 @@ const wacPC = async (connectionActions: ConnectionActions) => {
           shard,
           jidto
         })
+      }
+      break
+    case 'getallchats':
+      console.log(`patchpanel[${connectionActions.shard}] getallchats`)
+      if (patchpanel.has(connectionActions.shard)) {
+        const { type, hardid, shard } = connectionActions
+        const blueCable = patchpanel.get(shard)
+        const wacP = blueCable.wacP
+        wacP.send({
+          type,
+          hardid,
+          shard
+        })
+
+      }
+      break
+    case 'getchatinfo':
+      console.log(`patchpanel[${connectionActions.shard}] getchatinfo`)
+      if (patchpanel.has(connectionActions.shard)) {
+        const { type, hardid, shard, chat } = connectionActions
+        const blueCable = patchpanel.get(shard)
+        const wacP = blueCable.wacP
+        wacP.send({
+          type,
+          hardid,
+          shard,
+          chat
+        })
+
       }
       break
   }

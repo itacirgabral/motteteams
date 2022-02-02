@@ -96,6 +96,23 @@ const mkServer = function mkServer () {
               jidto: bread.jidto,
             })
             break
+          case 'getallchats':
+            console.log('getallchats')
+            wacPC({
+              type: 'getallchats',
+              hardid: bread.hardid,
+              shard: bread.shard
+            })
+            break
+          case 'getchatinfo':
+            console.log('getchatinfo')
+            wacPC({
+              type: 'getchatinfo',
+              hardid: bread.hardid,
+              shard: bread.shard,
+              chat: bread.chat,
+            })
+            break
           default:
             console.log('redis:stream -> switch ?')
             console.error(bread)
