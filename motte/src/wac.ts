@@ -30,12 +30,16 @@ process.on('message', async (message: Bread) => {
       const sentmessage = await whatsappsocket.sendMessage(id, { text: msg })
       // console.dir({ sentmessage })
     } else if (message.type === 'sendReadReceipt') {
-      const { jidfrom, participant, wids } = message
-      // // whatsappsocket.sendReadReceipt(jidfrom, participant, [json.wid])
+      const { jid, participant, wid } = message
+      console.log('sendReadReceipt')
+
+      await whatsappsocket.sendReadReceipt(jid, participant, [wid])
 
     } else  if (message.type === 'sendPresenceAvailable') {
       const { jidto } = message
-      // await whatsappsocket.sendPresenceUpdate('available', id)
+      console.log('sendPresenceAvailable')
+
+      await whatsappsocket.sendPresenceUpdate('available', jidto)
 
     }
   }
@@ -244,9 +248,9 @@ const wac = function wac (connect: Connect): Promise<string> {
               const data = JSON.stringify(json)
               // redis.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
 
-              const jidfrom = json.from.length > 14 ? `${json.from}@g.us` : `${json.from}@s.whatsapp.net`
-              const participant = json.author ? `${json.author}@s.whatsapp.net` : undefined
-              allwait.push(socket.sendReadReceipt(jidfrom, participant, [json.wid]))
+              // const jidfrom = json.from.length > 14 ? `${json.from}@g.us` : `${json.from}@s.whatsapp.net`
+              // const participant = json.author ? `${json.author}@s.whatsapp.net` : undefined
+              // allwait.push(socket.sendReadReceipt(jidfrom, participant, [json.wid]))
 
               if (midiaMessage.includes(json.type)) {
                 // fragile message[json.type]
@@ -456,16 +460,19 @@ const wacPC = async (connectionActions: ConnectionActions) => {
     case 'sendReadReceipt':
       if (patchpanel.has(connectionActions.shard)) {
         console.log(`patchpanel[${connectionActions.shard}] sendReadReceipt`)
-        const { type, hardid, shard, jidfrom, participant, wids } = connectionActions
+        const { type, hardid, shard, from, participant, wid } = connectionActions
+
+        const jid = `${ from }@${ from.length > 14 ? 'g.us' : 's.whatsapp.net' }`
+
         const blueCable = patchpanel.get(shard)
         const wacP = blueCable.wacP
         wacP.send({
           type,
           hardid,
           shard,
-          jidfrom,
+          jid,
           participant,
-          wids
+          wid
         })
       }
       break

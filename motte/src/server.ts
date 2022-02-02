@@ -82,9 +82,9 @@ const mkServer = function mkServer () {
               type: 'sendReadReceipt',
               hardid: bread.hardid,
               shard: bread.shard,
-              jidfrom: bread.jidfrom,
+              from: bread.from,
               participant: bread.participant,
-              wids: bread.wids
+              wid: bread.wid
             })
             break
           case 'sendPresenceAvailable':
