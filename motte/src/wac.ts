@@ -39,6 +39,7 @@ process.on('message', async (message: Bread) => {
       await whatsappsocket.sendPresenceUpdate('available', jidto)
 
     } else  if (message.type === 'getallchats') {
+      console.log('in child proc hello getallchats')
       const type = 'chatlistupdate'
       // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
     } else  if (message.type === 'getchatinfo') {
