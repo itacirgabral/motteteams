@@ -440,6 +440,22 @@ const it = observable.subscribe({
       })
     } else if (bread.type === 'chatlistupdate') {
       console.log('chatlistupdate')
+      console.dir(bread)
+      const boxenginebotkey = mkboxenginebotkey({ shard: bread.whatsapp })
+
+      const orgaid_teamid = await redis.hget(boxenginebotkey, 'gsadmin')
+      const botkey = mkbotkey({ shard: orgaid_teamid })
+
+      const botref = await redis.hget(botkey, 'ref')
+      const conversationParameters = {
+        isGroup: true,
+        channelData: JSON.parse(botref),
+        activity: MessageFactory.text(bread.chats)
+      }
+
+      await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
+        //
+      })
     }
   },
   error: console.error,

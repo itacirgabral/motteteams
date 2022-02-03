@@ -346,14 +346,15 @@ class TeamsConversationBot extends TeamsActivityHandler {
             // fix
             // apenas novas conversas, não em respostas
 
-            console.log('allchats')
-
             const whatsapp = await redis.hget(botkey, 'whatsapp')
             if (whatsapp) {
               const type = 'getallchats'
-              await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp)
+              await Promise.all([
+                context.sendActivity(MessageFactory.text('Ok humano, buscar-lo-ei')),
+                redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp)
+              ])
             } else {
-              console.log('no whats')
+              await context.sendActivity(MessageFactory.text('humano... aqui não tem whatsapp'))
             }
 
           } else if (cutarroba === 'chatinfo') {
