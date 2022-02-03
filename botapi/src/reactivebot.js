@@ -210,6 +210,8 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const isCommand = cutarroba.indexOf(' ') === -1
 
         if (isCommand && isChannel) {
+          const shard = `${orgid}_${teamid}`
+          const botkey = mkbotkey({ shard })
           if (cutarroba === 'login') {
             console.log('login')
             const adaptiveCard = loginTemplate.expand()
@@ -250,9 +252,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
             console.log('qrcode')
             await context.sendActivity(MessageFactory.text('Buscando pelo whatsapp associado'))
 
-            const shard = `${orgid}_${teamid}`
-
-            const botkey = mkbotkey({ shard })
             const[plan, whatsapp] = await redis.hmget(botkey, 'plan', 'whatsapp')
 
             let textMessage
@@ -347,13 +346,14 @@ class TeamsConversationBot extends TeamsActivityHandler {
             // fix
             // apenas novas conversas, não em respostas
 
-            const boxenginebotkey = mkboxenginebotkey({
-              shard: context.activity.conversation.id
-            })
-            const whatsapp = await redis.hget(boxenginebotkey, 'whatsapp')
+            console.log('allchats')
+
+            const whatsapp = await redis.hget(botkey, 'whatsapp')
             if (whatsapp) {
               const type = 'getallchats'
               await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp)
+            } else {
+              console.log('no whats')
             }
 
           } else if (cutarroba === 'chatinfo') {
