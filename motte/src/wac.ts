@@ -1,13 +1,11 @@
 import { fork } from 'child_process'
 import { readFileSync, writeFileSync, rmSync } from 'fs'
-import path from 'path'
-import got from 'got'
-import fs from 'fs'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, downloadContentFromMessage, WASocket } from '@adiwajshing/baileys-md'
 import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
+import { minio } from './minio'
 
 const midiaMessage = ['imageMessage', 'videoMessage', 'documentMessage', 'audioMessage']
 const midiaMessageMap = {
@@ -20,16 +18,33 @@ const midiaMessageMap = {
 let whatsappsocket: WASocket
 process.on('message', async (message: Bread) => {
   console.log(process.env.SERVICE || 'MAIN')
-  console.dir(message)
-  console.dir(whatsappsocket.sendMessage)
+  if (whatsappsocket) {
+    if (message.type === 'sendTextMessage') {
+      const { to, msg, cacapa } = message
+      const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
+      const id = `${to}@${posfix}`
+      console.log(`id=${id}`)
+      const sentmessage = await whatsappsocket.sendMessage(id, { text: msg })
+      // console.dir({ sentmessage })
+    } else if (message.type === 'sendReadReceipt') {
+      const { jid, participant, wid } = message
+      console.log('sendReadReceipt')
 
-  if (message.type === 'sendTextMessage' && !!whatsappsocket) {
-    const { to, msg, cacapa } = message
-    const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
-    const id = `${to}@${posfix}`
-    console.log(`id=${id}`)
-    const sentmessage = await whatsappsocket.sendMessage(id, { text: msg })
-    // console.dir({ sentmessage })
+      await whatsappsocket.sendReadReceipt(jid, participant, [wid])
+
+    } else  if (message.type === 'sendPresenceAvailable') {
+      const { jidto } = message
+      console.log('sendPresenceAvailable')
+
+      await whatsappsocket.sendPresenceUpdate('available', jidto)
+
+    } else  if (message.type === 'getallchats') {
+      const type = 'chatlistupdate'
+      // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
+    } else  if (message.type === 'getchatinfo') {
+      const type = 'chatlistupdate'
+      // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
+    }
   }
 })
 
@@ -159,7 +174,6 @@ const wac = function wac (connect: Connect): Promise<string> {
         // const [whMain, whTeams, whSpy] = await webhookP
 
         if (connection) {
-          panopticbotkey
           const type = 'zuckershark'
           await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
         }
@@ -228,37 +242,73 @@ const wac = function wac (connect: Connect): Promise<string> {
 
           const [whMain, whTeams, whSpy] = await webhookP
 
-          const mreadreceipts = []
+          const allwait = []
 
-          const pipeline = redis.pipeline()
           cleanMessage.forEach(async (json, idx) => {
             if (!json.nada && json.from !== 'status') {
               const type = 'zaphook'
               const data = JSON.stringify(json)
-              pipeline.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
+              // redis.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
 
-              const jidfrom = json.from.length > 14 ? `${json.from}@g.us` : `${json.from}@s.whatsapp.net`
-              const participant = json.author ? `${json.author}@s.whatsapp.net` : undefined
-              mreadreceipts.push(socket.sendReadReceipt(jidfrom, participant, [json.wid]))
+              // const jidfrom = json.from.length > 14 ? `${json.from}@g.us` : `${json.from}@s.whatsapp.net`
+              // const participant = json.author ? `${json.author}@s.whatsapp.net` : undefined
+              // allwait.push(socket.sendReadReceipt(jidfrom, participant, [json.wid]))
 
               if (midiaMessage.includes(json.type)) {
+                // fragile message[json.type]
                 const original = messages[idx]?.message[json.type]
                 if (original) {
-                  setTimeout(() => {
-                  const streamP = downloadContentFromMessage(original, midiaMessageMap[json.type])
-                  const filename = path.join(__dirname, '..', '..', 'uploads', json.wid)
-                  streamP.then(stream => stream.pipe(fs.createWriteStream(filename)))
-                  }, 0)
+                  const bucketName = process.env.MINIO_BUCKET
+                  const stream = await downloadContentFromMessage(original, midiaMessageMap[json.type])
+                  let ext
+                  switch (json.type) {
+                    case 'audioMessage':
+                      ext = '.ogg'
+                      break;
+                    case 'imageMessage':
+                      ext = '.jpeg'
+                      break;
+                    case 'videoMessage':
+                      ext = '.mp4'
+                      break;
+                    case 'documentMessage':
+                      ext = `_${json.filename}`
+                      break;
+                  }
+                  const objectName = `${connect.shard}/${json.from}/${json.timestamp}_${json.wid}${ext}`
+                  const metaData = { 'Content-Type': json.mimetype }
+
+                  allwait.push(new Promise((res, rej) => {
+                    minio.putObject(bucketName, objectName, stream, null, metaData, (err, data) => {
+                      if(!err) {
+                        minio.presignedGetObject(bucketName, objectName, (err, url) => {
+                          if(!err) {
+                            const data = JSON.stringify({
+                              ...json,
+                              url
+                            })
+                            res(redis.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard))
+                          } else {
+                            rej(err)
+                          }
+                        })
+                      } else {
+                        rej(err)
+                      }
+                    })
+                  }))
+
+
                 }
+              } else {
+                const data = JSON.stringify(json)
+                allwait.push(redis.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard))
               }
 
             }
           })
 
-          await Promise.all([
-            ...mreadreceipts,// notifica o whatsapp que lemos as mensagens
-            pipeline.exec()// envia pro teams as novas mensagens
-          ])
+          await Promise.all(allwait)
 
           // [ ] salvar nos minio
         } else if (type === 'append') {
@@ -393,7 +443,7 @@ const wacPC = async (connectionActions: ConnectionActions) => {
       break
     case 'sendTextMessage':
       if (patchpanel.has(connectionActions.shard)) {
-        console.log(`patchpanel[${connectionActions.shard}]`)
+        console.log(`patchpanel[${connectionActions.shard}] sendTextMessage`)
         const { type, hardid, shard, to, msg, cacapa } = connectionActions
         const blueCable = patchpanel.get(shard)
         const wacP = blueCable.wacP
@@ -407,6 +457,68 @@ const wacPC = async (connectionActions: ConnectionActions) => {
         })
       } else {
         console.log('sendTextMessage não tá conectado')
+      }
+      break
+    case 'sendReadReceipt':
+      if (patchpanel.has(connectionActions.shard)) {
+        console.log(`patchpanel[${connectionActions.shard}] sendReadReceipt`)
+        const { type, hardid, shard, from, participant, wid } = connectionActions
+
+        const jid = `${ from }@${ from.length > 14 ? 'g.us' : 's.whatsapp.net' }`
+
+        const blueCable = patchpanel.get(shard)
+        const wacP = blueCable.wacP
+        wacP.send({
+          type,
+          hardid,
+          shard,
+          jid,
+          participant,
+          wid
+        })
+      }
+      break
+    case 'sendPresenceAvailable':
+      if (patchpanel.has(connectionActions.shard)) {
+        console.log(`patchpanel[${connectionActions.shard}] sendPresenceAvailable`)
+        const { type, hardid, shard, jidto } = connectionActions
+        const blueCable = patchpanel.get(shard)
+        const wacP = blueCable.wacP
+        wacP.send({
+          type,
+          hardid,
+          shard,
+          jidto
+        })
+      }
+      break
+    case 'getallchats':
+      console.log(`patchpanel[${connectionActions.shard}] getallchats`)
+      if (patchpanel.has(connectionActions.shard)) {
+        const { type, hardid, shard } = connectionActions
+        const blueCable = patchpanel.get(shard)
+        const wacP = blueCable.wacP
+        wacP.send({
+          type,
+          hardid,
+          shard
+        })
+
+      }
+      break
+    case 'getchatinfo':
+      console.log(`patchpanel[${connectionActions.shard}] getchatinfo`)
+      if (patchpanel.has(connectionActions.shard)) {
+        const { type, hardid, shard, chat } = connectionActions
+        const blueCable = patchpanel.get(shard)
+        const wacP = blueCable.wacP
+        wacP.send({
+          type,
+          hardid,
+          shard,
+          chat
+        })
+
       }
       break
   }

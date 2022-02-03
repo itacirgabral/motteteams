@@ -69,8 +69,8 @@
           ],
           "commands": [
             {
-              "title": "setup",
-              "description": "Inicia processo de instalação"
+              "title": "help",
+              "description": "Ajuda do sistema"
             }
           ]
         }

@@ -199,17 +199,17 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const text = context.activity?.text?.trim() ?? ''
         console.log(`text=${text}`)
 
-        
-
         const orgid = context.activity?.channelData?.tenant?.id
         const teamid = context.activity?.channelData?.team?.id
-        const isTeamChannel = !!orgid && !!teamid
 
+        const isChannel = context.activity.conversation.conversationType === 'channel'
+        const isPersonal = context.activity.conversation.conversationType === 'personal'
         const firstBlank = text.indexOf(' ')
         const secondBlank = text.indexOf(' ', text.indexOf(' ') + 1)
         const cutarroba = secondBlank === -1 ? text.slice(firstBlank + 1) : text.slice(firstBlank + 1, secondBlank)
         const isCommand = cutarroba.indexOf(' ') === -1
-        if (isTeamChannel && isCommand) {
+
+        if (isCommand && isChannel) {
           if (cutarroba === 'login') {
             console.log('login')
             const adaptiveCard = loginTemplate.expand()
@@ -342,13 +342,43 @@ class TeamsConversationBot extends TeamsActivityHandler {
             const card = CardFactory.adaptiveCard(adaptiveCard)
             const message = MessageFactory.attachment(card)
             await context.sendActivity(message)
+          } else if (cutarroba === 'allchats') {
+
+            // fix
+            // apenas novas conversas, não em respostas
+
+            const boxenginebotkey = mkboxenginebotkey({
+              shard: context.activity.conversation.id
+            })
+            const whatsapp = await redis.hget(boxenginebotkey, 'whatsapp')
+            if (whatsapp) {
+              const type = 'getallchats'
+              await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp)
+            }
+
+          } else if (cutarroba === 'chatinfo') {
+            const type = 'getchatinfo'
+            const chat = '556599375661'
+            await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'chat', chat)
+
           } else {
             console.dir(context.activity.attachments)
             console.log(`nenhum comando para ${cutarroba}`)
           }
+        } else if (isCommand && isPersonal) {
+          if (cutarroba === 'help') {
+            const message = MessageFactory.text('Olá humano. Não compreendo!')
+            await context.sendActivity(message)
+          } else {
+            console.dir(context.activity.attachments)
+            console.log(`nenhum comando para ${cutarroba}`)
+          }
+
         } else {
           console.log(`text=${text}`)
         }
+
+        // AWAIT NEXT FOL ALL
         await next()
       })
 

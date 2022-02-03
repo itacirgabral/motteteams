@@ -342,7 +342,7 @@ const it = observable.subscribe({
                 reply: hook.reply ? 'sim' : 'não',
                 forward: hook.forward ? 'sim' : 'não',
                 text,
-                url: 'https://minio.gestormessenger.team/orgid/teamid/wid'
+                url: hook.url
             }})
 
           } else {
@@ -360,8 +360,22 @@ const it = observable.subscribe({
           await turnContext.sendActivity(message)
 
           const pipeline = redis.pipeline()
+
+          // cria atendimento
           pipeline.hmset(boxenginebotkey, 'whatsapp', bread.whatsapp, 'chat', hook.from) // const attid = `${bread.whatsapp}/${hook.from}`
           pipeline.hset(attmetakey, 'ref', JSON.stringify(ref))
+
+          // avisa no zap que foi visualizado
+          const type = 'sendReadReceipt'
+          const from = hook.from
+          const participant = hook.author
+          const wid = hook.wid
+          if (participant) {
+            pipeline.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', bread.whatsapp, 'from', from, 'participant', participant, 'wid', wid )
+          } else {
+            pipeline.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', bread.whatsapp, 'from', from, 'wid', wid )
+          }
+
           await pipeline.exec()
         })
       } else {
@@ -377,7 +391,7 @@ const it = observable.subscribe({
                 reply: hook.reply ? 'sim' : 'não',
                 forward: hook.forward ? 'sim' : 'não',
                 text,
-                url: `https://file.gestormessenger.team/${hook.wid}`
+                url: hook.url
             }})
 
           } else {
@@ -393,6 +407,17 @@ const it = observable.subscribe({
           const message = MessageFactory.attachment(card)
 
           await turnContext.sendActivity(message)
+
+          // avisar que chegou
+          const type = 'sendReadReceipt'
+          const from = hook.from
+          const participant = hook.author
+          const wid = hook.wid
+          if (participant) {
+            await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', bread.whatsapp, 'from', from, 'participant', participant, 'wid', wid )
+          } else {
+            await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', bread.whatsapp, 'from', from, 'wid', wid )
+          }
         })
       }
     } else if (bread.type === 'zuckershark') {
@@ -413,6 +438,8 @@ const it = observable.subscribe({
       await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
         //
       })
+    } else if (bread.type === 'chatlistupdate') {
+      console.log('chatlistupdate')
     }
   },
   error: console.error,
