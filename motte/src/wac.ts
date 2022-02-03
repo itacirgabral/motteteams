@@ -132,7 +132,7 @@ const wac = function wac (connect: Connect): Promise<string> {
   return new Promise((res, rej) => {
     if(connect.type === 'connect' && isConnAdm.isConnect(connect)) {
       console.log('iniciando o processo BAILEY CONNECT')
-      const browser: WABrowserDescription = ['GMAPI2', 'Chrome', '95']
+      const browser: WABrowserDescription = ['GMTeams', 'Chrome', '97']
 
       const { state, saveState } = saveConnect(connect.auth)
       const socket = baileys({

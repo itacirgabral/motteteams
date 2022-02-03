@@ -124,12 +124,12 @@ class TeamsConversationBot extends TeamsActivityHandler {
       super();
 
       this.onConversationUpdate(async (context, next) => {
-        const isTeams = context.activity.channelId === 'msteams'
-        const isAdd = context.activity.channelData.eventType === 'teamMemberAdded'
-        const isGSADMIN = context.activity.channelData.team.name === 'GSADMIN'
+        const isTeams = context.activity?.channelId === 'msteams'
+        const isAdd = context.activity?.channelData?.eventType === 'teamMemberAdded'
+        const isGSADMIN = context.activity?.channelData?.team?.name === 'GSADMIN'
 
-        const teamid = context.activity.channelData.team.id
-        const orgid = context.activity.channelData.tenant.id
+        const teamid = context.activity?.channelData?.team?.id
+        const orgid = context.activity?.channelData?.tenant?.id
         const shard = `${orgid}_${teamid}`
         console.log(`bot=${shard}`)
 
@@ -137,8 +137,8 @@ class TeamsConversationBot extends TeamsActivityHandler {
           const botkey = mkbotkey({ shard })
 
           const channelData = {
-            teamsChannelId: context.activity.channelData.team.id,
-            teamsTeamId: context.activity.channelData.team.id,
+            teamsChannelId: teamid,
+            teamsTeamId: teamid,
             ...context.activity.channelData,
             team: {
               ...context.activity.channelData.team,
@@ -164,8 +164,8 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const isTeams = context.activity.channelId === 'msteams'
         const isAdd = context.activity.action === 'add'
 
-        const teamid = context.activity.channelData.team.id
-        const orgid = context.activity.channelData.tenant.id
+        const teamid = context.activity?.channelData?.team?.id
+        const orgid = context.activity?.channelData?.tenant?.id
         const shard = `${orgid}_${teamid}`
 
         if (isTeams && isAdd) {
@@ -305,8 +305,8 @@ class TeamsConversationBot extends TeamsActivityHandler {
             await context.sendActivity(MessageFactory.text('Ok humano, finalizar-lo-ei'))
             const conversationId = context.activity.conversation.id
 
-            const teamid = context.activity.channelData.team.id
-            const orgid = context.activity.channelData.tenant.id
+            const teamid = context.activity?.channelData?.team?.id
+            const orgid = context.activity?.channelData?.tenant?.id
             const shard = `${orgid}_${teamid}`
 
             console.dir(context.activity)

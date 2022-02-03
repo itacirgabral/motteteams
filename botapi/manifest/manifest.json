@@ -60,6 +60,14 @@
             {
               "title": "reserva",
               "description": "Vincula grupo ou contato neste canal"
+            },
+            {
+              "title": "allchats",
+              "description": "Lista todos os chats do WhatsApp"
+            },
+            {
+              "title": "chatinfo",
+              "description": "Detalha as informações de um chat"
             }
           ]
         },
@@ -69,8 +77,8 @@
           ],
           "commands": [
             {
-              "title": "help",
-              "description": "Ajuda do sistema"
+              "title": "setup",
+              "description": "Inicia processo de instalação"
             }
           ]
         }
