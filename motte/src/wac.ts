@@ -1,8 +1,8 @@
 import { fork } from 'child_process'
 import { readFileSync, writeFileSync, rmSync } from 'fs'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
-import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, downloadContentFromMessage, WASocket } from '@adiwajshing/baileys-md'
-import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey } from '@gmapi/redispack'
+import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, downloadContentFromMessage, WASocket, Chat } from '@adiwajshing/baileys-md'
+import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey, mkchatkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 import { minio } from './minio'
@@ -152,23 +152,105 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.log(`blocklist.update ${type}`)
         console.dir(blocklist)
       })
-      socket.ev.on ('chats.delete', id => {
-        console.log(`chats.delete ${id}`)
+      socket.ev.on ('chats.delete', ids => {
+        console.log(`chats.delete ${ids}`)
       })
+
       socket.ev.on ('chats.set', ({ chats }) => {
         console.log('chats.set')
 
+        const toSet = new Map<string, number>()
+        const toDel = new Set<string>()
+  
+        chats.forEach(el => {
+          // o delete não funciona
+          // aparentemente também se reflete aqui
+          // é quando vem sem timestamp Long {}
+          const chatid = el.id
+          const timestamp = Number(el.conversationTimestamp)
+          if (Number.isInteger(timestamp) && timestamp > 0) {
+            if (toSet.has(chatid)) {
+              const lastTimestamp = toSet.get(chatid)
+              if (timestamp > lastTimestamp) {
+                toSet.set(chatid, timestamp)
+              }
+            } else {
+              toSet.set(chatid, timestamp)
+            }
+          } else {
+            toDel.add(chatid)
+            console.log(`toDel ${chatid}`)
+          }
+        })
+  
         const pipeline = redis.pipeline()
+        toSet.forEach((timestamp, jid) => {
+          const chatkey = mkchatkey({
+            shard: connect.shard,
+            chatid: jid.split('@')[0]
+          })
+          pipeline.hset(chatkey, 'timestamp', timestamp)
+        })
+        toDel.forEach(jid => {
+          const chatkey = mkchatkey({
+            shard: connect.shard,
+            chatid: jid.split('@')[0]
+          })
+          pipeline.del(chatkey)
+        })
+
+        // chats.set -> con ready
         pipeline.lpush(connect.cacapa, JSON.stringify({ type: 'connected' }))
         pipeline.expire(connect.cacapa, 90)
+
         pipeline.exec().catch(console.error)
       })
-      socket.ev.on ('chats.update', () => {
+      socket.ev.on ('chats.update', updates => {
         console.log('chats.update')
+
+        const toSet = new Map<string, number>()
+        const toDel = new Set<string>()
+        updates.forEach(el => {
+          const chatid = el.id
+          const timestamp = Number(el.conversationTimestamp)
+          if (Number.isInteger(timestamp) && timestamp > 0) {
+            if (toSet.has(chatid)) {
+              const lastTimestamp = toSet.get(chatid)
+              if (timestamp > lastTimestamp) {
+                toSet.set(chatid, timestamp)
+              }
+            } else {
+              toSet.set(chatid, timestamp)
+            }
+          } else {
+            toDel.add(chatid)
+            console.log(`toDel ${chatid}`)
+          }
+        })
+
+        const pipeline = redis.pipeline()
+        toSet.forEach((timestamp, jid) => {
+          const chatkey = mkchatkey({
+            shard: connect.shard,
+            chatid: jid.split('@')[0]
+          })
+          pipeline.hset(chatkey, 'timestamp', timestamp)
+        })
+        toDel.forEach(jid => {
+          const chatkey = mkchatkey({
+            shard: connect.shard,
+            chatid: jid.split('@')[0]
+          })
+          pipeline.del(chatkey)
+        })
+        pipeline.exec().catch(console.error)
+
       })
-      socket.ev.on ('chats.upsert', chat => {
+
+      socket.ev.on ('chats.upsert', chats => {
+        console.log("CHAT ABORDAGEM")
         console.log('chats.upsert')
-        console.dir(chat)
+        console.log(JSON.stringify(chats, null, 2))
       })
       socket.ev.on ('connection.update', async ({ connection, lastDisconnect }) => {
         console.log(`connection.update ${connection}`)

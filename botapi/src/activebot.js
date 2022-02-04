@@ -260,28 +260,22 @@ const it = observable.subscribe({
 
       await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async context => {
         // espera na caçapa pela leitura do qrcode pelo celular
-        const [, listResponde] = await redis.blpop(cacapaListResponse, 40)
-        const listDate = JSON.parse(listResponde)
-        const boxenginebotkey = mkboxenginebotkey({ shard: listDate.shard })
-
-        // listDate.shard whatsapp, vem do l push pop
-        // shard team bot instalação
-
-        const pipeline2 = redis.pipeline()
-        pipeline2.hset(botkey, 'whatsapp', listDate.shard)
-        pipeline2.hset(boxenginebotkey, 'gsadmin', shard)
-
-        await Promise.all([
-          pipeline2.exec(),
-          context.sendActivity(MessageFactory.text(`WhatsApp [${listDate.shard}](https://wa.me/${listDate.shard}) leu o qrcode.`))
-        ])
-
-        // dar essa noticia pelo avisador geral no toggle do baileys
-        // const [, c1json] = await redis.blpop(cacapaListResponse, 40)
-        // //const c1 = JSON.parse(c1json)
-        // const[, c2json] = await redis.blpop(cacapaListResponse, 40)
-        // //const c2 = JSON.parse(c2json)
-        // await context.sendActivity(MessageFactory.text(`Conectado!`))
+        const [, listResponde] = await redis.blpop(cacapaListResponse, 40).catch(() => ([, '_timeout_']))
+        if (listResponde !== '_timeout_') {
+          const listDate = JSON.parse(listResponde)
+          const boxenginebotkey = mkboxenginebotkey({ shard: listDate.shard })
+          const pipeline2 = redis.pipeline()
+          pipeline2.hset(botkey, 'whatsapp', listDate.shard)
+          pipeline2.hset(boxenginebotkey, 'gsadmin', shard)
+  
+          await Promise.all([
+            pipeline2.exec(),
+            context.sendActivity(MessageFactory.text(`WhatsApp [${listDate.shard}](https://wa.me/${listDate.shard}) leu o qrcode.`))
+          ])
+        } else {
+          // timeout
+          context.sendActivity(MessageFactory.text('Humano... Demorou pra ler o qrcode'))
+        }
       })
     } else if (bread.type === 'zaphook') {
       const hook = JSON.parse(bread.data)

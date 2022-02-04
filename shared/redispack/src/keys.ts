@@ -68,8 +68,8 @@ const mkbookphonekey = function mkbookphonekey ({ shard }: { shard: string; }) {
  * "hardid:xyz:zap:ijk:chat"
  * ```
  */
-const mkchatkey = function mkchatkey ({ shard }: { shard: string; }) {
-  return `hardid:${hardid}:zap:${shard}:chat`
+const mkchatkey = function mkchatkey ({ shard, chatid }: { shard: string; chatid: string}) {
+  return `hardid:${hardid}:zap:${shard}:chat:${chatid}`
 }
 
 /**
