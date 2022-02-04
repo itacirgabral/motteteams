@@ -352,7 +352,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
               console.log(`chatkeys=${chatkeys}`)
               const keychatids = await redis.keys(chatkeys)
               const chatids = keychatids.map(el => el.split(':').pop())
-              console.dir({ chatids })
 
               await context.sendActivities(chatids.map(chatid => MessageFactory.text(chatid)))
             } else {
