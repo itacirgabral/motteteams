@@ -38,12 +38,17 @@ process.on('message', async (message: Bread) => {
 
       await whatsappsocket.sendPresenceUpdate('available', jidto)
 
-    } else  if (message.type === 'getallchats') {
+    } else  /*if (message.type === 'getallchats') {
       const { shard } = message
       console.log(`get all chats of ${shard}`)
       const type = 'chatlistupdate'
-      await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', shard, 'chats', JSON.stringify(['chat1', 'chat11', 'chat21']))
-    } else  if (message.type === 'getchatinfo') {
+      const chatkeys = mkchatkey({ shard, chatid: '*' })
+      const chatids = await redis.keys(chatkeys)
+
+      console.dir({ chatids })
+    
+      await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', shard, 'chats', JSON.stringify(chatids))
+    } else */ if (message.type === 'getchatinfo') {
       const type = 'chatlistupdate'
       // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
     }

@@ -9,7 +9,7 @@ const {
 } = require('botbuilder');
 const ACData = require('adaptivecards-templating');
 
-const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptickey, mkboxenginebotkey, mkattkey, mkattmetakey } = require('@gmapi/redispack')
+const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptickey, mkboxenginebotkey, mkattkey, mkattmetakey, mkchatkey } = require('@gmapi/redispack')
 const QRCode = require('qrcode')
 
 const hardid = process.env.HARDID
@@ -348,11 +348,13 @@ class TeamsConversationBot extends TeamsActivityHandler {
 
             const whatsapp = await redis.hget(botkey, 'whatsapp')
             if (whatsapp) {
-              const type = 'getallchats'
-              await Promise.all([
-                context.sendActivity(MessageFactory.text('Ok humano, buscar-lo-ei')),
-                redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp)
-              ])
+              const chatkeys = mkchatkey({ shard: whatsapp, chatid: '*' })
+              console.log(`chatkeys=${chatkeys}`)
+              const keychatids = await redis.keys(chatkeys)
+              const chatids = keychatids.map(el => el.split(':').pop())
+              console.dir({ chatids })
+
+              await context.sendActivities(chatids.map(chatid => MessageFactory.text(chatid)))
             } else {
               await context.sendActivity(MessageFactory.text('humano... aqui não tem whatsapp'))
             }
