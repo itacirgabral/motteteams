@@ -19,7 +19,7 @@
         state: present
         update_cache: yes
 
-    - name: Install hashicorp stack
-      apt:
-        name: ['consul', 'nomad', 'vault', 'waypoint', 'boundary']
-        state: latest
+    # - name: Install hashicorp stack
+    #   apt:
+    #     name: ['consul', 'nomad', 'vault', 'waypoint', 'boundary']
+    #     state: latest

@@ -6,7 +6,7 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure("2") do |config|
-  config.vm.box = "hashicorp/bionic64"
+  config.vm.box = "hubuntu/focal64"
 
   config.vm.provision :shell, path: "bootstrap.sh", run: "once"
   config.vm.provision :docker
@@ -14,8 +14,7 @@ Vagrant.configure("2") do |config|
     ansible.playbook = "playbook.yaml"
   end
 
-  config.vm.network :forwarded_port, guest: 3000, host: 3000
   config.vm.network :forwarded_port, guest: 6379, host: 6379
   config.vm.network :forwarded_port, guest: 9000, host: 9000
-  config.vm.network :forwarded_port, guest: 5984, host: 5984
+  config.vm.network :forwarded_port, guest: 3978, host: 3978
 end
