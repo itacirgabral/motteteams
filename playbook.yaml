@@ -3,22 +3,56 @@
   become: true
   tasks:
 
+    # ZERO UPDATE
+    - name: Update apt repo and cache
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: 3600
+    - name: Upgrade all packages on servers
+      apt:
+        upgrade: dist
+        force_apt_get: yes
     - name: Install Pre Packages
       apt:
         name: ['curl', 'git', 'build-essential']
         state: latest
 
-    - name: add hashicorp apt key
+    # REDIS
+    - name: add redis apt key
       apt_key:
-        url: https://apt.releases.hashicorp.com/gpg
+        url: https://packages.redis.io/gpg
         state: present
-
-    - name: add hashicorp repository
+    - name: add redis repository
       apt_repository:
-        repo: deb [arch=amd64] https://apt.releases.hashicorp.com bionic main
+        repo: deb [arch=amd64] ppa:redislabs/redis focal main
         state: present
         update_cache: yes
+    - name: Install redis
+      apt:
+        name: ['redis']
+        state: latest
+    - name: Ensure Redis is started
+      service: name=redis state=started enabled=yes
+      sudo: true
+    - name: Ensure Redis Configuration
+      template: src=redis.conf.j2 dest=/etc/redis/redis.conf owner=root group=root mode=0644
+      sudo: true
+      notify: Redis Restart
 
+    # UFW
+
+    # 
+    # # HASHICORP
+    # - name: add hashicorp apt key
+    #   apt_key:
+    #     url: https://apt.releases.hashicorp.com/gpg
+    #     state: present
+    # - name: add hashicorp repository
+    #   apt_repository:
+    #     repo: deb [arch=amd64] https://apt.releases.hashicorp.com focal main
+    #     state: present
+    #     update_cache: yes
     # - name: Install hashicorp stack
     #   apt:
     #     name: ['consul', 'nomad', 'vault', 'waypoint', 'boundary']
