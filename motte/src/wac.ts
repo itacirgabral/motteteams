@@ -47,12 +47,61 @@ process.on('message', async (message: Bread) => {
       // console.log(`get all chats of ${shard}`)
       // const type = 'chatlistupdate'
       // const chatkeys = mkchatkey({ shard, chatid: '*' })
-      // const chatids = await redis.keys(chatkeys)    
+      // const chatids = await redis.keys(chatkeys)
       // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', shard, 'chats', JSON.stringify(chatids))
     } else if (message.type === 'getchatinfo') {
-      const type = 'getchatinfo'
-      console.log("OOOPA getchatinfo")
       console.dir(message)
+      // é um chat conhecido?
+      const chatkey = mkchatkey({ shard: message.shard, chatid: message.chat })
+      console.log(`chatinfo ${chatkey}`)
+      const hadChat = await redis.exists(chatkey)
+
+      if (hadChat) {
+        if (message.chat.length > 14) {
+          // group
+          const jid = `${ message.chat }@g.us`
+          const [
+            profile,
+            status,
+            groupMetadata
+          ] = await Promise.all([
+            whatsappsocket.profilePictureUrl(jid, 'image'),
+            whatsappsocket.fetchStatus(jid),
+            whatsappsocket.groupMetadata(jid)
+          ])
+
+          console.dir({
+            profile,
+            status,
+            groupMetadata
+          })
+
+        } else {
+          // person
+          const jid = `${ message.chat }@s.whatsapp.net`
+          const [
+            profile,
+            status,
+            businessProfile
+          ] = await Promise.all([
+            whatsappsocket.profilePictureUrl(jid, 'image'),
+            whatsappsocket.fetchStatus(jid),
+            whatsappsocket.getBusinessProfile(jid)
+          ])
+
+          console.dir({
+            profile,
+            status,
+            businessProfile
+          })
+        }
+
+      } else {
+        console.log('nops')
+        // cacapa -> chat não reconhecido
+      }
+
+
       // const [result] = await sock.onWhatsApp(id)
       // const status = await sock.fetchStatus("xyz@s.whatsapp.net")
       // for low res picture
@@ -60,7 +109,7 @@ process.on('message', async (message: Bread) => {
       // for high res picture
       // const ppUrl = await sock.profilePictureUrl("xyz@g.us", 'image')
       // onst profile = await sock.getBusinessProfile("xyz@s.whatsapp.net")
-      // const metadata = await sock.groupMetadata("abcd-xyz@g.us") 
+      // const metadata = await sock.groupMetadata("abcd-xyz@g.us")
 
       // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
     }
@@ -178,7 +227,7 @@ const wac = function wac (connect: Connect): Promise<string> {
 
         const toSet = new Map<string, number>()
         const toDel = new Set<string>()
-  
+
         chats.forEach(el => {
           // o delete não funciona
           // aparentemente também se reflete aqui
@@ -199,7 +248,7 @@ const wac = function wac (connect: Connect): Promise<string> {
             console.log(`toDel ${chatid}`)
           }
         })
-  
+
         const pipeline = redis.pipeline()
         toSet.forEach((timestamp, jid) => {
           const chatkey = mkchatkey({
@@ -312,8 +361,13 @@ const wac = function wac (connect: Connect): Promise<string> {
           process.exit(1)
         }
       })
-      socket.ev.on ('contacts.upsert', async () => {
+      socket.ev.on ('contacts.update', async contact => {
+        console.log('contacts.update')
+        console.dir(contact)
+      })
+      socket.ev.on ('contacts.upsert', async contact => {
         console.log('contacts.upsert')
+        console.dir(contact)
       })
       socket.ev.on ('group-participants.update', ({ id, participants, action }) => {
         console.log(`group-participants.update ${id}`)
