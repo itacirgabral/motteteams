@@ -359,10 +359,19 @@ class TeamsConversationBot extends TeamsActivityHandler {
             }
 
           } else if (cutarroba === 'chatinfo') {
-            const type = 'getchatinfo'
-            const chat = '556599375661'
-            await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'chat', chat)
-
+            const chatid = text.slice(secondBlank + 1)
+            console.log(`chatid=${chatid}`)
+            if (Number.isInteger(parseInt(chatid))) {
+              const type = 'getchatinfo'
+              const whatsapp = await redis.hget(botkey, 'whatsapp')
+              if (whatsapp) {
+                await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'chat', chatid)
+              } else {
+                const textMessage = 'Sem bots no momento'
+                await context.sendActivity(MessageFactory.text(textMessage))
+              }
+              
+            }
           } else {
             console.dir(context.activity.attachments)
             console.log(`nenhum comando para ${cutarroba}`)

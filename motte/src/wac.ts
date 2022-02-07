@@ -38,18 +38,30 @@ process.on('message', async (message: Bread) => {
 
       await whatsappsocket.sendPresenceUpdate('available', jidto)
 
-    } else  /*if (message.type === 'getallchats') {
-      const { shard } = message
-      console.log(`get all chats of ${shard}`)
-      const type = 'chatlistupdate'
-      const chatkeys = mkchatkey({ shard, chatid: '*' })
-      const chatids = await redis.keys(chatkeys)
+    } else  if (message.type === 'getallchats') {
+      // /////////////////////////////// //
+      // seria cosultado direto do redis //
+      // /////////////////////////////// //
 
-      console.dir({ chatids })
-    
-      await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', shard, 'chats', JSON.stringify(chatids))
-    } else */ if (message.type === 'getchatinfo') {
-      const type = 'chatlistupdate'
+      // const { shard } = message
+      // console.log(`get all chats of ${shard}`)
+      // const type = 'chatlistupdate'
+      // const chatkeys = mkchatkey({ shard, chatid: '*' })
+      // const chatids = await redis.keys(chatkeys)    
+      // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', shard, 'chats', JSON.stringify(chatids))
+    } else if (message.type === 'getchatinfo') {
+      const type = 'getchatinfo'
+      console.log("OOOPA getchatinfo")
+      console.dir(message)
+      // const [result] = await sock.onWhatsApp(id)
+      // const status = await sock.fetchStatus("xyz@s.whatsapp.net")
+      // for low res picture
+      // const ppUrl = await sock.profilePictureUrl("xyz@g.us")
+      // for high res picture
+      // const ppUrl = await sock.profilePictureUrl("xyz@g.us", 'image')
+      // onst profile = await sock.getBusinessProfile("xyz@s.whatsapp.net")
+      // const metadata = await sock.groupMetadata("abcd-xyz@g.us") 
+
       // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
     }
   }
@@ -597,6 +609,8 @@ const wacPC = async (connectionActions: ConnectionActions) => {
       break
     case 'getchatinfo':
       console.log(`patchpanel[${connectionActions.shard}] getchatinfo`)
+
+      // apenas se tiver conectado?
       if (patchpanel.has(connectionActions.shard)) {
         const { type, hardid, shard, chat } = connectionActions
         const blueCable = patchpanel.get(shard)
@@ -607,7 +621,6 @@ const wacPC = async (connectionActions: ConnectionActions) => {
           shard,
           chat
         })
-
       }
       break
   }
