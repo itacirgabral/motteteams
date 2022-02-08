@@ -50,10 +50,7 @@ process.on('message', async (message: Bread) => {
       // const chatids = await redis.keys(chatkeys)
       // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', shard, 'chats', JSON.stringify(chatids))
     } else if (message.type === 'getchatinfo') {
-      console.dir(message)
-      // é um chat conhecido?
       const chatkey = mkchatkey({ shard: message.shard, chatid: message.chat })
-      console.log(`chatinfo ${chatkey}`)
       const hadChat = await redis.exists(chatkey)
 
       if (hadChat) {
@@ -70,11 +67,18 @@ process.on('message', async (message: Bread) => {
             whatsappsocket.groupMetadata(jid)
           ])
 
-          console.dir({
+          const groupInfoTxt = JSON.stringify({
+            isGroup: true,
             profile,
             status,
             groupMetadata
           })
+
+          // respoder na cacapa
+          const pipeline = redis.pipeline()
+          pipeline.lpush(message.cacapa, groupInfoTxt)
+          pipeline.expire(message.cacapa, 90)
+          await pipeline.exec()
 
         } else {
           // person
@@ -89,11 +93,19 @@ process.on('message', async (message: Bread) => {
             whatsappsocket.getBusinessProfile(jid)
           ])
 
-          console.dir({
+          // respoder na cacapa
+          const personInfoTxt = JSON.stringify({
+            isGroup: false,
             profile,
             status,
             businessProfile
           })
+
+          // respoder na cacapa
+          const pipeline = redis.pipeline()
+          pipeline.lpush(message.cacapa, personInfoTxt)
+          pipeline.expire(message.cacapa, 90)
+          await pipeline.exec()
         }
 
       } else {
@@ -666,14 +678,15 @@ const wacPC = async (connectionActions: ConnectionActions) => {
 
       // apenas se tiver conectado?
       if (patchpanel.has(connectionActions.shard)) {
-        const { type, hardid, shard, chat } = connectionActions
+        const { type, hardid, shard, chat, cacapa } = connectionActions
         const blueCable = patchpanel.get(shard)
         const wacP = blueCable.wacP
         wacP.send({
           type,
           hardid,
           shard,
-          chat
+          chat,
+          cacapa
         })
       }
       break

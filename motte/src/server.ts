@@ -111,6 +111,7 @@ const mkServer = function mkServer () {
               hardid: bread.hardid,
               shard: bread.shard,
               chat: bread.chat,
+              cacapa: bread.cacapa
             })
             break
           default:

@@ -365,12 +365,20 @@ class TeamsConversationBot extends TeamsActivityHandler {
               const type = 'getchatinfo'
               const whatsapp = await redis.hget(botkey, 'whatsapp')
               if (whatsapp) {
-                await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'chat', chatid)
+                const cacapa = mkcacapakey()
+                await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'chat', chatid, 'cacapa', cacapa)
+                const [_key, chatinfoResponse] = await redis.blpop(cacapa, 40)
+
+                if (chatinfoResponse) {
+                  await context.sendActivity(MessageFactory.text(chatinfoResponse))
+                } else {
+                  await context.sendActivity(MessageFactory.text(`chatinfo ${chatid} timeout`))
+                }
               } else {
                 const textMessage = 'Sem bots no momento'
                 await context.sendActivity(MessageFactory.text(textMessage))
               }
-              
+
             }
           } else {
             console.dir(context.activity.attachments)
