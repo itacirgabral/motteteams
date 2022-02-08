@@ -55,8 +55,8 @@ const mkcredskey = function mkcredskey ({ shard }: { shard: string }) {
  * "hardid:xyz:zap:ijk:bookphone"
  * ```
  */
-const mkbookphonekey = function mkbookphonekey ({ shard }: { shard: string; }) {
-  return `hardid:${hardid}:zap:${shard}:bookphone`
+const mkbookphonekey = function mkbookphonekey ({ shard, cid }: { shard: string; cid: string; }) {
+  return `hardid:${hardid}:zap:${shard}:bookphone:${cid}`
 }
 
 /**

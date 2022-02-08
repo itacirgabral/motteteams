@@ -380,12 +380,35 @@ const wac = function wac (connect: Connect): Promise<string> {
       // CONTACTS
       socket.ev.on ('contacts.update', async contact => {
         console.log('contacts.update')
-        console.dir(contact)
+        console.log('######################################')
+        const pipeline = redis.pipeline()
+        contact.forEach(el => {
+          // contacts.upsert
+          const { id, imgUrl, name, notify, status } = el
+          const cid = id.split('@')[0]
+          const bookphonekey = mkbookphonekey({ shard: connect.shard, cid })
+
+          if (imgUrl) {
+            pipeline.hset(bookphonekey, 'imgUrl', imgUrl)
+          }
+          if (name) {
+            pipeline.hset(bookphonekey, 'name', name)
+          }
+          if (notify) {
+            pipeline.hset(bookphonekey, 'imgUrl', notify)
+          }
+          if (status) {
+            pipeline.hset(bookphonekey, 'imgUrl', status)
+          }
+        })
+        await pipeline.exec()
+        console.log(JSON.stringify(contact))
+        console.log('######################################')
       })
       socket.ev.on ('contacts.upsert', async contact => {
         console.log('contacts.upsert')
-        console.dir(contact)
       })
+
       socket.ev.on ('group-participants.update', ({ id, participants, action }) => {
         console.log(`group-participants.update ${id}`)
         console.dir({ participants, action })
@@ -483,32 +506,8 @@ const wac = function wac (connect: Connect): Promise<string> {
           await Promise.all(allwait)
 
           // [ ] salvar nos minio
-        } else if (type === 'append') {
-          const chatMessages = messages
-            .filter(el => !el.messageStubType)
-            .filter(el => !el.status)
-
-          if (chatMessages.length > 0) {
-            const jids = new Set()
-            chatMessages.forEach(m => {
-              if(m.key.remoteJid) {
-                jids.add(m.key.remoteJid)
-              }
-            })
-
-            // redis allowedJids
-            console.log(`allowedJids ${Array.from(jids).join(', ')}`)
-            //mkbookphonekey
-
-            const pipeline = redis.pipeline()
-            const bookphonekey = mkbookphonekey({ shard: connect.shard })
-            for(const jid of jids) {
-              pipeline.hsetnx(bookphonekey, jid, 'nodatayet')
-            }
-            await pipeline.exec()
-          }
         } else {
-          console.log('any ')
+          console.log('type ')
           console.log(JSON.stringify({ messages, type }, null, 2))
         }
       })
