@@ -100,8 +100,6 @@ process.on('message', async (message: Bread) => {
             status,
             businessProfile
           })
-
-          // respoder na cacapa
           const pipeline = redis.pipeline()
           pipeline.lpush(message.cacapa, personInfoTxt)
           pipeline.expire(message.cacapa, 90)
@@ -230,10 +228,11 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.log(`blocklist.update ${type}`)
         console.dir(blocklist)
       })
+
+      // CHATS
       socket.ev.on ('chats.delete', ids => {
         console.log(`chats.delete ${ids}`)
       })
-
       socket.ev.on ('chats.set', ({ chats }) => {
         console.log('chats.set')
 
@@ -324,15 +323,16 @@ const wac = function wac (connect: Connect): Promise<string> {
         pipeline.exec().catch(console.error)
 
       })
-
       socket.ev.on ('chats.upsert', chats => {
         console.log("CHAT ABORDAGEM")
         console.log('chats.upsert')
         console.log(JSON.stringify(chats, null, 2))
       })
+
       socket.ev.on ('connection.update', async ({ connection, lastDisconnect }) => {
         console.log(`connection.update ${connection}`)
         console.dir({ connection, lastDisconnect })
+        console.log(JSON.stringify(console.dir({ connection, lastDisconnect }), null, 2))
         // const [whMain, whTeams, whSpy] = await webhookP
 
         if (connection) {
@@ -354,6 +354,7 @@ const wac = function wac (connect: Connect): Promise<string> {
           const statusCode = err2?.output?.statusCode
           if (statusCode === 401) {
             console.log(`apagando ${connect.auth}`)
+
             rmSync(connect.auth)
             const boxenginebotkey = mkboxenginebotkey({
               shard: connect.shard
@@ -363,16 +364,20 @@ const wac = function wac (connect: Connect): Promise<string> {
             const botkey = mkbotkey({
               shard: orgid_teamid
             })
+
             await redis
               .pipeline()
               .hdel(botkey, 'whatsapp')
               .del(boxenginebotkey)
+              .exec()
           }
 
           console.log('## process.exit(1) ##')
           process.exit(1)
         }
       })
+
+      // CONTACTS
       socket.ev.on ('contacts.update', async contact => {
         console.log('contacts.update')
         console.dir(contact)
