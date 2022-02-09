@@ -380,14 +380,12 @@ const wac = function wac (connect: Connect): Promise<string> {
       // CONTACTS
       socket.ev.on ('contacts.update', async contact => {
         console.log('contacts.update')
-        console.log('######################################')
         const pipeline = redis.pipeline()
         contact.forEach(el => {
           // contacts.upsert
           const { id, imgUrl, name, notify, status } = el
           const cid = id.split('@')[0]
           const bookphonekey = mkbookphonekey({ shard: connect.shard, cid })
-
           if (imgUrl) {
             pipeline.hset(bookphonekey, 'imgUrl', imgUrl)
           }
@@ -395,15 +393,13 @@ const wac = function wac (connect: Connect): Promise<string> {
             pipeline.hset(bookphonekey, 'name', name)
           }
           if (notify) {
-            pipeline.hset(bookphonekey, 'imgUrl', notify)
+            pipeline.hset(bookphonekey, 'notify', notify)
           }
           if (status) {
-            pipeline.hset(bookphonekey, 'imgUrl', status)
+            pipeline.hset(bookphonekey, 'status', status)
           }
         })
         await pipeline.exec()
-        console.log(JSON.stringify(contact))
-        console.log('######################################')
       })
       socket.ev.on ('contacts.upsert', async contact => {
         console.log('contacts.upsert')
@@ -413,14 +409,53 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.log(`group-participants.update ${id}`)
         console.dir({ participants, action })
       })
-      socket.ev.on ('groups.update', partialGroupInfo => {
+      socket.ev.on ('groups.update', async partialGroupInfo => {
         console.log('groups.update')
         console.dir(partialGroupInfo)
+
+        const pipeline = redis.pipeline()
+        partialGroupInfo.forEach(el => {
+          const { id, announce, creation, desc, descId, descOwner, ephemeralDuration, owner, participants, restrict, subject } = el
+
+          const cid = id.split('@')[0]
+          const bookphonekey = mkbookphonekey({ shard: connect.shard, cid })
+          if (announce !== undefined) {
+            // announce is set when the group only allows admins to write messages
+            pipeline.hset(bookphonekey, 'announce', announce)
+          }
+          if (restrict !== undefined) {
+            // restrict is set when the group only allows admins to change group settings
+            pipeline.hset(bookphonekey, 'restrict', restrict)
+          }
+          if (subject) {
+            pipeline.hset(bookphonekey, 'subject', subject)
+          }
+          if (owner) {
+            pipeline.hset(bookphonekey, 'owner', owner)
+          }
+          if (descOwner) {
+            pipeline.hset(bookphonekey, 'descOwner', descOwner)
+          }
+          if (descId) {
+            pipeline.hset(bookphonekey, 'descId', descId)
+          }
+          if (desc) {
+            pipeline.hset(bookphonekey, 'desc', desc)
+          }
+          if (creation) {
+            pipeline.hset(bookphonekey, 'creation', creation)
+          }
+          if (ephemeralDuration) {
+            pipeline.hset(bookphonekey, 'ephemeralDuration', ephemeralDuration)
+          }
+        })
+        await pipeline.exec()
       })
-      // socket.ev.on ('message-info.update', messageInfo => {
-      //   console.log('message-info.update')
-      //   console.dir(messageInfo)
-      // })
+      socket.ev.on ('groups.upsert', el => {
+        console.log('groups.upsert')
+        console.dir(el)
+      })
+
       socket.ev.on ('messages.delete', (idxs) => {
         console.log('messages.delete')
         console.dir(idxs)
