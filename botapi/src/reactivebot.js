@@ -124,7 +124,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
       super();
 
       this.onConversationUpdate(async (context, next) => {
-        const isTeams = context.activity?.channelId === 'msteams'
+        const isTeams = context.activity.conversation.conversationType === 'channel'
         const isAdd = context.activity?.channelData?.eventType === 'teamMemberAdded'
         const isGSADMIN = context.activity?.channelData?.team?.name === 'GSADMIN'
 
@@ -161,8 +161,12 @@ class TeamsConversationBot extends TeamsActivityHandler {
 
       this.onInstallationUpdate(async (context, next) => {
         console.log('onInstallationUpdate')
-        const isTeams = context.activity.channelId === 'msteams'
+        const isTeams = context.activity.conversation.conversationType === 'channel'
         const isAdd = context.activity.action === 'add'
+        /*
+        conversation: {
+    conversationType: 'personal'
+        */
 
         const teamid = context.activity?.channelData?.team?.id
         const orgid = context.activity?.channelData?.tenant?.id
