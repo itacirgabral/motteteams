@@ -436,6 +436,68 @@ class TeamsConversationBot extends TeamsActivityHandler {
     }
   }
 
+  handleTeamsTabFetch(context, tabRequest) {
+    return {
+      tab: {
+        type: "continue",
+        value: {
+            cards: [
+                {
+                    "card": {
+                      "type": "AdaptiveCard",
+                      "body": [
+                          {
+                              "type": "TextBlock",
+                              "size": "Medium",
+                              "weight": "Bolder",
+                              "text": "Publish Adaptive Card Schema"
+                          },
+                          {
+                              "type": "ColumnSet",
+                              "columns": [
+                                  {
+                                      "type": "Column",
+                                      "items": [
+                                          {
+                                              "type": "Image",
+                                              "style": "Person",
+                                              "url": "https://pbs.twimg.com/profile_images/3647943215/d7f12830b3c17a5a9e4afcc370e3a37e_400x400.jpeg",
+                                              "size": "Small"
+                                          }
+                                      ],
+                                      "width": "auto"
+                                  },
+                                  {
+                                      "type": "Column",
+                                      "items": [
+                                          {
+                                              "type": "TextBlock",
+                                              "weight": "Bolder",
+                                              "text": "Paulo Paixao",
+                                              "wrap": true
+                                          }
+                                      ],
+                                      "width": "stretch"
+                                  }
+                              ]
+                          },
+                          {
+                              "type": "TextBlock",
+                              "text": "ow that we have defined the main rules and features of the format, we need to produce a schema and publish it to GitHub. The schema will be the starting point of our reference documentation",
+                              "wrap": true
+                          }
+                      ],
+                      "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                      "version": "1.5"
+                  }
+                }
+            ]
+        },
+    },
+    responseType: "tab"
+    }
+  }
+
   async handleTeamsSigninVerifyState(context, query) {
     console.log("SsoBot handleTeamsSigninVerifyState")
   }
