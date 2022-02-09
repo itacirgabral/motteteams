@@ -477,12 +477,6 @@ const wac = function wac (connect: Connect): Promise<string> {
           cleanMessage.forEach(async (json, idx) => {
             if (!json.nada && json.from !== 'status') {
               const type = 'zaphook'
-              const data = JSON.stringify(json)
-              // redis.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard)
-
-              // const jidfrom = json.from.length > 14 ? `${json.from}@g.us` : `${json.from}@s.whatsapp.net`
-              // const participant = json.author ? `${json.author}@s.whatsapp.net` : undefined
-              // allwait.push(socket.sendReadReceipt(jidfrom, participant, [json.wid]))
 
               if (midiaMessage.includes(json.type)) {
                 // fragile message[json.type]
@@ -517,6 +511,7 @@ const wac = function wac (connect: Connect): Promise<string> {
                               ...json,
                               url
                             })
+
                             res(redis.xadd(panopticbotkey, '*', 'type', type, 'data', data, 'whatsapp', connect.shard))
                           } else {
                             rej(err)
@@ -541,6 +536,9 @@ const wac = function wac (connect: Connect): Promise<string> {
           await Promise.all(allwait)
 
           // [ ] salvar nos minio
+        } else if (type === 'append') {
+          console.log('type append')
+          // baloes de meta mensagens, tipo "vc é adm agora"
         } else {
           console.log('type ')
           console.log(JSON.stringify({ messages, type }, null, 2))
