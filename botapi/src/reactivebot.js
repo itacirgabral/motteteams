@@ -163,10 +163,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
         console.log('onInstallationUpdate')
         const isTeams = context.activity.conversation.conversationType === 'channel'
         const isAdd = context.activity.action === 'add'
-        /*
-        conversation: {
-    conversationType: 'personal'
-        */
 
         const teamid = context.activity?.channelData?.team?.id
         const orgid = context.activity?.channelData?.tenant?.id
@@ -437,65 +433,124 @@ class TeamsConversationBot extends TeamsActivityHandler {
   }
 
   handleTeamsTabFetch(context, tabRequest) {
-    return {
-      tab: {
-        type: "continue",
-        value: {
-            cards: [
-                {
-                    "card": {
-                      "type": "AdaptiveCard",
-                      "body": [
-                          {
-                              "type": "TextBlock",
-                              "size": "Medium",
-                              "weight": "Bolder",
-                              "text": "Publish Adaptive Card Schema"
-                          },
-                          {
-                              "type": "ColumnSet",
-                              "columns": [
-                                  {
-                                      "type": "Column",
-                                      "items": [
-                                          {
-                                              "type": "Image",
-                                              "style": "Person",
-                                              "url": "https://pbs.twimg.com/profile_images/3647943215/d7f12830b3c17a5a9e4afcc370e3a37e_400x400.jpeg",
-                                              "size": "Small"
-                                          }
-                                      ],
-                                      "width": "auto"
-                                  },
-                                  {
-                                      "type": "Column",
-                                      "items": [
-                                          {
-                                              "type": "TextBlock",
-                                              "weight": "Bolder",
-                                              "text": "Paulo Paixao",
-                                              "wrap": true
-                                          }
-                                      ],
-                                      "width": "stretch"
-                                  }
-                              ]
-                          },
-                          {
-                              "type": "TextBlock",
-                              "text": "ow that we have defined the main rules and features of the format, we need to produce a schema and publish it to GitHub. The schema will be the starting point of our reference documentation",
-                              "wrap": true
-                          }
-                      ],
-                      "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                      "version": "1.5"
-                  }
-                }
-            ]
+    console.log('handleTeamsTabFetch')
+
+    const tabName = tabRequest?.tabContext?.tabEntityId
+    switch (tabName) {
+      case 'GestorMessengerContatos':
+        return {
+          tab: {
+            type: "continue",
+            value: {
+                cards: [
+                    {
+                        "card": {
+                          "type": "AdaptiveCard",
+                          "body": [
+                              {
+                                  "type": "TextBlock",
+                                  "size": "Medium",
+                                  "weight": "Bolder",
+                                  "text": "Publish Adaptive Card Schema"
+                              },
+                              {
+                                  "type": "ColumnSet",
+                                  "columns": [
+                                      {
+                                          "type": "Column",
+                                          "items": [
+                                              {
+                                                  "type": "Image",
+                                                  "style": "Person",
+                                                  "url": "https://pbs.twimg.com/profile_images/3647943215/d7f12830b3c17a5a9e4afcc370e3a37e_400x400.jpeg",
+                                                  "size": "Small"
+                                              }
+                                          ],
+                                          "width": "auto"
+                                      },
+                                      {
+                                          "type": "Column",
+                                          "items": [
+                                              {
+                                                  "type": "TextBlock",
+                                                  "weight": "Bolder",
+                                                  "text": "Paulo Paixao",
+                                                  "wrap": true
+                                              }
+                                          ],
+                                          "width": "stretch"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "type": "TextBlock",
+                                  "text": "ow that we have defined the main rules and features of the format, we need to produce a schema and publish it to GitHub. The schema will be the starting point of our reference documentation",
+                                  "wrap": true
+                              }
+                          ],
+                          "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                          "version": "1.5"
+                      }
+                    }
+                ]
+            },
         },
-    },
-    responseType: "tab"
+        responseType: "tab"
+        }
+        break;
+      case 'GestorMessengerEquipes':
+        return {
+          tab: {
+            type: "continue",
+            value: {
+                cards: [
+                    {
+                        "card": {
+                          "type": "AdaptiveCard",
+                          "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                          "version": "1.3",
+                          "body": [
+                            {
+                              "type": "TextBlock",
+                              "text": "ABA DE EQUIPES",
+                              "horizontalAlignment": "Center",
+                              "fontType": "Monospace",
+                              "size": "ExtraLarge",
+                              "weight": "Bolder",
+                              "color": "Default",
+                              "separator": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "Em quais equipes você está?",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "Quais instâncias estão em quais equipes?",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "Qual canal está associado a qual remetente?",
+                              "wrap": true
+                            }
+                          ]
+                      }
+                    }
+                ]
+            },
+        },
+        responseType: "tab"
+        }
+        break;
+      default:
+        break;
     }
+    console.log(JSON.stringify(context, null, 2))
+    console.log(JSON.stringify(tabRequest, null, 2))
+
+    return
   }
 
   async handleTeamsSigninVerifyState(context, query) {
