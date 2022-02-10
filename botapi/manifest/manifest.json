@@ -1,7 +1,7 @@
 {
-  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.12/MicrosoftTeams.schema.json",
+  "$schema": "https://raw.githubusercontent.com/OfficeDev/microsoft-teams-app-schema/preview/DevPreview/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.9",
   "version": "1.2.003",
-  "manifestVersion": "1.12",
   "id": "64187adc-f9e5-433a-9b3f-a7d5b8335e5c",
   "packageName": "com.package.name",
   "name": {
@@ -24,12 +24,25 @@
     "color": "color.png"
   },
   "accentColor": "#007869",
+  "staticTabs": [
+    {
+      "entityId": "GestorMessengerContatos",
+      "name": "Contatos",
+      "contentBotId": "de788039-604f-49e0-9545-34dff1e455a9",
+      "scopes": ["personal"]
+    },
+    {
+      "entityId": "GestorMessengerEquipes",
+      "name": "Equipes",
+      "contentBotId": "de788039-604f-49e0-9545-34dff1e455a9",
+      "scopes": ["personal"]
+    }
+  ],
   "bots": [
     {
       "botId": "de788039-604f-49e0-9545-34dff1e455a9",
       "scopes": [
-        "team",
-        "personal"
+        "team"
       ],
       "isNotificationOnly": false,
       "supportsCalling": false,
@@ -63,27 +76,20 @@
             },
             {
               "title": "allchats",
-              "description": "Lista todos os chats do WhatsApp"
+              "description": "Lista todos os chats"
             },
             {
               "title": "chatinfo",
-              "description": "Detalha as informações de um chat"
-            }
-          ]
-        },
-        {
-          "scopes": [
-            "personal"
-          ],
-          "commands": [
-            {
-              "title": "setup",
-              "description": "Inicia processo de instalação"
+              "description": "Busca por informações de um chat"
             }
           ]
         }
       ]
     }
+  ],
+  "devicePermissions": [
+    "notifications",
+    "openExternal"
   ],
   "validDomains": [
     "alfabot.gestormessenger.team",
