@@ -42,7 +42,8 @@
     {
       "botId": "de788039-604f-49e0-9545-34dff1e455a9",
       "scopes": [
-        "team"
+        "team",
+        "personal"
       ],
       "isNotificationOnly": false,
       "supportsCalling": false,
@@ -81,6 +82,17 @@
             {
               "title": "chatinfo",
               "description": "Busca por informações de um chat"
+            }
+          ]
+        },
+        {
+          "scopes": [
+            "personal"
+          ],
+          "commands": [
+            {
+              "title": "help",
+              "description": "Ajuda do Sistema"
             }
           ]
         }

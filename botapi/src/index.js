@@ -2,31 +2,9 @@ require('dotenv').config({
   path: require('path').join(__dirname, '.env')
 });
 
+require('./activebot')
 const restify = require('restify')
-const {
-    CardFactory,
-    CloudAdapter,
-    ConfigurationServiceClientCredentialFactory,
-    createBotFrameworkAuthenticationFromConfiguration,
-    MessageFactory,
-    TurnContext
-} = require('botbuilder')
-const {
-  client: redis,
-  panoptickey,
-  panopticbotkey,
-  trafficwand,
-  mkbotkey,
-  mkattkey,
-  mkattmetakey,
-  mkcacapakey,
-  mkboxenginebotkey
-} = require('@gmapi/redispack')
-
-
 const { TeamsConversationBot } = require('./reactivebot')
-const activebot = require('./activebot')
-
 const adapter = require('./msteamsAdapter')
 
 adapter.onTurnError = async (context, error) => {

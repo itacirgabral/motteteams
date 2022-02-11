@@ -1,16 +1,15 @@
 const {
-  ActivityTypes,
   CardFactory,
   MessageFactory,
   TeamsActivityHandler,
-  teamsGetChannelId,
-  TurnContext,
+  tokenExchangeOperationName,
   TeamsInfo
 } = require('botbuilder');
 const ACData = require('adaptivecards-templating');
 
 const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptickey, mkboxenginebotkey, mkattkey, mkattmetakey, mkchatkey } = require('@gmapi/redispack')
-const QRCode = require('qrcode')
+const QRCode = require('qrcode');
+const adapter = require('./msteamsAdapter');
 
 const hardid = process.env.HARDID
 
@@ -386,6 +385,31 @@ class TeamsConversationBot extends TeamsActivityHandler {
           }
         } else if (isCommand && isPersonal) {
           if (cutarroba === 'help') {
+
+            const OAuthScopeKey = context.adapter.OAuthScopeKey
+            const UserTokenClientKey = context.adapter.UserTokenClientKey
+            const botFrameworkAuthentication = context.adapter.botFrameworkAuthentication
+
+          //   const oauthCard = await CardFactory.oauthCard(
+          //     myConnectionName,
+          //     "Title",
+          //     "text",
+          //     signInLink,
+          //     {
+          //         id: this.accessToken,
+          //         uri: `api://botid-${myAppId}`
+          //     }
+          // )
+
+            console.dir(botFrameworkAuthentication)
+
+            const tokenExchangeResponse = context.turnState.get("tokenExchangeResponse")
+            if (tokenExchangeResponse) {
+              console.dir({ tokenExchangeResponse })
+            } else {
+              console.log('no tokenExchangeResponse')
+            }
+
             const message = MessageFactory.text('Olá humano. Não compreendo!')
             await context.sendActivity(message)
           } else {
@@ -557,7 +581,26 @@ class TeamsConversationBot extends TeamsActivityHandler {
     console.log("SsoBot handleTeamsSigninVerifyState")
   }
   async handleTeamsSigninTokenExchange(context, query) {
-    console.log("SsoBot handleTeamsSigninTokenExchange")
+    console.log("SsoBot handleTeamsSigninTokenExchange");
+    if (context?.activity?.name === tokenExchangeOperationName) {
+      const tokenExchangeRequest = context?.activity?.value;
+      const tkReq = tokenExchangeRequest
+
+      console.dir({ tokenExchangeRequest })
+      const connectionName = process.env.SSO_CONNECTION_NAME
+      const userId = context.activity.from.id
+
+      const tkRes = await context.adapter.exchangeToken(context, connectionName, userId, tkReq).catch(err => {
+        console.error(err)
+      })
+      if (tkRes) {
+        console.dir({ tkRes })
+      } else {
+        console.log('no tkRes')
+      }
+    } else {
+      console.log(`${context?.activity?.name} !== ${tokenExchangeOperationName}`)
+    }
   }
 }
 
