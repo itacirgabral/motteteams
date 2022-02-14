@@ -118,6 +118,11 @@ const loginTemplate = new ACData.Template({
   version: '1.3'
 })
 
+let msGraphClient
+const { Client } = require('@microsoft/microsoft-graph-client')
+const fetch = require('isomorphic-fetch')
+globalThis.fetch = fetch
+
 class TeamsConversationBot extends TeamsActivityHandler {
   constructor() {
       super();
@@ -385,7 +390,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
           }
         } else if (isCommand && isPersonal) {
           if (cutarroba === 'help') {
-
             const connectionName = process.env.SSO_CONNECTION_NAME
             const appId = process.env.MicrosoftAppId
 
@@ -394,11 +398,20 @@ class TeamsConversationBot extends TeamsActivityHandler {
               uri: `api://botid-${appId}`
             })
 
-            console.dir(oauthCard)
-
             const message = MessageFactory.attachment(oauthCard)
             await context.sendActivity(message)
+          } else if (cutarroba === 'token') {
+            if (msGraphClient) {
+              const me = await msGraphClient.api("me").get()
 
+              console.log("ME ME ME ME ME ME ME ME ME ME ME ME ME ME ME ME ME ME ")
+              console.dir(me)
+
+              await context.sendActivity(MessageFactory.text(`me=${me}`))
+            } else {
+              await context.sendActivity(MessageFactory.text('no token'))
+            }
+            //
           } else {
             console.dir(context.activity.attachments)
             console.log(`nenhum comando para ${cutarroba}`)
@@ -570,10 +583,13 @@ class TeamsConversationBot extends TeamsActivityHandler {
   async handleTeamsSigninTokenExchange(context, query) {
     console.log("SsoBot handleTeamsSigninTokenExchange");
     if (context?.activity?.name === tokenExchangeOperationName) {
-      const tokenExchangeRequest = context?.activity?.value;
-      const tkReq = tokenExchangeRequest
+      console.dir(context?.activity?.value)
 
-      console.dir({ tokenExchangeRequest })
+      msGraphClient = Client.init({
+        authProvider: cb => {
+          cb(null, context?.activity?.value)
+        }
+      })
 
     } else {
       console.log(`${context?.activity?.name} !== ${tokenExchangeOperationName}`)
