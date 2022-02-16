@@ -17,19 +17,33 @@ router.get(`/`, async (req, res) => {
   res.send(wacs)
 })
 router.post('/respondercomtextosimples', async (req, res) => {
-  const { to, msg, whatsapp } = req.body
+  const { whatsapp, to, msg } = req.body
 
   const type = 'respondercomtextosimples'
-  await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'to', to, 'msg', msg, 'cacapa', 'random123')
+  await redis.xadd(panoptickey, '*',
+  'hardid', hardid,
+  'type', type,
+  'shard', whatsapp,
+  'to', to,
+  'msg', msg,
+  'cacapa', 'random123')
 
   res.status(200)
   res.json({ to, msg, whatsapp })
 })
 router.post('/respondercomarquivo', async (req, res) => {
-  const { to, link, whatsapp } = req.body
+  const { whatsapp, to, link, mimetype, filename } = req.body
 
-  const type = 'respondercomarquivo'
-  await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'to', to, 'msg', link, 'link', 'random123')
+  const type = 'sendFileMessage'
+  await redis.xadd(panoptickey, '*',
+    'hardid', hardid,
+    'type', type,
+    'shard', whatsapp,
+    'to', to,
+    'link', link,
+    'mimetype', mimetype,
+    'filename', filename,
+    'cacapa', 'random123')
 
   res.status(200)
   res.json({ to, link, whatsapp })

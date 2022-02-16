@@ -23,7 +23,7 @@ process.on('message', async (message: Bread) => {
       const { to, msg, cacapa } = message
       const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
       const id = `${to}@${posfix}`
-      console.log(`id=${id}`)
+      console.log(`id=${id} sendTextMessage`)
       const sentmessage = await whatsappsocket.sendMessage(id, { text: msg })
       // console.dir({ sentmessage })
     } else if (message.type === 'sendReadReceipt') {
@@ -122,6 +122,19 @@ process.on('message', async (message: Bread) => {
       // const metadata = await sock.groupMetadata("abcd-xyz@g.us")
 
       // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
+    } else if (message.type === 'sendFileMessage') {
+      const { to, link, mimetype, filename, cacapa } = message
+      const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
+      const id = `${to}@${posfix}`
+      console.log(`id=${id} sendFileMessage`)
+
+      const sentmessage = await whatsappsocket.sendMessage(id, {
+        document: {
+          url: link
+        },
+        fileName: filename,
+        mimetype
+      })
     }
   }
 })
@@ -725,6 +738,26 @@ const wacPC = async (connectionActions: ConnectionActions) => {
           chat,
           cacapa
         })
+      }
+      break
+    case 'sendFileMessage':
+      if (patchpanel.has(connectionActions.shard)) {
+        console.log(`patchpanel[${connectionActions.shard}] sendFileMessage`)
+        const { type, hardid, shard, to, link, mimetype, filename, cacapa } = connectionActions
+        const blueCable = patchpanel.get(shard)
+        const wacP = blueCable.wacP
+        wacP.send({
+          type,
+          hardid,
+          shard,
+          to,
+          link,
+          mimetype,
+          filename,
+          cacapa
+        })
+      } else {
+        console.log('sendFileMessage não tá conectado')
       }
       break
     case 'waclist':

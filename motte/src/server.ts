@@ -114,6 +114,24 @@ const mkServer = function mkServer () {
               cacapa: bread.cacapa
             })
             break
+          case 'sendFileMessage':
+            console.log('sendFileMessage')
+            /**
+             * GAMBIARRA PRO THIAGO
+             * APRESENTAR QUINTA FEIRA
+             */
+            wacPC({
+              type: 'sendFileMessage',
+              hardid: bread.hardid,
+              shard: bread.shard,
+              to: bread.to,
+              link: bread.link,
+              filename: bread.filename,
+              mimetype: bread.mimetype,
+              cacapa: bread.cacapa
+            })
+            break
+            break
           default:
             console.log('redis:stream -> switch ?')
             console.error(bread)
