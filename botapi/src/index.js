@@ -8,19 +8,19 @@ const { TeamsConversationBot } = require('./reactivebot')
 const adapter = require('./msteamsAdapter')
 
 adapter.onTurnError = async (context, error) => {
-    console.log('\n [onTurnError] unhandled error:')
-    console.dir(error)
+  console.log('\n [onTurnError] unhandled error:')
+  console.dir(error)
 
-    await context.sendTraceActivity(
-        'OnTurnError Trace',
-        `${ error }`,
-        'https://www.botframework.com/schemas/error',
-        'TurnError'
-    );
+  await context.sendTraceActivity(
+    'OnTurnError Trace',
+    `${ error }`,
+    'https://www.botframework.com/schemas/error',
+    'TurnError'
+  );
 
-    await context.sendActivity('The bot encountered an error or bug.')
+  await context.sendActivity('The bot encountered an error or bug.')
 
-    await context.sendActivity('To continue to run this bot, please fix the bot source code.')
+  await context.sendActivity('To continue to run this bot, please fix the bot source code.')
 }
 
 const server = restify.createServer()

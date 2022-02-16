@@ -119,9 +119,8 @@ const loginTemplate = new ACData.Template({
 })
 
 let msGraphClient
-const { Client } = require('@microsoft/microsoft-graph-client')
-const fetch = require('isomorphic-fetch')
-globalThis.fetch = fetch
+const microsoft = require('@microsoft/microsoft-graph-client')
+require('isomorphic-fetch')
 
 class TeamsConversationBot extends TeamsActivityHandler {
   constructor() {
@@ -404,7 +403,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
             if (msGraphClient) {
               const me = await msGraphClient.api("me").get()
 
-              console.log("ME ME ME ME ME ME ME ME ME ME ME ME ME ME ME ME ME ME ")
               console.dir(me)
 
               await context.sendActivity(MessageFactory.text(`me=${me}`))
@@ -585,9 +583,12 @@ class TeamsConversationBot extends TeamsActivityHandler {
     if (context?.activity?.name === tokenExchangeOperationName) {
       console.dir(context?.activity?.value)
 
-      msGraphClient = Client.init({
-        authProvider: cb => {
-          cb(null, context?.activity?.value)
+      const token = context?.activity?.value?.token
+
+      msGraphClient = microsoft.Client.init({
+        debugLogging: true,
+        authProvider: done => {
+          done(null, token)
         }
       })
 
