@@ -3,8 +3,10 @@ import http from 'http'
 import { mkServer } from './server'
 import { zygote } from './zygote'
 import { wac } from './wac'
+import rest from './rest'
 
 const isMain = !process.env.SERVICE
+const httpPort = process.env.HTTP_PORT || '8080'
 
 // Pocesso principal
 if (isMain) {
@@ -15,19 +17,9 @@ if (isMain) {
    */
   const { inBound } = mkServer()
 
-  const healthPort = Number(process.env.HEALT_PORT) || 8538
-
-  let n = 0
-  // chech consul health
-  const server = http.createServer((req, res) => {
-    res.statusCode = 200
-    res.setHeader('Content-Type', 'application/json')
-    res.end(JSON.stringify({
-      ok: true,
-      n: n++
-    }))
+  rest.listen(httpPort, () => {
+    console.log(`⚡️[server]: Server is running at https://localhost:${httpPort}`)
   })
-  server.listen(healthPort)
 
   // Serviço Novo QR CODE
 } else if (process.env.SERVICE === 'zygote') {

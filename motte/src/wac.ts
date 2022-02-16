@@ -727,6 +727,9 @@ const wacPC = async (connectionActions: ConnectionActions) => {
         })
       }
       break
+    case 'waclist':
+      return JSON.stringify(Array.from(patchpanel.keys()))
+      break
   }
 }
 

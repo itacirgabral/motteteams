@@ -17,6 +17,7 @@
     "@gmapi/redispack": "1.0.0",
     "@gmapi/types": "1.0.0",
     "dotenv": "^10.0.0",
+    "express": "^4.17.2",
     "fluent-json-schema": "^3.0.1",
     "got": "^11.8.2",
     "jsonwebtoken": "^8.5.1",
@@ -25,6 +26,7 @@
     "rxjs": "^7.4.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.13",
     "@types/jsonwebtoken": "^8.5.5",
     "@types/minio": "^7.0.11",
     "@types/node": "^16.11.6",
