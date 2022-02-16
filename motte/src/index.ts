@@ -18,7 +18,7 @@ if (isMain) {
   const { inBound } = mkServer()
 
   rest.listen(httpPort, () => {
-    console.log(`⚡️[server]: Server is running at https://localhost:${httpPort}`)
+    console.log(`⚡️[server]: Server is running at http://localhost:${httpPort}`)
   })
 
   // Serviço Novo QR CODE

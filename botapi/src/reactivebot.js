@@ -295,7 +295,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
               await context.sendActivity(MessageFactory.text(`respondendo pelo whatsapp=${whatsapp} para o chat=${chat} a mensagem=${msg}`))
               setTimeout(async () => {
                 const type = 'respondercomtextosimples'
-                await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'to', chat, 'msg', msg, 'cacap', 'random123')
+                await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'to', chat, 'msg', msg, 'cacapa', 'random123')
                 // console.log(`panoptickey=${panoptickey} shard=${whatsapp} chat=${chat} msg=${msg}`)
               }, 0)
             } else {
