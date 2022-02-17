@@ -1,11 +1,37 @@
 import { fork } from 'child_process'
 import { readFileSync, writeFileSync, rmSync } from 'fs'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
-import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, downloadContentFromMessage, WASocket, Chat } from '@gmapi/baileys'
-import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey, mkchatkey } from '@gmapi/redispack'
+import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, downloadContentFromMessage, WASocket } from '@gmapi/baileys'
+import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey, mkchatkey, mkfifokey, stream2bread } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 import { minio } from './minio'
+
+import { Redis } from 'ioredis'
+const trafficwandGen = async function * trafficwandGen ({ redis, streamkey, startAt = '$', stopAt }: { redis: Redis; streamkey: string; startAt?: string; stopAt?: string }) {
+  const redisBlock = redis.duplicate()
+  let lastlogid = startAt
+  let ends = false
+  while (!ends) {
+    const stream = await redisBlock.xread('BLOCK', 0, 'STREAMS', streamkey, lastlogid)
+    for (const county of stream) {
+      // const countyHead = county[0]
+      const countyBody = county[1]
+      for (const log of countyBody) {
+        const logHead = log[0]
+        const logBody = log[1]
+        lastlogid = logHead
+
+        if (stopAt && lastlogid.localeCompare(stopAt) === 1) {
+          ends = true
+        } else {
+          const bread = stream2bread({ log: logBody })
+          yield bread
+        }
+      }
+    }
+  }
+}
 
 const midiaMessage = ['imageMessage', 'videoMessage', 'documentMessage', 'audioMessage']
 const midiaMessageMap = {
@@ -245,10 +271,15 @@ const wac = function wac (connect: Connect): Promise<string> {
         if(!whatsappsocket && connection === 'open') {
           whatsappsocket = socket // deixa o socket servido pro IPC fácil
 
-          console.dir({
-            drummerStartAt: connect.drummerStartAt,
-            drummerStopAt: connect.drummerStopAt
-          })
+          if (connect.drummerStartAt === 'agora' && connect.drummerStopAt === 'nunca') {
+            const fifokey = mkfifokey({ shard: connect.shard })
+            const breads = trafficwandGen({ redis, streamkey: fifokey })
+
+            for await (const bread of breads) {
+              console.dir(bread)
+            }
+            console.log(`drummer ${fifokey} finish `)
+          }
         }
 
         if (connection === 'close') {
@@ -666,23 +697,8 @@ const wacPC = async (connectionActions: ConnectionActions) => {
         }
       }
       break
-    case 'sendTextMessage':
-      if (patchpanel.has(connectionActions.shard)) {
-        console.log(`patchpanel[${connectionActions.shard}] sendTextMessage`)
-        const { type, hardid, shard, to, msg, cacapa } = connectionActions
-        const blueCable = patchpanel.get(shard)
-        const wacP = blueCable.wacP
-        wacP.send({
-          type,
-          hardid,
-          shard,
-          to,
-          msg,
-          cacapa
-        })
-      } else {
-        console.log('sendTextMessage não tá conectado')
-      }
+    case 'waclist':
+      return JSON.stringify(Array.from(patchpanel.keys()))
       break
     case 'sendReadReceipt':
       if (patchpanel.has(connectionActions.shard)) {
@@ -748,6 +764,7 @@ const wacPC = async (connectionActions: ConnectionActions) => {
         })
       }
       break
+    // o baterista que vai mandar mensagens
     case 'sendFileMessage':
       if (patchpanel.has(connectionActions.shard)) {
         console.log(`patchpanel[${connectionActions.shard}] sendFileMessage`)
@@ -768,8 +785,23 @@ const wacPC = async (connectionActions: ConnectionActions) => {
         console.log('sendFileMessage não tá conectado')
       }
       break
-    case 'waclist':
-      return JSON.stringify(Array.from(patchpanel.keys()))
+    case 'sendTextMessage':
+      if (patchpanel.has(connectionActions.shard)) {
+        console.log(`patchpanel[${connectionActions.shard}] sendTextMessage`)
+        const { type, hardid, shard, to, msg, cacapa } = connectionActions
+        const blueCable = patchpanel.get(shard)
+        const wacP = blueCable.wacP
+        wacP.send({
+          type,
+          hardid,
+          shard,
+          to,
+          msg,
+          cacapa
+        })
+      } else {
+        console.log('sendTextMessage não tá conectado')
+      }
       break
   }
 }
