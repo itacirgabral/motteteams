@@ -8,4 +8,5 @@ export interface Connect {
   shard: string;
   cacapa: string;
   auth?: string;
+  drummerStartAt?: string;
 }

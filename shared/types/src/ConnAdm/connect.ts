@@ -9,6 +9,8 @@ const mkConnect = S.object()
   .prop('shard', S.string().required())
   .prop('cacapa', S.string().required())
   .prop('auth', S.string())
+  .prop('drummerStartAt', S.string())
+  .prop('drummerStartAt', S.string())
 
 const connect = mkConnect.valueOf()
 

@@ -221,7 +221,7 @@ const wac = function wac (connect: Connect): Promise<string> {
   const webhookP = redis.hmget(mkwebhookkey({ shard: connect.shard }), 'main', 'teams', 'spy')
 
   return new Promise((wacRes, wacRej) => {
-    if(connect.type === 'connect' && isConnAdm.isConnect(connect)) {
+    if(connect.type === 'connect') {
       console.log('iniciando o processo BAILEY CONNECT')
       const browser: WABrowserDescription = ['GMTeams', 'Chrome', '97']
 
@@ -245,11 +245,10 @@ const wac = function wac (connect: Connect): Promise<string> {
         if(!whatsappsocket && connection === 'open') {
           whatsappsocket = socket // deixa o socket servido pro IPC fácil
 
-          const drmmConf = {
-            startAt: process.env.drummerStartAt,
-            stopAt: process.env.drummerStopAt
-          }
-          wacRes(`mandando iniciar o baterista de ${drmmConf.startAt ? drmmConf.startAt : 'agora'} até ${drmmConf.stopAt ? drmmConf.startAt : 'sempre'}`)
+          console.dir({
+            drummerStartAt: connect.drummerStartAt,
+            drummerStopAt: connect.drummerStopAt
+          })
         }
 
         if (connection === 'close') {
@@ -590,7 +589,8 @@ const wacPC = async (connectionActions: ConnectionActions) => {
             hardid,
             shard,
             cacapa,
-            drummerStartAt: '',
+            drummerStartAt: 'agora',
+            drummerStopAt: 'nunca',
             // ignore 2x :s
             auth: `./auth_info_multi/${shard}.json`
           }
