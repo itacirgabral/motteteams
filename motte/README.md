@@ -9,7 +9,7 @@ npm adduser --registry http://localhost:4873
 npm publish --registry http://localhost:4873
 ```
 ```
-npm install -S @adiwajshing/baileys-md --registry http://localhost:4873
+npm install -S @gmapi/baileys --registry http://localhost:4873
 ```
 
 ## NICE TO HAVE

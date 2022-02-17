@@ -78,6 +78,9 @@ if (isMain) {
       } <:> shard=${
         process.env.shard
       }`)
+
+      // process.env.drummerStartAt
+      // process.env.drummerStopAt
     })
     .catch(console.error)
 }

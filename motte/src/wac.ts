@@ -1,7 +1,7 @@
 import { fork } from 'child_process'
 import { readFileSync, writeFileSync, rmSync } from 'fs'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
-import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, downloadContentFromMessage, WASocket, Chat } from '@adiwajshing/baileys-md'
+import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, downloadContentFromMessage, WASocket, Chat } from '@gmapi/baileys'
 import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey, mkchatkey } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
@@ -220,7 +220,7 @@ const wac = function wac (connect: Connect): Promise<string> {
 
   const webhookP = redis.hmget(mkwebhookkey({ shard: connect.shard }), 'main', 'teams', 'spy')
 
-  return new Promise((res, rej) => {
+  return new Promise((wacRes, wacRej) => {
     if(connect.type === 'connect' && isConnAdm.isConnect(connect)) {
       console.log('iniciando o processo BAILEY CONNECT')
       const browser: WABrowserDescription = ['GMTeams', 'Chrome', '97']
@@ -232,7 +232,57 @@ const wac = function wac (connect: Connect): Promise<string> {
       })
 
       socket.ev.on('creds.update', saveState)
+      socket.ev.on ('connection.update', async ({ connection, lastDisconnect }) => {
+        console.log(`connection.update ${connection}`)
+        console.dir({ connection, lastDisconnect })
+        // const [whMain, whTeams, whSpy] = await webhookP
 
+        if (connection) {
+          const type = 'zuckershark'
+          await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
+        }
+
+        if(!whatsappsocket && connection === 'open') {
+          whatsappsocket = socket // deixa o socket servido pro IPC fácil
+
+          const drmmConf = {
+            startAt: process.env.drummerStartAt,
+            stopAt: process.env.drummerStopAt
+          }
+          wacRes(`mandando iniciar o baterista de ${drmmConf.startAt ? drmmConf.startAt : 'agora'} até ${drmmConf.stopAt ? drmmConf.startAt : 'sempre'}`)
+        }
+
+        if (connection === 'close') {
+          //
+          const err = lastDisconnect.error
+          const data = lastDisconnect.date
+
+          const err2 = err as any
+          const statusCode = err2?.output?.statusCode
+          if (statusCode === 401) {
+            console.log(`apagando ${connect.auth}`)
+
+            rmSync(connect.auth)
+            const boxenginebotkey = mkboxenginebotkey({
+              shard: connect.shard
+            })
+
+            const orgid_teamid = await redis.hget(boxenginebotkey, 'gsadmin')
+            const botkey = mkbotkey({
+              shard: orgid_teamid
+            })
+
+            await redis
+              .pipeline()
+              .hdel(botkey, 'whatsapp')
+              .del(boxenginebotkey)
+              .exec()
+          }
+
+          console.log('## process.exit(1) ##')
+          process.exit(1)
+        }
+      })
       socket.ev.on ('blocklist.set', ({ blocklist }) => {
         console.log('blocklist.set')
         console.dir(blocklist)
@@ -342,54 +392,6 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.log(JSON.stringify(chats, null, 2))
       })
 
-      socket.ev.on ('connection.update', async ({ connection, lastDisconnect }) => {
-        console.log(`connection.update ${connection}`)
-        console.dir({ connection, lastDisconnect })
-        console.log(JSON.stringify(console.dir({ connection, lastDisconnect }), null, 2))
-        // const [whMain, whTeams, whSpy] = await webhookP
-
-        if (connection) {
-          const type = 'zuckershark'
-          await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
-        }
-
-        // deixa o socket servido pro IPC fácil
-        if(!whatsappsocket && connection === 'open') {
-          whatsappsocket = socket
-        }
-
-        if (connection === 'close') {
-          //
-          const err = lastDisconnect.error
-          const data = lastDisconnect.date
-
-          const err2 = err as any
-          const statusCode = err2?.output?.statusCode
-          if (statusCode === 401) {
-            console.log(`apagando ${connect.auth}`)
-
-            rmSync(connect.auth)
-            const boxenginebotkey = mkboxenginebotkey({
-              shard: connect.shard
-            })
-
-            const orgid_teamid = await redis.hget(boxenginebotkey, 'gsadmin')
-            const botkey = mkbotkey({
-              shard: orgid_teamid
-            })
-
-            await redis
-              .pipeline()
-              .hdel(botkey, 'whatsapp')
-              .del(boxenginebotkey)
-              .exec()
-          }
-
-          console.log('## process.exit(1) ##')
-          process.exit(1)
-        }
-      })
-
       // CONTACTS
       socket.ev.on ('contacts.update', async contact => {
         console.log('contacts.update')
@@ -418,6 +420,7 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.log('contacts.upsert')
       })
 
+      // GROUPS
       socket.ev.on ('group-participants.update', ({ id, participants, action }) => {
         console.log(`group-participants.update ${id}`)
         console.dir({ participants, action })
@@ -469,6 +472,7 @@ const wac = function wac (connect: Connect): Promise<string> {
         console.dir(el)
       })
 
+      // MESSAGES
       socket.ev.on ('messages.delete', (idxs) => {
         console.log('messages.delete')
         console.dir(idxs)
@@ -560,20 +564,23 @@ const wac = function wac (connect: Connect): Promise<string> {
       socket.ev.on ('presence.update', ({ id, presences }) => {
         console.log(`presence.update ${id} ${presences}}`)
       })
-
-      // socket.fetchPrivacySettings()
     } else {
-      rej("connectionActions.type === 'connect' && isConnect(connectionActions)")
+      wacRej("connectionActions.type === 'connect' && isConnect(connectionActions)")
     }
   })
 }
 
 const wacPC = async (connectionActions: ConnectionActions) => {
+  // encontra o processo correto e despacha
   switch (connectionActions.type) {
     case 'connect':
       if (isConnAdm.isConnect(connectionActions) && !patchpanel.has(connectionActions.shard)) {
         const { type, hardid, shard, cacapa } = connectionActions
         console.log('wacPC connect')
+
+        // busca onde o baterista deve
+        // começar e terminar
+        // envia por env
 
         const wacP = fork('./dist/index', {
           env: {
@@ -583,6 +590,7 @@ const wacPC = async (connectionActions: ConnectionActions) => {
             hardid,
             shard,
             cacapa,
+            drummerStartAt: '',
             // ignore 2x :s
             auth: `./auth_info_multi/${shard}.json`
           }

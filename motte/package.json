@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@adiwajshing/baileys-md": "4.0.0",
+    "@gmapi/baileys": "1.0.0",
     "@gmapi/baileys2gmapi": "1.0.0",
     "@gmapi/redispack": "1.0.0",
     "@gmapi/types": "1.0.0",

@@ -1,4 +1,4 @@
-import { WAMessage } from '@adiwajshing/baileys-md'
+import { WAMessage } from '@gmapi/baileys'
 import { postalScraper } from './postalScraper'
 
 import {
