@@ -1,5 +1,4 @@
 import { Signupconnection, Connect } from '@gmapi/types'
-import http from 'http'
 import { mkServer } from './server'
 import { zygote } from './zygote'
 import { wac } from './wac'
