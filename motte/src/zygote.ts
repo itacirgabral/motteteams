@@ -1,6 +1,6 @@
 import { fork } from 'child_process'
 import { writeFileSync, renameSync, existsSync, rmSync } from 'fs'
-import baileys, { BufferJSON, SignalDataTypeMap, WABrowserDescription, initAuthCreds, proto } from '@adiwajshing/baileys-md'
+import baileys, { BufferJSON, SignalDataTypeMap, WABrowserDescription, initAuthCreds, proto } from '@gmapi/baileys'
 import { client as redis, bornskey } from '@gmapi/redispack'
 import { Signupconnection } from '@gmapi/types'
 import { makeCountyToken } from './jwt'
