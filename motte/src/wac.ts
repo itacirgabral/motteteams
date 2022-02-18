@@ -41,18 +41,16 @@ const midiaMessageMap = {
   audioMessage: 'audio'
 }
 
+/*
+** unificar as requisições pelo socket
+** vindas do baterista para envio de mensagens
+** vindas do IPC de tudo fora da fila
+*/
 let whatsappsocket: WASocket
 process.on('message', async (message: Bread) => {
   console.log(process.env.SERVICE || 'MAIN')
   if (whatsappsocket) {
-    if (message.type === 'sendTextMessage') {
-      const { to, msg, cacapa } = message
-      const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
-      const id = `${to}@${posfix}`
-      console.log(`id=${id} sendTextMessage`)
-      const sentmessage = await whatsappsocket.sendMessage(id, { text: msg })
-      // console.dir({ sentmessage })
-    } else if (message.type === 'sendReadReceipt') {
+    if (message.type === 'sendReadReceipt') {
       const { jid, participant, wid } = message
       console.log('sendReadReceipt')
 
@@ -64,17 +62,7 @@ process.on('message', async (message: Bread) => {
 
       await whatsappsocket.sendPresenceUpdate('available', jidto)
 
-    } else  if (message.type === 'getallchats') {
-      // /////////////////////////////// //
-      // seria cosultado direto do redis //
-      // /////////////////////////////// //
 
-      // const { shard } = message
-      // console.log(`get all chats of ${shard}`)
-      // const type = 'chatlistupdate'
-      // const chatkeys = mkchatkey({ shard, chatid: '*' })
-      // const chatids = await redis.keys(chatkeys)
-      // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', shard, 'chats', JSON.stringify(chatids))
     } else if (message.type === 'getchatinfo') {
       const chatkey = mkchatkey({ shard: message.shard, chatid: message.chat })
       const hadChat = await redis.exists(chatkey)
@@ -148,19 +136,6 @@ process.on('message', async (message: Bread) => {
       // const metadata = await sock.groupMetadata("abcd-xyz@g.us")
 
       // await redis.xadd(panopticbotkey, '*', 'type', type, 'whatsapp', connect.shard, 'connection', connection)
-    } else if (message.type === 'sendFileMessage') {
-      const { to, link, mimetype, filename, cacapa } = message
-      const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
-      const id = `${to}@${posfix}`
-      console.log(`id=${id} sendFileMessage`)
-
-      const sentmessage = await whatsappsocket.sendMessage(id, {
-        document: {
-          url: link
-        },
-        fileName: filename,
-        mimetype
-      })
     }
   }
 })
@@ -277,6 +252,28 @@ const wac = function wac (connect: Connect): Promise<string> {
 
             for await (const bread of breads) {
               console.dir(bread)
+              if (bread.type === 'sendTextMessage') {
+                const { to, msg, cacapa } = bread
+                const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
+                const id = `${to}@${posfix}`
+                console.log(`id=${id} sendTextMessage`)
+
+                await socket.sendMessage(id, { text: msg }).catch(console.error)
+              } else if (bread.type === 'sendFileMessage') {
+                const { to, link, mimetype, filename, cacapa } = bread
+                const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
+                const id = `${to}@${posfix}`
+                console.log(`id=${id} sendFileMessage`)
+
+                await whatsappsocket.sendMessage(id, {
+                  document: {
+                    url: link
+                  },
+                  fileName: filename,
+                  mimetype
+                }).catch(console.error)
+              }
+
             }
             console.log(`drummer ${fifokey} finish `)
           }

@@ -34,7 +34,7 @@ router.post('/respondercomtextosimples', async (req, res) => {
 router.post('/respondercomarquivo', async (req, res) => {
   const { whatsapp, to, link, mimetype, filename } = req.body
 
-  const type = 'sendFileMessage'
+  const type = 'respondercomarquivo'
   await redis.xadd(panoptickey, '*',
     'hardid', hardid,
     'type', type,

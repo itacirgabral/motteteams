@@ -1,4 +1,4 @@
-import { client as redis, mkcredskey, panoptickey, trafficwand, Bread } from '@gmapi/redispack'
+import { client as redis, mkfifokey, panoptickey, trafficwand, Bread } from '@gmapi/redispack'
 import { Observable } from 'rxjs'
 import { zygotePC } from './zygote'
 import { wacPC  } from './wac'
@@ -54,19 +54,13 @@ const mkServer = function mkServer () {
             }
             break
           case 'respondercomtextosimples':
-            console.log('respondercomtextosimples')
-            /**
-             * GAMBIARRA PRO THIAGO
-             * APRESENTAR QUINTA FEIRA
-             */
-            wacPC({
-              type: 'sendTextMessage',
-              hardid: bread.hardid,
-              shard: bread.shard,
-              to: bread.to,
-              msg: bread.msg,
-              cacapa: bread.cacapa
-            })
+            redis.xadd(mkfifokey({ shard: bread.shard }), '*',
+            'hardid', bread.hardid,
+            'type', 'sendTextMessage',
+            'shard', bread.shard,
+            'to', bread.to,
+            'msg', bread.msg,
+            'cacapa', 'random123').catch(console.error)
             break
           case 'sendReadReceipt':
             console.log('sendReadReceipt')
@@ -106,22 +100,16 @@ const mkServer = function mkServer () {
               cacapa: bread.cacapa
             })
             break
-          case 'sendFileMessage':
-            console.log('sendFileMessage')
-            /**
-             * GAMBIARRA PRO THIAGO
-             * APRESENTAR QUINTA FEIRA
-             */
-            wacPC({
-              type: 'sendFileMessage',
-              hardid: bread.hardid,
-              shard: bread.shard,
-              to: bread.to,
-              link: bread.link,
-              filename: bread.filename,
-              mimetype: bread.mimetype,
-              cacapa: bread.cacapa
-            })
+          case 'respondercomarquivo':
+            redis.xadd(mkfifokey({ shard: bread.shard }), '*',
+              'hardid', bread.hardid,
+              'type', 'sendFileMessage',
+              'shard', bread.shard,
+              'to', bread.to,
+              'link', bread.link,
+              'mimetype', bread.mimetype,
+              'filename', bread.filename,
+              'cacapa', 'random123').catch(console.error)
             break
             break
           default:
