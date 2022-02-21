@@ -197,6 +197,34 @@ const mkattmetakey = function mkattmetakey ({ shard, attid }: { shard: string; a
   return `hardid:${hardid}:bot:${shard}:atende:${attid}:meta`
 }
 
+/**
+ * GESTOR SISTEMAS
+ */
+/**
+ * Chave para os escritórios
+ * É um hashmap
+ *
+ * @example
+ * ```
+ * "hardid:xyz:office:oid"
+ * ```
+ */
+const mkofficekey = function mkofficekey ({ shard, oid }: { shard: string; oid: string }) {
+  return `hardid:${hardid}:office:${oid}`
+}
+/**
+ * Chave para as empresas
+ * É um hashmap
+ *
+ * @example
+ * ```
+ * "hardid:xyz:company:cio"
+ * ```
+ */
+const mkcompanykey = function mkcompanykey ({ shard, cid }: { shard: string; cid: string }) {
+  return `hardid:${hardid}:company:${cid}`
+}
+
 export {
   panoptickey,
   bornskey,
@@ -217,5 +245,7 @@ export {
   mkpongkey,
   mkfifokey,
   mkofifkey,
-  mkwebhookkey
+  mkwebhookkey,
+  mkofficekey,
+  mkcompanykey
 }

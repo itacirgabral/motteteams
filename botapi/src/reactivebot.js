@@ -7,7 +7,7 @@ const {
 } = require('botbuilder');
 const ACData = require('adaptivecards-templating');
 
-const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptickey, mkboxenginebotkey, mkattkey, mkattmetakey, mkchatkey } = require('@gmapi/redispack')
+const { client: redis, mkbotkey, mkcacapakey, panopticbotkey, panoptickey, mkboxenginebotkey, mkattkey, mkattmetakey, mkchatkey, mkofficekey } = require('@gmapi/redispack')
 const QRCode = require('qrcode');
 const adapter = require('./msteamsAdapter');
 
@@ -224,13 +224,24 @@ class TeamsConversationBot extends TeamsActivityHandler {
             await context.sendActivity(message)
           } else if (cutarroba === 'extrato') {
             console.log('extrato')
-            const [memberInfo, teamsInfo, teamsChannels, teamsMembers] = await Promise.all([
+
+            await context.sendActivity(MessageFactory.text('Buscando pelo extrato'))
+            
+            const oidP = redis.hget(botkey, 'office')
+            const megainfoP = Promise.all([
               TeamsInfo.getMember(context, context.activity.from.id),
               TeamsInfo.getTeamDetails(context, context.activity.channelData.teamsTeamId),
               TeamsInfo.getTeamChannels(context, context.activity.channelData.teamsTeamId),
-              TeamsInfo.getTeamMembers(context, context.activity.channelData.teamsTeamId),
-              context.sendActivity(MessageFactory.text('Buscando pelo extrato'))
+              TeamsInfo.getTeamMembers(context, context.activity.channelData.teamsTeamId)
             ])
+
+            const oid = await oidP
+            
+            const officeKey = mkofficekey({ shard, oid })
+            const office = await redis.hgetall(officeKey)
+            context.sendActivity(MessageFactory.text(JSON.stringify(office, null, 2)))
+
+            const [memberInfo, teamsInfo, teamsChannels, teamsMembers] = await megainfoP
             const activity = context.activity
             const info = {
               memberInfo,
