@@ -13,10 +13,12 @@
     },
     "dependencies": {
         "@gmapi/redispack": "^1.0.0",
+        "@microsoft/microsoft-graph-client": "^3.0.2",
         "adaptive-expressions": "^4.14.1",
         "adaptivecards-templating": "^2.1.0",
         "botbuilder": "~4.15.0",
         "dotenv": "^8.2.0",
+        "isomorphic-fetch": "^3.0.0",
         "qrcode": "^1.5.0",
         "restify": "~8.6.0"
     },

@@ -2,36 +2,10 @@ import { fork } from 'child_process'
 import { readFileSync, writeFileSync, rmSync } from 'fs'
 import { Connect, Disconnect, Connectionstate, isConnAdm } from '@gmapi/types'
 import baileys, { BufferJSON, WABrowserDescription, AuthenticationCreds, SignalDataTypeMap, proto, downloadContentFromMessage, WASocket } from '@gmapi/baileys'
-import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey, mkchatkey, mkfifokey, stream2bread } from '@gmapi/redispack'
+import { client as redis, mkbookphonekey, mkwebhookkey, panopticbotkey, mkboxenginebotkey, Bread, mkbotkey, mkchatkey, mkfifokey, trafficwandGen } from '@gmapi/redispack'
 import baileys2gmapi from '@gmapi/baileys2gmapi'
 import { patchpanel } from './patchpanel'
 import { minio } from './minio'
-
-import { Redis } from 'ioredis'
-const trafficwandGen = async function * trafficwandGen ({ redis, streamkey, startAt = '$', stopAt }: { redis: Redis; streamkey: string; startAt?: string; stopAt?: string }) {
-  const redisBlock = redis.duplicate()
-  let lastlogid = startAt
-  let ends = false
-  while (!ends) {
-    const stream = await redisBlock.xread('BLOCK', 0, 'STREAMS', streamkey, lastlogid)
-    for (const county of stream) {
-      // const countyHead = county[0]
-      const countyBody = county[1]
-      for (const log of countyBody) {
-        const logHead = log[0]
-        const logBody = log[1]
-        lastlogid = logHead
-
-        if (stopAt && lastlogid.localeCompare(stopAt) === 1) {
-          ends = true
-        } else {
-          const bread = stream2bread({ log: logBody })
-          yield bread
-        }
-      }
-    }
-  }
-}
 
 const midiaMessage = ['imageMessage', 'videoMessage', 'documentMessage', 'audioMessage']
 const midiaMessageMap = {
@@ -274,6 +248,9 @@ const wac = function wac (connect: Connect): Promise<string> {
                 }).catch(console.error)
               }
 
+
+              // pausa estartégica humanizadora
+              // nao
             }
             console.log(`drummer ${fifokey} finish `)
           }
