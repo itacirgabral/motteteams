@@ -210,6 +210,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
         const firstBlank = text.indexOf(' ')
         const secondBlank = text.indexOf(' ', text.indexOf(' ') + 1)
         const cutarroba = secondBlank === -1 ? text.slice(firstBlank + 1) : text.slice(firstBlank + 1, secondBlank)
+        const inplacearroba = text.slice(0, firstBlank)
         const isCommand = cutarroba.indexOf(' ') === -1
 
         if (isCommand && isChannel) {
@@ -383,12 +384,18 @@ class TeamsConversationBot extends TeamsActivityHandler {
               }
 
             }
+          } else if (cutarroba === 'setoffice') {
+            const oid = text.slice(secondBlank + 1)
+
+            await redis.hset(botkey, 'office', oid)
+            await context.sendActivity(MessageFactory.text(`botkey=${botkey} office=${oid}`))
+
           } else {
             console.dir(context.activity.attachments)
             console.log(`nenhum comando para ${cutarroba}`)
           }
         } else if (isCommand && isPersonal) {
-          if (cutarroba === 'help') {
+          if (inplacearroba === 'help') {
             const connectionName = process.env.SSO_CONNECTION_NAME
             const appId = process.env.MicrosoftAppId
 
@@ -399,7 +406,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
 
             const message = MessageFactory.attachment(oauthCard)
             await context.sendActivity(message)
-          } else if (cutarroba === 'token') {
+          } else if (inplacearroba === 'token') {
             if (msGraphClient) {
               const me = await msGraphClient.api("me").get()
 
@@ -410,9 +417,19 @@ class TeamsConversationBot extends TeamsActivityHandler {
               await context.sendActivity(MessageFactory.text('no token'))
             }
             //
+          } else if (inplacearroba === 'setoffice') {
+            // const oid = text.slice(firstBlank + 1)
+            // const teamid = context.activity?.channelData?.team?.id
+            // const orgid = context.activity?.channelData?.tenant?.id
+            // const shard = `${orgid}_${teamid}`
+    
+            // const botkey = mkbotkey({ shard })
+
+            // await redis.hset(botkey, 'office', oid)
+
+            // await context.sendActivity(MessageFactory.text(`botkey=${botkey} office=${oid}`))
           } else {
-            console.dir(context.activity.attachments)
-            console.log(`nenhum comando para ${cutarroba}`)
+            console.log(`nenhum comando para ${inplacearroba}`)
           }
 
         } else {

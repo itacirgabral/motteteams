@@ -30,6 +30,11 @@ export interface GestorSistemasOffice {
   document?: string;
 }
 
+/* eslint-disable camelcase */
+export interface GestorSistemasCompany {
+
+}
+
 const json2office = async function office ({ data, prefix, redis }: { data: Array<GestorSistemasOffice>; prefix: string; redis: Redis }) {
   const pipeline = redis.pipeline()
   for (const office of data) {
