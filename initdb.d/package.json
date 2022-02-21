@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "putOffice": "npx ts-node -r dotenv/config ./putOffice"
+    "putOffice": "npx ts-node -r dotenv/config ./putOffice",
+    "putCompany": "npx ts-node -r dotenv/config ./putCompany"
   },
   "keywords": [],
   "author": "",

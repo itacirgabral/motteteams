@@ -17,5 +17,3 @@ if (json) {
 } else {
   console.log('./dumpup/office.json not found')
 }
-
-console.dir(redis)

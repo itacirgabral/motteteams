@@ -32,10 +32,37 @@ export interface GestorSistemasOffice {
 
 /* eslint-disable camelcase */
 export interface GestorSistemasCompany {
-
+  uuid: string;
+  // office: string;
+  offices: {
+    data: Array<{ uuid: string; xFant: string; document: string }>
+  };
+  status: boolean;
+  xNome?: string;
+  xFant?: string;
+  IE?: string;
+  IEST?: string;
+  IM?: string;
+  CNAE?: number;
+  CRT?: number;
+  CNPJ?: string;
+  CPF?: string;
+  xLgr?: string;
+  nro?: string;
+  xCpl?: string;
+  xBairro?: string;
+  cMun?: number;
+  xMun?: string;
+  UF?: string;
+  CEP?: number;
+  cPais?: number;
+  xPais?: string;
+  fone?: string;
+  code?: string;
+  document?: string;
 }
 
-const json2office = async function office ({ data, prefix, redis }: { data: Array<GestorSistemasOffice>; prefix: string; redis: Redis }) {
+const json2office = async function json2office ({ data, prefix, redis }: { data: Array<GestorSistemasOffice>; prefix: string; redis: Redis }) {
   const pipeline = redis.pipeline()
   for (const office of data) {
     const key = `${prefix}:office:${office.uuid}`
@@ -164,7 +191,127 @@ const json2office = async function office ({ data, prefix, redis }: { data: Arra
 
   return pipeline.exec()
 }
+const json2company = async function json2company ({ data, prefix, redis }: { data: Array<GestorSistemasCompany>; prefix: string; redis: Redis }) {
+  const pipeline = redis.pipeline()
+  for (const company of data) {
+    const key = `${prefix}:company:${company.uuid}`
+    pipeline.hmset(key, 'uuid', company.uuid, 'status', JSON.stringify(company.status), 'office', company.offices.data[0]?.uuid)
+
+    if (company.xNome) {
+      pipeline.hset(key, 'xNome', company.xNome)
+    } else {
+      pipeline.hdel(key, 'xNome')
+    }
+    if (company.xFant) {
+      pipeline.hset(key, 'xFant', company.xFant)
+    } else {
+      pipeline.hdel(key, 'xFant')
+    }
+    if (company.IE) {
+      pipeline.hset(key, 'IE', company.IE)
+    } else {
+      pipeline.hdel(key, 'IE')
+    }
+    if (company.IEST) {
+      pipeline.hset(key, 'IEST', company.IEST)
+    } else {
+      pipeline.hdel(key, 'IEST')
+    }
+    if (company.IM) {
+      pipeline.hset(key, 'IM', company.IM)
+    } else {
+      pipeline.hdel(key, 'IM')
+    }
+    if (company.CNAE) {
+      pipeline.hset(key, 'CNAE', company.CNAE)
+    } else {
+      pipeline.hdel(key, 'CNAE')
+    }
+    if (company.CRT) {
+      pipeline.hset(key, 'CRT', company.CRT)
+    } else {
+      pipeline.hdel(key, 'CRT')
+    }
+    if (company.CNPJ) {
+      pipeline.hset(key, 'CNPJ', company.CNPJ)
+    } else {
+      pipeline.hdel(key, 'CNPJ')
+    }
+    if (company.CPF) {
+      pipeline.hset(key, 'CPF', company.CPF)
+    } else {
+      pipeline.hdel(key, 'CPF')
+    }
+    if (company.xLgr) {
+      pipeline.hset(key, 'xLgr', company.xLgr)
+    } else {
+      pipeline.hdel(key, 'xLgr')
+    }
+    if (company.nro) {
+      pipeline.hset(key, 'nro', company.nro)
+    } else {
+      pipeline.hdel(key, 'nro')
+    }
+    if (company.xCpl) {
+      pipeline.hset(key, 'xCpl', company.xCpl)
+    } else {
+      pipeline.hdel(key, 'xCpl')
+    }
+    if (company.xBairro) {
+      pipeline.hset(key, 'xBairro', company.xBairro)
+    } else {
+      pipeline.hdel(key, 'xBairro')
+    }
+    if (company.cMun) {
+      pipeline.hset(key, 'cMun', company.cMun)
+    } else {
+      pipeline.hdel(key, 'cMun')
+    }
+    if (company.xMun) {
+      pipeline.hset(key, 'xMun', company.xMun)
+    } else {
+      pipeline.hdel(key, 'xMun')
+    }
+    if (company.UF) {
+      pipeline.hset(key, 'UF', company.UF)
+    } else {
+      pipeline.hdel(key, 'UF')
+    }
+    if (company.CEP) {
+      pipeline.hset(key, 'CEP', company.CEP)
+    } else {
+      pipeline.hdel(key, 'CEP')
+    }
+    if (company.cPais) {
+      pipeline.hset(key, 'cPais', company.cPais)
+    } else {
+      pipeline.hdel(key, 'cPais')
+    }
+    if (company.xPais) {
+      pipeline.hset(key, 'xPais', company.xPais)
+    } else {
+      pipeline.hdel(key, 'xPais')
+    }
+    if (company.fone) {
+      pipeline.hset(key, 'fone', company.fone)
+    } else {
+      pipeline.hdel(key, 'fone')
+    }
+    if (company.code) {
+      pipeline.hset(key, 'code', company.code)
+    } else {
+      pipeline.hdel(key, 'code')
+    }
+    if (company.document) {
+      pipeline.hset(key, 'document', company.document)
+    } else {
+      pipeline.hdel(key, 'document')
+    }
+  }
+  return pipeline.exec()
+}
 
 export {
-  json2office
+  json2office,
+  json2company
 }
