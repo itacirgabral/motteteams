@@ -5,7 +5,7 @@
   "scripts": {
     "build": "npx tsc",
     "dev": "npx ts-node -r dotenv/config src/index.ts",
-    "start": "tsc && node -r dotenv/config dist/index.js",
+    "start": "node -r dotenv/config dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

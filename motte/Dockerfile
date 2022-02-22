@@ -1,14 +1,15 @@
 FROM node:16-alpine
-WORKDIR /usr/src/app
 
-EXPOSE 3978
+WORKDIR /app
 
 COPY ./node_modules ./
 COPY ./package-lock.json ./
 COPY ./package.json ./
 
-COPY ./src/.env.example ./src.env
-COPY ./src ./
+COPY ./.env.example ./.env
+COPY ./dist ./
+
+# RUN npm install
 
 ENV TZ="America/Cuiaba"
 

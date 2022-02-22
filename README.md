@@ -67,7 +67,9 @@ task "server" {
 ```
 
 ## DOCKER
-- cat ./canister_password.log | docker login --username itacirgabral --password-stdin
+- docker login cloud.canister.io:5000
+- docker build -t cloud.canister.io:5000/itacirgabral/motte:1.2.004 ./
+- docker push cloud.canister.io:5000/itacirgabral/motte
 
 # bot key
 ## equipe
