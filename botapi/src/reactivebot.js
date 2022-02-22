@@ -226,7 +226,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
             console.log('extrato')
 
             await context.sendActivity(MessageFactory.text('Buscando pelo extrato'))
-            
+
             const oidP = redis.hget(botkey, 'office')
             const megainfoP = Promise.all([
               TeamsInfo.getMember(context, context.activity.from.id),
@@ -236,7 +236,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
             ])
 
             const oid = await oidP
-            
+
             const officeKey = mkofficekey({ shard, oid })
             const office = await redis.hgetall(officeKey)
             context.sendActivity(MessageFactory.text(JSON.stringify(office, null, 2)))
@@ -433,7 +433,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
             // const teamid = context.activity?.channelData?.team?.id
             // const orgid = context.activity?.channelData?.tenant?.id
             // const shard = `${orgid}_${teamid}`
-    
+
             // const botkey = mkbotkey({ shard })
 
             // await redis.hset(botkey, 'office', oid)
@@ -482,12 +482,174 @@ class TeamsConversationBot extends TeamsActivityHandler {
     }
   }
 
-  handleTeamsTabFetch(context, tabRequest) {
+  async handleTeamsTabFetch(context, tabRequest) {
     console.log('handleTeamsTabFetch')
 
     const tabName = tabRequest?.tabContext?.tabEntityId
     switch (tabName) {
-      case 'GestorMessengerContatos':
+      case 'GestorMessengerEscritorio':
+
+        return {
+          tab: {
+            type: "continue",
+            value: {
+                cards: [
+                    {
+                        "card": {
+                          "type": "AdaptiveCard",
+                          "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                          "version": "1.3",
+                          "body": [
+                            {
+                              "type": "TextBlock",
+                              "text": "ESCRITóRIO",
+                              "horizontalAlignment": "Center",
+                              "fontType": "Monospace",
+                              "size": "ExtraLarge",
+                              "weight": "Bolder",
+                              "color": "Default",
+                              "separator": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "uuid",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "status",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "xNome",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "xFant",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "IE",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "IEST",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "IM",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "CNAE",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "CRT",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "CNPJ",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "CPF",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "xLgr",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "nro",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "xCpl",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "xBairro",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "cMun",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "xMun",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "UF",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "CEP",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "cPais",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "xPais",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "fone",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "code",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "key_xml",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "automation",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "document",
+                              "wrap": true
+                            }
+                          ]
+                      }
+                    }
+                ]
+            },
+        },
+        responseType: "tab"
+        }
+        break;
+      case 'GestorMessengerClientes':
         return {
           tab: {
             type: "continue",
@@ -597,10 +759,6 @@ class TeamsConversationBot extends TeamsActivityHandler {
       default:
         break;
     }
-    console.log(JSON.stringify(context, null, 2))
-    console.log(JSON.stringify(tabRequest, null, 2))
-
-    return
   }
 
   async handleTeamsSigninVerifyState(context, query) {
