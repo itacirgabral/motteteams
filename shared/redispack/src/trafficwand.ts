@@ -42,7 +42,7 @@ const trafficwand = function trafficwand ({ redis, streamkey, replay = false }: 
   })
 }
 
-const trafficwandGen = async function * trafficwandGen ({ redis, streamkey, startAt = '$', stopAt = 'a' }: { redis: Redis; streamkey: string; startAt?: string; stopAt?: string }) {
+const trafficwandGen = async function * trafficwandGen ({ redis, streamkey, startAt = '$', stopAt }: { redis: Redis; streamkey: string; startAt?: string; stopAt?: string }) {
   const redisBlock = redis.duplicate()
   let lastlogid = startAt
   let ends = false
@@ -55,7 +55,11 @@ const trafficwandGen = async function * trafficwandGen ({ redis, streamkey, star
         const logHead = log[0]
         const logBody = log[1]
         lastlogid = logHead
-        if (lastlogid.localeCompare(stopAt) === 1) {
+
+        if (!stopAt) {
+          const bread = stream2bread({ log: logBody })
+          yield bread
+        } else if (lastlogid.localeCompare(stopAt) === 1) {
           const bread = stream2bread({ log: logBody })
           yield bread
         } else {

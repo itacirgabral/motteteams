@@ -228,14 +228,14 @@ const wac = function wac (connect: Connect): Promise<string> {
               console.dir(bread)
               if (bread.type === 'sendTextMessage') {
                 const { to, msg, cacapa } = bread
-                const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
+                const posfix = to.length < 14 ? 's.whatsapp.net' : 'g.us'
                 const id = `${to}@${posfix}`
                 console.log(`id=${id} sendTextMessage`)
 
                 await socket.sendMessage(id, { text: msg }).catch(console.error)
               } else if (bread.type === 'sendFileMessage') {
                 const { to, link, mimetype, filename, cacapa } = bread
-                const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
+                const posfix = to.length < 14 ? 's.whatsapp.net' : 'g.us'
                 const id = `${to}@${posfix}`
                 console.log(`id=${id} sendFileMessage`)
 
@@ -252,7 +252,9 @@ const wac = function wac (connect: Connect): Promise<string> {
               // pausa estartégica humanizadora
               // nao
             }
-            console.log(`drummer ${fifokey} finish `)
+            console.log(`drummer ${fifokey} finish`)
+          } else {
+            console.log('no drummer')
           }
         }
 
