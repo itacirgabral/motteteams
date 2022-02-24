@@ -246,6 +246,24 @@ const wac = function wac (connect: Connect): Promise<string> {
                   fileName: filename,
                   mimetype
                 }).catch(console.error)
+              } else if (bread.type === 'sendButtons') {
+                const { to, msg, options, cacapa } = bread
+                const posfix = to.length < 14 ? 's.whatsapp.net' : 'g.us'
+                const id = `${to}@${posfix}`
+                console.log(`id=${id} sendButtons`)
+
+                const buttonsText: Array<string> = JSON.parse(options)
+                await socket.sendMessage(id, {
+                  text: msg,
+                  footer: 'bot',
+                  buttons: buttonsText.map((displayText, idx) => ({
+                    buttonId: `id${idx}`,
+                    type: 1,
+                    buttonText: {
+                      displayText
+                    }
+                  })),
+                }).catch(console.error)
               }
 
 

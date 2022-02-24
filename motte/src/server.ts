@@ -111,6 +111,15 @@ const mkServer = function mkServer () {
               'filename', bread.filename,
               'cacapa', 'random123').catch(console.error)
             break
+          case 'respondercomescolhas':
+            redis.xadd(mkfifokey({ shard: bread.shard }), '*',
+            'hardid', bread.hardid,
+            'type', 'sendButtons',
+            'shard', bread.shard,
+            'to', bread.to,
+            'msg', bread.msg,
+            'options', bread.options,
+            'cacapa', 'random123').catch(console.error)
             break
           default:
             console.log('redis:stream -> switch ?')
