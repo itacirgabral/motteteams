@@ -90,3 +90,7 @@ This will open a tunnel from the remote port 6379 (redis standard) to your local
 ```
 ssh -L 6380:localhost:6379 [remoteuser]@[remotehost]
 ```
+## RSYNC
+```
+rsync -azP --exclude '*.env' --exclude '*.log' ../gmapi root@143.198.15.89:/root/gmapi
+```
