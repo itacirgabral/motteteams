@@ -267,7 +267,7 @@ const it = observable.subscribe({
           const pipeline2 = redis.pipeline()
           pipeline2.hset(botkey, 'whatsapp', listDate.shard)
           pipeline2.hset(boxenginebotkey, 'gsadmin', shard)
-  
+
           await Promise.all([
             pipeline2.exec(),
             context.sendActivity(MessageFactory.text(`WhatsApp [${listDate.shard}](https://wa.me/${listDate.shard}) leu o qrcode.`))
@@ -322,10 +322,21 @@ const it = observable.subscribe({
           activity: message
         }
 
+          // avisa que terminou o atendimento
+          const type = 'respondercomtextosimples'
+          const sendEnd = redis.xadd(panoptickey, '*',
+          'hardid', hardid,
+          'type', type,
+          'shard', bread.whatsapp,
+          'to', hook.from,
+          'msg', '_atendimento iniciado_',
+          'cacapa', 'random123')
+
         await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async turnContext => {
           const ref = TurnContext.getConversationReference(turnContext.activity)
           const boxenginebotkey = mkboxenginebotkey({ shard: ref.activityId })
 
+          await sendEnd
           const text = takeText(hook)
 
           let adaptiveCard

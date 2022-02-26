@@ -228,14 +228,14 @@ const wac = function wac (connect: Connect): Promise<string> {
               console.dir(bread)
               if (bread.type === 'sendTextMessage') {
                 const { to, msg, cacapa } = bread
-                const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
+                const posfix = to.length < 14 ? 's.whatsapp.net' : 'g.us'
                 const id = `${to}@${posfix}`
                 console.log(`id=${id} sendTextMessage`)
 
                 await socket.sendMessage(id, { text: msg }).catch(console.error)
               } else if (bread.type === 'sendFileMessage') {
                 const { to, link, mimetype, filename, cacapa } = bread
-                const posfix = to.indexOf('-') === -1 ? 's.whatsapp.net' : 'g.us'
+                const posfix = to.length < 14 ? 's.whatsapp.net' : 'g.us'
                 const id = `${to}@${posfix}`
                 console.log(`id=${id} sendFileMessage`)
 
@@ -246,13 +246,33 @@ const wac = function wac (connect: Connect): Promise<string> {
                   fileName: filename,
                   mimetype
                 }).catch(console.error)
+              } else if (bread.type === 'sendButtons') {
+                const { to, msg, options, cacapa } = bread
+                const posfix = to.length < 14 ? 's.whatsapp.net' : 'g.us'
+                const id = `${to}@${posfix}`
+                console.log(`id=${id} sendButtons`)
+
+                const buttonsText: Array<string> = JSON.parse(options)
+                await socket.sendMessage(id, {
+                  text: msg,
+                  footer: 'bot',
+                  buttons: buttonsText.map((displayText, idx) => ({
+                    buttonId: `id${idx}`,
+                    type: 1,
+                    buttonText: {
+                      displayText
+                    }
+                  })),
+                }).catch(console.error)
               }
 
 
               // pausa estartégica humanizadora
               // nao
             }
-            console.log(`drummer ${fifokey} finish `)
+            console.log(`drummer ${fifokey} finish`)
+          } else {
+            console.log('no drummer')
           }
         }
 

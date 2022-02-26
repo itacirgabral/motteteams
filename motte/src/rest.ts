@@ -48,6 +48,24 @@ router.post('/respondercomarquivo', async (req, res) => {
   res.status(200)
   res.json({ to, link, whatsapp })
 })
+router.post('/respondercomescolhas', async (req, res) => {
+  const { whatsapp, to, msg, options } = req.body
+
+  if (Array.isArray(options) && options.length > 0 && options.every(el => typeof(el) === 'string')) {
+    const type = 'respondercomescolhas'
+    await redis.xadd(panoptickey, '*',
+      'hardid', hardid,
+      'type', type,
+      'shard', whatsapp,
+      'to', to,
+      'msg', msg,
+      'options', JSON.stringify(options),
+      'cacapa', 'random123')
+
+    res.status(200)
+    res.json({ to, msg, whatsapp })
+  }
+})
 
 app.use(express.json())
 app.use(`/${httpPassword}/`, router)

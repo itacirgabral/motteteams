@@ -343,6 +343,16 @@ class TeamsConversationBot extends TeamsActivityHandler {
                 attid
               })
 
+              // // avisa que terminou o atendimento
+              const type = 'respondercomtextosimples'
+              const sendEnd = redis.xadd(panoptickey, '*',
+              'hardid', hardid,
+              'type', type,
+              'shard', whatsapp,
+              'to', chat,
+              'msg', '_atendimento finalizado_',
+              'cacapa', 'random123')
+
               const result = await redis
                 .multi()
                 .del(boxenginebotkey)
