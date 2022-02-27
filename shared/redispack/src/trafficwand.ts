@@ -1,5 +1,7 @@
 import { Redis } from 'ioredis'
 import { Observable } from 'rxjs'
+import Yallist from 'yallist'
+import { setTimeout } from 'timers/promises'
 
 type Bread = {
   [key: string]: string;
@@ -70,9 +72,88 @@ const trafficwandGen = async function * trafficwandGen ({ redis, streamkey, star
   }
 }
 
+const mkStepwand = ({ delay = 1000, delta = 200, breads = [] }: { delay?: number; delta?: number; breads?: Array<Bread> }) => {
+  const indians = new Yallist<{ goodFor: number; bread: Bread}>()
+  let dontStop = true
+
+  for (const bread of breads) {
+    indians.push({
+      bread,
+      goodFor: delay + Math.trunc(delta * (Math.random() - 0.5))
+    })
+  }
+
+  const steps = () => indians.toArray().map(el => el.bread)
+  const dates = () => indians.toArray().map(el => el.goodFor)
+
+  let blockerResolve: (value: unknown) => void
+  let blockerReject: (value: unknown) => void
+  let blocker = new Promise((resolve, reject) => {
+    blockerResolve = resolve
+    blockerReject = reject
+  })
+
+  const close = () => {
+    dontStop = false
+    blockerReject(null)
+  }
+
+  const pub = (bread: Bread) => {
+    indians.push({
+      bread,
+      goodFor: delay + Math.trunc(delta * (Math.random() - 0.5))
+    })
+    if (indians.length === 1) {
+      blockerResolve(null)
+    }
+  }
+
+  const pubOver = (bread: Bread) => {
+    indians.unshift({
+      bread,
+      goodFor: delay + Math.trunc(delta * (Math.random() - 0.5))
+    })
+    if (indians.length === 1) {
+      blockerResolve(null)
+    }
+  }
+
+  const gen = async function * gen () {
+    while (dontStop) {
+      if (indians.head) {
+        const sleepms = indians.head?.value.goodFor ?? 0
+        await setTimeout(sleepms > delta ? sleepms : delta)
+        const bread = indians.shift()?.bread
+        if (bread && dontStop) {
+          yield bread
+        } else {
+          dontStop = false
+          console.log(`dontStop=${dontStop}`)
+        }
+      } else {
+        await blocker
+        blocker = new Promise((resolve, reject) => {
+          blockerResolve = resolve
+          blockerReject = reject
+        })
+      }
+    }
+  }
+
+  return {
+    pub,
+    pubOver,
+    gen,
+    steps,
+    dates,
+    close
+  }
+}
+
 export {
   trafficwand,
   trafficwandGen,
   Bread,
-  stream2bread
+  stream2bread,
+  mkStepwand
 }
