@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState } from "react";
+import ReconnectingWebSocket from 'reconnecting-websocket';
 // https://fluentsite.z22.web.core.windows.net/quick-start
 import { Provider, teamsTheme, Loader } from "@fluentui/react-northstar";
 import { HashRouter as Router, Redirect, Route } from "react-router-dom";
@@ -15,10 +16,11 @@ import TabConfig from "./TabConfig";
  */
 export default function App() {
   const [isConnected, setConnected] = useState(false)
-  const ref = useRef({} as WebSocket)
+  const ref = useRef({} as ReconnectingWebSocket)
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8080')
+    // const ws = new WebSocket('ws://localhost:8080')
+    const ws = new  ReconnectingWebSocket('ws://localhost:8080')
     ref.current = ws
 
     ws.onopen = async ev => {
@@ -38,6 +40,7 @@ export default function App() {
   const { theme, loading } = useTeamsFx();
   return (
     <Provider theme={theme || teamsTheme} styles={{ backgroundColor: "#eeeeee" }}>
+      <p>isConnected={isConnected ? 'sim' : 'não'}</p>
       <Router>
         <Route exact path="/">
           <Redirect to="/tab" />

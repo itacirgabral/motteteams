@@ -67,6 +67,7 @@ app.ws('/*', {
       const body = JSON.parse(message)
       console.dir(body)
 
+      ws.send(JSON.stringify({ nanoid: '123456' }))
       //  ws.publish('home/sensors/temperature', message);
     } catch (err) {
       console.error(err)
