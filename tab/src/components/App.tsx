@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useRef, useState } from "react";
 // https://fluentsite.z22.web.core.windows.net/quick-start
 import { Provider, teamsTheme, Loader } from "@fluentui/react-northstar";
 import { HashRouter as Router, Redirect, Route } from "react-router-dom";
@@ -14,6 +14,27 @@ import TabConfig from "./TabConfig";
  * of the app.
  */
 export default function App() {
+  const [isConnected, setConnected] = useState(false)
+  const ref = useRef({} as WebSocket)
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8080')
+    ref.current = ws
+
+    ws.onopen = async ev => {
+      console.dir({ on: 'open', ev, ws })
+      setConnected(true)
+    }
+
+    ws.onmessage = async ev => {
+      console.dir({ on: 'message', ev })
+    }
+
+    return () => {
+      // cleanup
+    }
+  }, [])
+
   const { theme, loading } = useTeamsFx();
   return (
     <Provider theme={theme || teamsTheme} styles={{ backgroundColor: "#eeeeee" }}>
