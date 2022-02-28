@@ -88,7 +88,7 @@ task "server" {
 ## ssh redis
 This will open a tunnel from the remote port 6379 (redis standard) to your local port 9999.
 ```
-ssh -L 6380:localhost:6379 [remoteuser]@[remotehost]
+ssh -L 6380:localhost:6379 root@143.198.15.89
 ```
 ## RSYNC
 ```

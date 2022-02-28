@@ -8,6 +8,9 @@
     "scripts": {
         "start": "node ./src/index.js",
         "watch": "npx node-dev ./src/index.js",
+        "pack:linux": "npx pkg --targets node16-linux-x64 --out-path ./bin ./src/index.js",
+        "pack:alpine": "npx pkg --compress Brotli --targets node16-alpine-x64 --out-path ./bin ./src/index.js",
+        "pack:static": "npx pkg --compress Brotli --targets node16-linuxstatic-x64 --out-path ./bin ./src/index.js",    
         "test": "echo \"Error: no test specified\" && exit 1",
         "tunnel": "cloudflared tunnel --hostname zapbridge.gestormessenger.team --url localhost:3978 --name zapbot --config ./cloudflarer.cert.json"
     },

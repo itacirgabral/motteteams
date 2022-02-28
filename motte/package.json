@@ -6,6 +6,9 @@
     "build": "npx tsc",
     "dev": "npx ts-node -r dotenv/config src/index.ts",
     "start": "node -r dotenv/config dist/index.js",
+    "pack:linux": "npx pkg --targets node16-linux-x64 --out-path ./bin ./dist/index.js",
+    "pack:alpine": "npx pkg --compress Brotli --targets node16-alpine-x64 --out-path ./bin ./dist/index.js",
+    "pack:static": "npx pkg --compress Brotli --targets node16-linuxstatic-x64 --out-path ./bin ./dist/index.js",    
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

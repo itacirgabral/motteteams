@@ -4,3 +4,4 @@ docs/*
 *.log
 dist
 auth_info_*.json
+bin
