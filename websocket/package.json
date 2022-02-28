@@ -1,0 +1,41 @@
+{
+  "name": "gmws",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "private": true,
+  "scripts": {
+    "prebuild": "rm -rf ./dist ",
+    "build": "npx tsc",
+    "pack:linux": "npx pkg --compress Brotli --targets node16-linux-x64 --out-path ./bin ./dist/index.js",
+    "pack:alpine": "npx pkg --compress Brotli --targets node16-alpine-x64 --out-path ./bin ./dist/index.js",
+    "pack:static": "npx pkg --compress Brotli --targets node16-linuxstatic-x64 --out-path ./bin ./dist/index.js",
+    "pack:all": "npm run pack:linux && npm run pack:alpine && npm run pack:static ",
+    "start": "node -r dotenv/config dist/app.js",
+    "app": "ts-node-dev -r dotenv/config src/app.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/node": "^17.0.21",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.2.0",
+    "ts-node": "^10.5.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "uWebSockets.js": "uNetworking/uWebSockets.js#v20.3.0"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.6",
+    "utf-8-validate": "^5.0.8"
+  }
+}
