@@ -1,6 +1,6 @@
 import { setTimeout } from 'timers/promises'
 import * as uWS from 'uWebSockets.js'
-import { client as redis, panoptickey, mkcacapakey } from '@gmapi/redispack'
+import { client as redis, panoptickey, mkcacapakey, mkbotkey, mkboxenginebotkey } from '@gmapi/redispack'
 import { nanoid } from 'nanoid'
 import jsonwebtoken from 'jsonwebtoken'
 import qrcode from 'qrcode'
@@ -140,7 +140,8 @@ app.ws('/*', {
     let body: {
       type: string;
       role?: string;
-      whatsapp?: string
+      whatsapp?: string;
+      teamsid?: string;
     } | string
 
     try {
@@ -221,6 +222,21 @@ app.ws('/*', {
                 ws.subscribe(listDate0.shard)
               }
             }
+          }
+          break
+        case 'bridge':
+          if (ws.user?.id === 'admin' && body.whatsapp && body.teamsid) {
+            const boxenginebotkey = mkboxenginebotkey({ shard: body.whatsapp })
+            const botkey = mkbotkey({ shard: body.teamsid })
+            const pipeline = redis.pipeline()
+            pipeline.hset(botkey, 'whatsapp', body.whatsapp)
+            pipeline.hset(boxenginebotkey, 'gsadmin', body.teamsid)
+            await pipeline.exec()
+            ws.send(JSON.stringify({
+              type: 'bridge',
+              whatsapp: body.whatsapp,
+              teamsid: body.teamsid
+            }))
           }
           break
       }
