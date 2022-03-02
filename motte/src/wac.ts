@@ -220,6 +220,12 @@ const wac = function wac (connect: Connect): Promise<string> {
         if(!whatsappsocket && connection === 'open') {
           whatsappsocket = socket // deixa o socket servido pro IPC fácil
 
+          // avisa que abriu
+          const pipeline = redis.pipeline()
+          pipeline.lpush(connect.cacapa, JSON.stringify({ type: 'connect', shard: connect.shard }))
+          pipeline.expire(connect.cacapa, 90)
+          await pipeline.exec()
+
           if (connect.drummerStartAt === 'agora' && connect.drummerStopAt === 'nunca') {
             const fifokey = mkfifokey({ shard: connect.shard })
             const breads = trafficwandGen({ redis, streamkey: fifokey })

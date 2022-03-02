@@ -2,7 +2,7 @@ import { Signupconnection, Connect } from '@gmapi/types'
 import { mkServer } from './server'
 import { zygote } from './zygote'
 import { wac } from './wac'
-import rest from './rest'
+// import rest from './rest'
 
 const isMain = !process.env.SERVICE
 const httpPort = process.env.HTTP_PORT || '8080'
@@ -16,9 +16,9 @@ if (isMain) {
    */
   const { inBound } = mkServer()
 
-  rest.listen(httpPort, () => {
-    console.log(`⚡️[server]: Server is running at http://localhost:${httpPort}`)
-  })
+  // rest.listen(httpPort, () => {
+  //   console.log(`⚡️[server]: Server is running at http://localhost:${httpPort}`)
+  // })
 
   // Serviço Novo QR CODE
 } else if (process.env.SERVICE === 'zygote') {

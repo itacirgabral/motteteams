@@ -228,10 +228,8 @@ const it = observable.subscribe({
       const type = 'signupconnection'
       const cacapaListResponse = mkcacapakey()
 
-      const botkey = mkbotkey({ shard })
-      const whatsapp = await redis.hget(botkey, 'whatsapp')
-
-      const url = ' '
+      const url = 'whatever'
+      const whatsapp = 'whatever'
       await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', whatsapp, 'mitochondria', mitochondria, 'cacapa', cacapaListResponse, 'url', url)
 
       // espera na caçapa pelo código
@@ -249,8 +247,8 @@ const it = observable.subscribe({
       const card = CardFactory.adaptiveCard(adaptiveCard)
       const message = MessageFactory.attachment(card)
 
-      // criado em cima para pegar o zap da equipe
-      // const botkey = mkbotkey({ shard })
+      // ReferenceError: botkey is not defined
+      const botkey = mkbotkey({ shard })
       const botref = await redis.hget(botkey, 'ref')
       const conversationParameters = {
         isGroup: true,
@@ -322,15 +320,15 @@ const it = observable.subscribe({
           activity: message
         }
 
-          // avisa que terminou o atendimento
-          const type = 'respondercomtextosimples'
-          const sendEnd = redis.xadd(panoptickey, '*',
-          'hardid', hardid,
-          'type', type,
-          'shard', bread.whatsapp,
-          'to', hook.from,
-          'msg', '_atendimento iniciado_',
-          'cacapa', 'random123')
+        // avisa que terminou o atendimento
+        const type = 'respondercomtextosimples'
+        const sendEnd = redis.xadd(panoptickey, '*',
+        'hardid', hardid,
+        'type', type,
+        'shard', bread.whatsapp,
+        'to', hook.from,
+        'msg', '_atendimento iniciado_',
+        'cacapa', 'random123')
 
         await adapter.createConversationAsync(appId, channelId, serviceUrl, audience, conversationParameters, async turnContext => {
           const ref = TurnContext.getConversationReference(turnContext.activity)
