@@ -43,10 +43,7 @@ app.ws('/*', {
   maxPayloadLength: 16 * 1024 * 1024,
   idleTimeout: 10,
   maxBackpressure: 1024,
-  open: (ws) => {
-    // /* Let this client listen to all sensor topics */
-    // ws.subscribe('home/sensors/#');
-  },
+
   drain: (ws) => {
     console.log('WebSocket backpressure: ' + ws.getBufferedAmount())
   },
@@ -54,40 +51,67 @@ app.ws('/*', {
     /* The library guarantees proper unsubscription at close */
   },
   upgrade: async (res, req, context) => {
-  const upgradeAborted = { aborted: false }
-  res.onAborted(() => {
-    upgradeAborted.aborted = true
-  })
+    const upgradeAborted = { aborted: false }
+    res.onAborted(() => {
+      upgradeAborted.aborted = true
+    })
 
-  /* You MUST copy data out of req here, as req is only valid within this immediate callback */
-  const url = req.getUrl()
-  const secWebSocketKey = req.getHeader('sec-websocket-key')
-  const secWebSocketProtocol = req.getHeader('sec-websocket-protocol')
-  const secWebSocketExtensions = req.getHeader('sec-websocket-extensions')
-  const auth = req.getHeader('authorization').split('Bearer ').pop()
+    /* You MUST copy data out of req here, as req is only valid within this immediate callback */
+    const url = req.getUrl()
 
-  // await setTimeout(1000)
+    const secWebSocketKey = req.getHeader('sec-websocket-key')
+    const secWebSocketProtocol = req.getHeader('sec-websocket-protocol')
+    const secWebSocketExtensions = req.getHeader('sec-websocket-extensions')
+    const auth = req.getHeader('authorization').split('Bearer ').pop()
 
-  if (upgradeAborted.aborted) {
-    return
-  } else {
-    res.upgrade({
-      url: url
-    },
-    secWebSocketKey,
-    secWebSocketProtocol,
-    secWebSocketExtensions,
-    context)
-  }
+    let user
+    try {
+      user = auth ? jsonwebtoken.verify(auth, 'qwer') : { }
+    } catch {
+      user = { }
+    }
+
+    // await setTimeout(1000)
+
+    if (upgradeAborted.aborted) {
+      return
+    } else {
+      res.upgrade({
+        url,
+        user
+      },
+      secWebSocketKey,
+      secWebSocketProtocol,
+      secWebSocketExtensions,
+      context)
+    }
+  },
+  open: async (ws) => {
+    console.dir(ws)
+
+    if (!ws.user?.id) {
+      ws.send(JSON.stringify({
+        type: 'warning',
+        message: 'You have 5 seconds to do signin'
+      }))
+
+      await setTimeout(5_000)
+
+      if (!ws.getTopics().includes('onlineuser')) {
+        ws.send(JSON.stringify({
+          type: 'error',
+          message: 'you are loguted'
+        }))
+        ws.close()
+      }
+    }
+
 
   },
   message: async (ws, arraBuffer, isBinary) => {
     const message = Buffer.from(arraBuffer).toString('utf8')
-
-    const remote = Buffer.from(ws.getRemoteAddressAsText()).toString('utf8')
-
     const topics = ws.getTopics()
-    console.log(`remote=${remote} topis=[${topics.join(', ')}]`)
+    //const remote = Buffer.from(ws.getRemoteAddressAsText()).toString('utf8')
 
     let body: {
       type: string;
@@ -100,16 +124,17 @@ app.ws('/*', {
     }
 
     if (typeof(body) === 'object' && body?.type ) {
+      console.dir(body)
       switch (body.type) {
-        case 'getRandomNanoId':
+        case 'getTopics':
           // await setTimeout(1000)
           ws.send(JSON.stringify({
-            type: 'id',
-            you: remote,
-            topics,
-            id: nanoid()
+            type: 'getTopics',
+            topics
           }))
           break
+        case 'signin':
+          ws.subscribe('onlineuser')
       }
     } else {
       console.dir({ message })
