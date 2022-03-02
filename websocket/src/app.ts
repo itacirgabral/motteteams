@@ -3,6 +3,8 @@ import * as uWS from 'uWebSockets.js'
 import { nanoid } from 'nanoid'
 import jsonwebtoken from 'jsonwebtoken'
 
+const hardid = process.env.HARDID || ''
+
 const app = uWS.App()
 
 app.post('/auth/:scope', (res, req) => {
@@ -21,8 +23,24 @@ app.post('/auth/:scope', (res, req) => {
       try {
         const body = JSON.parse(bodyArray.join(''))
         if (!res.aborted) {
-          res.writeHeader('Content-Type', 'application/json')
-          res.end(JSON.stringify({ url, body, scope }))
+          if (body.username === 'admin' && body.password === hardid) {
+            res.writeHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({
+              url,
+              jwt: jsonwebtoken.sign(JSON.stringify({
+                id: body.username,
+                roles: [scope]
+              }), hardid),
+              scope
+            }))
+          } else {
+            res.writeHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({
+              url,
+              body,
+              scope
+            }))
+          }
         }
       } catch (err) {
         console.error(err)
@@ -66,7 +84,7 @@ app.ws('/*', {
 
     let user
     try {
-      user = auth ? jsonwebtoken.verify(auth, 'qwer') : { }
+      user = auth ? jsonwebtoken.verify(auth, hardid) : { }
     } catch {
       user = { }
     }
@@ -104,9 +122,13 @@ app.ws('/*', {
         }))
         ws.close()
       }
+    } else {
+      // send welcome
+      ws.send(JSON.stringify({
+        type: 'welcome',
+        message: `Welcome ${ws.user.id}@${Array.isArray(ws.user.roles) ? ws.user.roles.join('_') : ' '}`
+      }))
     }
-
-
   },
   message: async (ws, arraBuffer, isBinary) => {
     const message = Buffer.from(arraBuffer).toString('utf8')
@@ -134,6 +156,9 @@ app.ws('/*', {
           }))
           break
         case 'signin':
+          if (ws.user?.id === 'admin') {
+            ws.subscribe('onlineadmin')
+          }
           ws.subscribe('onlineuser')
       }
     } else {
