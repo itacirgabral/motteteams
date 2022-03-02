@@ -145,9 +145,6 @@ const zygote = function zygote (signupconnection: Signupconnection): Promise<Bir
             res(birth)
           })
         }
-
-
-
       } else if(update.qr) {
         lastQrcode = update.qr || ''
         const response = {
