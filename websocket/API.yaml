@@ -1,0 +1,45 @@
+asyncapi: 2.0.0
+
+info:
+  title: GestorMessengerAPI
+  version: '1.2.4'
+  description: |
+    Gestorm Messenger Solluções Corporativas para Mensageria
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  development:
+    url: ws://ws.gm.inf.br
+    protocol: websocket
+    description: WebSocket endpoint api
+
+channels:
+  zap/qrcode:
+    subscribe:
+      operationId: newQRCodePng
+      message:
+        $ref : '#/components/messages/NewQRCodePng'
+
+components:
+  messages:
+    NewQRCodePng:
+      name: newQRCodePng
+      title: New QRCode event
+      summary: The QR Code Image
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/newQRCodePngPayload'
+  schemas:
+    newQRCodePngPayload:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - qrcode
+          description: "should be qrcode"
+        qrcode:
+          type: string
+          description: "The QR COde png as base64 encoded png"

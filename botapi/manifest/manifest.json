@@ -26,6 +26,14 @@
   "accentColor": "#007869",
   "staticTabs": [
     {
+      "entityId": "2831b485-5c99-433b-969f-9ae0a077bf3e",
+      "name": "ControlPainel",
+      "contentUrl": "https://app.gm.inf.br/controlpaineltab",
+      "scopes": [
+        "personal"
+      ]
+    },
+    {
       "entityId": "GestorMessengerContatos",
       "name": "Contatos",
       "contentBotId": "de788039-604f-49e0-9545-34dff1e455a9",
@@ -105,6 +113,8 @@
   ],
   "validDomains": [
     "alfabot.gestormessenger.team",
+    "app.gm.inf.br",
+    "ws.gm.inf.br",
     "token.botframework.com"
   ],
   "webApplicationInfo": {

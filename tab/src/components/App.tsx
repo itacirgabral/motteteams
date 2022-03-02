@@ -20,7 +20,7 @@ export default function App() {
 
   useEffect(() => {
     // const ws = new WebSocket('ws://localhost:8080')
-    const ws = new  ReconnectingWebSocket('ws://localhost:8080')
+    const ws = new  ReconnectingWebSocket('wss://ws.gm.inf.br/')
     ref.current = ws
 
     ws.onopen = async ev => {
