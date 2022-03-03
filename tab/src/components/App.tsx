@@ -20,7 +20,12 @@ export default function App() {
 
   useEffect(() => {
     // const ws = new WebSocket('ws://localhost:8080')
-    const ws = new  ReconnectingWebSocket('wss://ws.gm.inf.br/')
+
+    const jwt = window.localStorage.getItem('jwt');
+    const whatsapp = window.localStorage.getItem('whatsapp');
+    const host = window.localStorage.getItem('host') || 'wss://ws.gm.inf.br'
+
+    const ws = new  ReconnectingWebSocket(`${host}/teamstap?jwt=${jwt}&whatsapp=${whatsapp}`)
     ref.current = ws
 
     ws.onopen = async ev => {

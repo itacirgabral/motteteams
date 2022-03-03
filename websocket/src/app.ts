@@ -4,6 +4,7 @@ import { client as redis, panoptickey, mkcacapakey, mkbotkey, mkboxenginebotkey 
 import { nanoid } from 'nanoid'
 import jsonwebtoken from 'jsonwebtoken'
 import qrcode from 'qrcode'
+import queryString from 'query-string'
 
 const hardid = process.env.HARDID || ''
 
@@ -71,18 +72,23 @@ app.ws('/*', {
     /* The library guarantees proper unsubscription at close */
   },
   upgrade: async (res, req, context) => {
+    console.log('upgrade')
     const upgradeAborted = { aborted: false }
     res.onAborted(() => {
       upgradeAborted.aborted = true
     })
 
     /* You MUST copy data out of req here, as req is only valid within this immediate callback */
-    const url = req.getUrl()
+    const pathname = req.getUrl().split('/').filter(el => el)
 
     const secWebSocketKey = req.getHeader('sec-websocket-key')
     const secWebSocketProtocol = req.getHeader('sec-websocket-protocol')
     const secWebSocketExtensions = req.getHeader('sec-websocket-extensions')
-    const auth = req.getHeader('authorization').split('Bearer ').pop()
+    
+    const authHeader = req.getHeader('authorization').split('Bearer ').pop() as string
+    const query = queryString.parse(req.getQuery())
+    const authQuery = query?.jwt as string
+    const auth = authHeader || authQuery
 
     let user
     try {
@@ -91,14 +97,16 @@ app.ws('/*', {
       user = { }
     }
 
+    const whatsapp = query.whatsapp ? query.whatsapp : undefined
     // await setTimeout(1000)
 
     if (upgradeAborted.aborted) {
       return
     } else {
       res.upgrade({
-        url,
-        user
+        pathname,
+        user,
+        whatsapp
       },
       secWebSocketKey,
       secWebSocketProtocol,
@@ -107,6 +115,7 @@ app.ws('/*', {
     }
   },
   open: async (ws) => {
+    console.log('open')
     console.dir(ws)
 
     if (!ws.user?.id) {
@@ -128,7 +137,9 @@ app.ws('/*', {
       // send welcome
       ws.send(JSON.stringify({
         type: 'welcome',
-        message: `Welcome ${ws.user.id}@${Array.isArray(ws.user.roles) ? ws.user.roles.join('_') : ' '}`
+        message: `Welcome ${ws.user.id}@${Array.isArray(ws.user.roles) ? ws.user.roles.join('_') : ' '}`,
+        url: ws.user?.url,
+        query: ws.user?.query,
       }))
     }
   },
