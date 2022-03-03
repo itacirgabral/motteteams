@@ -245,7 +245,6 @@ app.ws('/*', {
           }
           break
         case 'respondercomtextosimples':
-          console.log('respondercomtextosimples ####################')
           if (ws.user?.id === 'admin' && body.whatsapp && body.to && body.msg) {
             const type = 'respondercomtextosimples'
             await redis.xadd(panoptickey, '*',
@@ -261,8 +260,6 @@ app.ws('/*', {
               to: body.to,
               msg: body.msg
             }))
-          } else {
-            console.log('nops')
           }
           break
         case 'respondercomarquivo':
