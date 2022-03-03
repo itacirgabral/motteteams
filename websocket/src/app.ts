@@ -142,6 +142,11 @@ app.ws('/*', {
       role?: string;
       whatsapp?: string;
       teamsid?: string;
+      to?: string;
+      msg?: string;
+      link?: string; 
+      mimetype?: string;
+      filename?: string;
     } | string
 
     try {
@@ -239,6 +244,49 @@ app.ws('/*', {
             }))
           }
           break
+        case 'respondercomtextosimples':
+          console.log('respondercomtextosimples ####################')
+          if (ws.user?.id === 'admin' && body.whatsapp && body.to && body.msg) {
+            const type = 'respondercomtextosimples'
+            await redis.xadd(panoptickey, '*',
+            'hardid', hardid,
+            'type', type,
+            'shard', body.whatsapp,
+            'to', body.to,
+            'msg', body.msg,
+            'cacapa', 'random123')
+            ws.send(JSON.stringify({
+              type,
+              whatsapp: body.whatsapp,
+              to: body.to,
+              msg: body.msg
+            }))
+          } else {
+            console.log('nops')
+          }
+          break
+        case 'respondercomarquivo':
+          if (ws.user?.id === 'admin' && body.whatsapp && body.link && body.mimetype && body.filename) {
+            const type = 'respondercomarquivo'
+            await redis.xadd(panoptickey, '*',
+            'hardid', hardid,
+            'type', type,
+            'shard', body.whatsapp,
+            'to', body.to,
+            'link', body.link,
+            'mimetype', body.mimetype,
+            'filename', body.filename,
+            'cacapa', 'random123')
+            ws.send(JSON.stringify({
+              type,
+              whatsapp: body.whatsapp,
+              to: body.to,
+              link: body.link,
+              mimetype: body.mimetype,
+              filename: body.filename
+            }))
+          }
+          break
       }
     } else {
       console.dir({ message })
@@ -252,7 +300,8 @@ app.ws('/*', {
   }
 })
 
-app.listen(8080, listenSocket => {
+const appPort = process.env.APP_PORT || '8080'
+app.listen(Number(appPort), listenSocket => {
   if (listenSocket) {
     const port = uWS.us_socket_local_port(listenSocket)
     console.log('Listening to port ' + port)

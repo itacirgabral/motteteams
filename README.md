@@ -92,5 +92,5 @@ ssh -L 6380:localhost:6379 root@143.198.15.89
 ```
 ## RSYNC
 ```
-rsync -azP --exclude '*.env' --exclude '*.log' ../gmapi root@143.198.15.89:/root/gmapi
+rsync -azP --exclude '*.env' --exclude '*.log' ../websocket root@143.198.15.89:/root/
 ```
