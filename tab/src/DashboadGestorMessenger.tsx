@@ -1,12 +1,14 @@
 import React from "react";
+import ReconnectingWebSocket from 'reconnecting-websocket';
 import { Image, Button, Header, Flex, Segment} from "@fluentui/react-northstar";
 import Login from './LogIn'
 
 type Props = {
   isGSConnected: boolean;
   setGSConnected: React.Dispatch<React.SetStateAction<boolean>>
+  websocket: React.MutableRefObject<ReconnectingWebSocket>
 }
-const DashboadGestorMessenger = ({ isGSConnected, setGSConnected }: Props) => <Flex column>
+const DashboadGestorMessenger = ({ isGSConnected, setGSConnected, websocket }: Props) => <Flex column>
   <Image
     style={{ margin: '1rem auto'}}
     src="https://gestormessengerfiles.nyc3.digitaloceanspaces.com/GestorSistemasEngrenagemLogo.png"
@@ -19,7 +21,7 @@ const DashboadGestorMessenger = ({ isGSConnected, setGSConnected }: Props) => <F
   {
     isGSConnected ?
       <p>já fez login</p> :
-      <Login setGSConnected={setGSConnected} />
+      <Login websocket={websocket} />
   }
 </Flex>
 

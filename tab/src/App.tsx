@@ -9,7 +9,7 @@ import DashboadGestorMessenger from "./DashboadGestorMessenger";
 export default function App() {
   const [isConnected, setConnected] = useState(false)
   const [isGSConnected, setGSConnected] = useState(false)
-  const ref = useRef({} as ReconnectingWebSocket)
+  const websocket = useRef({} as ReconnectingWebSocket)
 
   useEffect(() => {
     const jwt = window.localStorage.getItem('jwt');
@@ -17,7 +17,7 @@ export default function App() {
     const host = window.localStorage.getItem('host') || 'wss://ws.gm.inf.br'
 
     const ws = new  ReconnectingWebSocket(`${host}/teamstap?jwt=${jwt}&whatsapp=${whatsapp}`)
-    ref.current = ws
+    websocket.current = ws
 
     ws.onopen = async ev => {
       console.dir({ on: 'open', ev, ws })
@@ -40,7 +40,7 @@ export default function App() {
         <Redirect to="/dash" />
       </Route>
       <Route exact path="/dash">
-        <DashboadGestorMessenger  isGSConnected={isGSConnected} setGSConnected={setGSConnected}/>
+        <DashboadGestorMessenger websocket={websocket} isGSConnected={isGSConnected} setGSConnected={setGSConnected}/>
       </Route>
     </Router>
   </Provider>
