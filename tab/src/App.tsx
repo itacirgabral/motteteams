@@ -28,6 +28,10 @@ export default function App() {
     ws.onopen = async ev => {
       console.dir({ on: 'open', ev, ws })
       setConnected(true)
+      ws.send(JSON.stringify({
+        type: 'register',
+        channel: 'onlineuser'
+    }))
     }
 
     ws.onmessage = async ev => {

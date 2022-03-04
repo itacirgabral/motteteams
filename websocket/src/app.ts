@@ -5,6 +5,7 @@ import { nanoid } from 'nanoid'
 import jsonwebtoken from 'jsonwebtoken'
 import qrcode from 'qrcode'
 import queryString from 'query-string'
+import fetch from 'isomorphic-fetch'
 
 const hardid = process.env.HARDID || ''
 
@@ -150,7 +151,7 @@ app.ws('/*', {
 
     let body: {
       type: string;
-      role?: string;
+      channel?: string;
       whatsapp?: string;
       teamsid?: string;
       to?: string;
@@ -158,6 +159,8 @@ app.ws('/*', {
       link?: string; 
       mimetype?: string;
       filename?: string;
+      email?: string;
+      senha?: string;
     } | string
 
     try {
@@ -176,14 +179,10 @@ app.ws('/*', {
             topics
           }))
           break
-        case 'signin':
-          if (ws.user?.id === 'admin') {
-            ws.subscribe('onlineadmin')
-            if (body?.role) {
-              ws.subscribe(body.role)
-            }
+        case 'register':
+          if (body.channel) {
+            ws.subscribe(body.channel)
           }
-          ws.subscribe('onlineuser')
           break
         case 'signupconnection':
           if (ws.user?.id === 'admin') {
@@ -295,7 +294,25 @@ app.ws('/*', {
             }))
           }
           break
-        case 'gestorsistemaslogin':
+        case 'gestorsistema/auth/login':
+          if (body.email && body.senha) {
+            const userLoginResponde = await fetch('https://api.gestorsistemas.com/api/auth/login', {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ email: body.email, password: body.senha }),
+              redirect: 'follow'
+            })
+
+            const aux = await userLoginResponde.json()
+            const type = 'gestorsistema/user'
+            ws.send(JSON.stringify({
+              type,
+              user: aux.data?.user?.data
+            }))
+          }
           /*
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
