@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import * as microsoftTeams from '@microsoft/teams-js';
 import { Provider, teamsTheme } from "@fluentui/react-northstar";
 import { HashRouter as Router, Redirect, Route } from "react-router-dom";
 
@@ -11,7 +12,7 @@ export default function App() {
   const [gsuser, setGsuser] = useState('')
   const [isGSConnected, setGSConnected] = useState(false)
   const websocket = useRef({} as ReconnectingWebSocket)
-
+  
   useEffect(() => {
     const jwt = window.localStorage.getItem('jwt');
     const whatsapp = window.localStorage.getItem('whatsapp');
@@ -27,11 +28,23 @@ export default function App() {
 
     ws.onopen = async ev => {
       console.dir({ on: 'open', ev, ws })
+
       setConnected(true)
+
       ws.send(JSON.stringify({
         type: 'register',
         channel: 'onlineuser'
-    }))
+      }))
+
+      microsoftTeams.authentication.getAuthToken({
+        resources: [process.env.SSOTAB_APP_URI || ''],
+        successCallback: msTToken => {
+          ws.send(JSON.stringify({
+            type: 'msteams/user',
+            jwt: msTToken
+          }))
+        }
+      })
     }
 
     ws.onmessage = async ev => {

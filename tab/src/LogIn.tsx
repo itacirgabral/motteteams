@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { Form, FormInput, FormButton } from "@fluentui/react-northstar";
 
-
 type Props = {
   websocket: React.MutableRefObject<ReconnectingWebSocket>
 }
@@ -11,6 +10,7 @@ const Login = ({ websocket }: Props) => {
   const [isLoading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
+
   return <Form
     style={{ margin: '1rem auto', textAlign: 'center'}}
     onSubmit={() => {
