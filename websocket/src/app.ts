@@ -8,8 +8,24 @@ import queryString from 'query-string'
 import fetch from 'isomorphic-fetch'
 
 const hardid = process.env.HARDID || ''
+const teamsAppId = process.env.TEAMS_APP_ID || ''
+const teamsAppSecret = process.env.TEAMS_APP_SECRET || ''
 
 const app = uWS.App()
+
+interface JwtPayloadBootstrap {
+  aio: string;
+  azp: string;
+  azpacr: string;
+  name: string;
+  oid: string;
+  preferred_username: string;
+  rh: string;
+  scp: string;
+  tid: string;
+  uti: string;
+  ver: string;
+}
 
 app.post('/auth/:scope', (res, req) => {
   res.onAborted(() => {
@@ -85,7 +101,7 @@ app.ws('/*', {
     const secWebSocketKey = req.getHeader('sec-websocket-key')
     const secWebSocketProtocol = req.getHeader('sec-websocket-protocol')
     const secWebSocketExtensions = req.getHeader('sec-websocket-extensions')
-    
+
     const authHeader = req.getHeader('authorization').split('Bearer ').pop() as string
     const query = queryString.parse(req.getQuery())
     const authQuery = query?.jwt as string
@@ -156,7 +172,7 @@ app.ws('/*', {
       teamsid?: string;
       to?: string;
       msg?: string;
-      link?: string; 
+      link?: string;
       mimetype?: string;
       filename?: string;
       email?: string;
@@ -194,7 +210,7 @@ app.ws('/*', {
             const cacapaListResponse = mkcacapakey()
 
             await redis.xadd(panoptickey, '*', 'hardid', hardid, 'type', type, 'shard', shard, 'mitochondria', mitochondria, 'cacapa', cacapaListResponse, 'url', url)
- 
+
             // espera na caçapa pelo código
             const listResponde0 = await redis.blpop(cacapaListResponse, 40)
             const listDate0 = JSON.parse(listResponde0[1])
@@ -317,11 +333,45 @@ app.ws('/*', {
         break
         case 'msteams/user':
           if (body.jwt) {
-            console.log('############')
-            console.log('msteams/user')
-            console.log(body.jwt)
-            console.log('msteams/user')
-            console.log('############')
+            const token = <JwtPayloadBootstrap>jsonwebtoken.decode(body.jwt)
+            const who = token?.preferred_username
+
+            const aadTokenEndpoint = `https://login.microsoftonline.com/${token.tid}/oauth2/v2.0/token`;
+
+            // // convert params to URL encoded form body payload
+            const oboBody = [
+              `grant_type=${encodeURIComponent('urn:ietf:params:oauth:grant-type:jwt-bearer')}`,
+              `client_id=${encodeURIComponent(teamsAppId)}`,
+              `client_secret=${encodeURIComponent(teamsAppSecret)}`,
+              `assertion=${encodeURIComponent(body.jwt)}`,
+              `requested_token_use=${encodeURIComponent('on_behalf_of')}`,
+              `scope=${encodeURIComponent('https://graph.microsoft.com/Channel.ReadBasic.All ChannelMessage.Read.All ChannelMessage.Send email Files.ReadWrite.All offline_access openid profile Sites.ReadWrite.All Tasks.ReadWrite Tasks.ReadWrite.Shared User.Invite.All User.Read')}`,
+            ].join("&");
+
+            const headers = {
+              accept: "application/json",
+              "content-type": "application/x-www-form-urlencoded"
+            };
+
+            const oboRaw = await fetch(aadTokenEndpoint, {
+              method: 'POST',
+              headers,
+              body: oboBody
+            })
+
+            const obo = await oboRaw.text()
+            console.log('############ OBO ############')
+            console.log(obo)
+
+            ws.send(JSON.stringify({
+              type: 'gestorsistema/obotoken',
+              who,
+              aadTokenEndpoint,
+              oboBody,
+              headers,
+              obo
+            }))
+
             // cria hset tokens
             /*
               // HSET movies:11002 title "Star Wars: Episode V - The Empire Strikes Back" plot "Luke Skywalker begins Jedi training with Yoda." release_year 1980 genre "Action" rating 8.7 votes 1127635

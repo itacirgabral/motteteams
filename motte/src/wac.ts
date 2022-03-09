@@ -226,6 +226,9 @@ const wac = function wac (connect: Connect): Promise<string> {
           pipeline.expire(connect.cacapa, 90)
           await pipeline.exec()
 
+          // mover este trecho pro comunicador lá em cima
+          // apenas enviar a aviso que conectou
+
           if (connect.drummerStartAt === 'agora' && connect.drummerStopAt === 'nunca') {
             const fifokey = mkfifokey({ shard: connect.shard })
             const breads = trafficwandGen({ redis, streamkey: fifokey })
@@ -282,6 +285,7 @@ const wac = function wac (connect: Connect): Promise<string> {
           }
         }
 
+        // nao pode esquecer de avisar que desligou depois
         if (connection === 'close') {
           //
           const err = lastDisconnect.error

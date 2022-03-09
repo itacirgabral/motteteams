@@ -14,7 +14,7 @@ if (isMain) {
    * INICIA NOVO PROCESSO
    * PRINCIPAL DO CONDADO
    */
-  const { inBound } = mkServer()
+  mkServer().catch(console.error)
 
   // rest.listen(httpPort, () => {
   //   console.log(`⚡️[server]: Server is running at http://localhost:${httpPort}`)
