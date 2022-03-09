@@ -1,6 +1,6 @@
 import { setTimeout } from 'timers/promises'
 import * as uWS from 'uWebSockets.js'
-import { client as redis, panoptickey, mkcacapakey, mkbotkey, mkboxenginebotkey } from '@gmapi/redispack'
+import { client as redis, panoptickey, mkcacapakey, mkbotkey, mkboxenginebotkey, mkuserkey } from '@gmapi/redispack'
 import { nanoid } from 'nanoid'
 import jsonwebtoken from 'jsonwebtoken'
 import qrcode from 'qrcode'
@@ -15,6 +15,7 @@ const app = uWS.App()
 
 interface JwtPayloadBootstrap {
   aio: string;
+  aud: string;
   azp: string;
   azpacr: string;
   name: string;
@@ -334,50 +335,43 @@ app.ws('/*', {
         case 'msteams/user':
           if (body.jwt) {
             const token = <JwtPayloadBootstrap>jsonwebtoken.decode(body.jwt)
-            const who = token?.preferred_username
+            const oid = token.oid
+            const tenant = token.tid
+            const email = token.preferred_username
+            // const accessTk = body.jwt
 
-            const aadTokenEndpoint = `https://login.microsoftonline.com/${token.tid}/oauth2/v2.0/token`;
+            const userkey = mkuserkey({ oid })
 
-            // // convert params to URL encoded form body payload
-            const oboBody = [
-              `grant_type=${encodeURIComponent('urn:ietf:params:oauth:grant-type:jwt-bearer')}`,
-              `client_id=${encodeURIComponent(teamsAppId)}`,
-              `client_secret=${encodeURIComponent(teamsAppSecret)}`,
-              `assertion=${encodeURIComponent(body.jwt)}`,
-              `requested_token_use=${encodeURIComponent('on_behalf_of')}`,
-              `scope=${encodeURIComponent('https://graph.microsoft.com/Channel.ReadBasic.All ChannelMessage.Read.All ChannelMessage.Send email Files.ReadWrite.All offline_access openid profile Sites.ReadWrite.All Tasks.ReadWrite Tasks.ReadWrite.Shared User.Invite.All User.Read')}`,
-            ].join("&");
+            const isAccessTk = await redis.hexists(userkey, 'accessTk')
+            if (!isAccessTk) {
+              const aadTokenEndpoint = `https://login.microsoftonline.com/${token.tid}/oauth2/v2.0/token`
+              const oboBody = [
+                `grant_type=${encodeURIComponent('urn:ietf:params:oauth:grant-type:jwt-bearer')}`,
+                `client_id=${encodeURIComponent(teamsAppId)}`,
+                `client_secret=${encodeURIComponent(teamsAppSecret)}`,
+                `assertion=${encodeURIComponent(body.jwt)}`,
+                `requested_token_use=${encodeURIComponent('on_behalf_of')}`,
+                `scope=${encodeURIComponent('https://graph.microsoft.com/Channel.ReadBasic.All ChannelMessage.Read.All ChannelMessage.Send email Files.ReadWrite.All offline_access openid profile Sites.ReadWrite.All Tasks.ReadWrite Tasks.ReadWrite.Shared User.Invite.All User.Read')}`,
+              ].join("&");
 
-            const headers = {
-              accept: "application/json",
-              "content-type": "application/x-www-form-urlencoded"
-            };
+              const headers = {
+                accept: "application/json",
+                "content-type": "application/x-www-form-urlencoded"
+              };
 
-            const oboRaw = await fetch(aadTokenEndpoint, {
-              method: 'POST',
-              headers,
-              body: oboBody
-            })
+              const oboRaw = await fetch(aadTokenEndpoint, {
+                method: 'POST',
+                headers,
+                body: oboBody
+              })
 
-            const obo = await oboRaw.text()
-            console.log('############ OBO ############')
-            console.log(obo)
-
-            ws.send(JSON.stringify({
-              type: 'gestorsistema/obotoken',
-              who,
-              aadTokenEndpoint,
-              oboBody,
-              headers,
-              obo
-            }))
-
-            // cria hset tokens
-            /*
-              // HSET movies:11002 title "Star Wars: Episode V - The Empire Strikes Back" plot "Luke Skywalker begins Jedi training with Yoda." release_year 1980 genre "Action" rating 8.7 votes 1127635
-              // FT.CREATE idx:movies ON hash PREFIX 1 "movies:" SCHEMA title TEXT SORTABLE release_year NUMERIC SORTABLE rating NUMERIC SORTABLE genre TAG SORTABLE
-              // FT.SEARCH idx:movies * SORTBY release_year ASC RETURN 2 title release_year
-            */
+              const obo = await oboRaw.json()
+              if (obo.access_token && obo.refresh_token) {
+                const accessTk = obo.access_token
+                const refreshTk = obo.refresh_token
+                await redis.hmset(userkey, 'tenant', tenant, 'oid', oid, 'email', email, 'accessTk', accessTk, 'refreshTk', refreshTk)
+              }
+            }
           }
         break
       }

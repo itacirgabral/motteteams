@@ -7,10 +7,10 @@ const hardid = process.env.HARDID || 'dev'
  *
  * @example
  * ```
- * "hardid:xyz:zap:panoptic"
+ * "hardid:xyz:whatsapp:panoptic"
  * ```
  */
-const panoptickey = `hardid:${hardid}:zap:panoptic`
+const panoptickey = `hardid:${hardid}:whatsapp:panoptic`
 
 /**
  * Chave onde as certidões de nascimento do condado são estodas.
@@ -21,7 +21,7 @@ const panoptickey = `hardid:${hardid}:zap:panoptic`
  * "hardid:xyz:borns"
  * ```
  */
-const bornskey = `hardid:${hardid}:zap:borns`
+const bornskey = `hardid:${hardid}:whatsapp:borns`
 
 /**
  * Cria uma chave aleatória para
@@ -39,11 +39,11 @@ const mkcacapakey = () => `hardid:${hardid}:cacapa:${crypto.randomBytes(16).toSt
  *
  * @example
  * ```
- * "hardid:xyz:zap:ijk:creds"
+ * "hardid:xyz:whatsapp:ijk:creds"
  * ```
  */
 const mkcredskey = function mkcredskey ({ shard }: { shard: string }) {
-  return `hardid:${hardid}:zap:${shard}:creds`
+  return `hardid:${hardid}:whatsapp:${shard}:creds`
 }
 
 /**
@@ -52,11 +52,11 @@ const mkcredskey = function mkcredskey ({ shard }: { shard: string }) {
  *
  * @example
  * ```
- * "hardid:xyz:zap:ijk:bookphone"
+ * "hardid:xyz:whatsapp:ijk:bookphone"
  * ```
  */
 const mkbookphonekey = function mkbookphonekey ({ shard, cid }: { shard: string; cid: string; }) {
-  return `hardid:${hardid}:zap:${shard}:bookphone:${cid}`
+  return `hardid:${hardid}:whatsapp:${shard}:bookphone:${cid}`
 }
 
 /**
@@ -65,11 +65,11 @@ const mkbookphonekey = function mkbookphonekey ({ shard, cid }: { shard: string;
  *
  * @example
  * ```
- * "hardid:xyz:zap:ijk:chat"
+ * "hardid:xyz:whatsapp:ijk:chat"
  * ```
  */
 const mkchatkey = function mkchatkey ({ shard, chatid }: { shard: string; chatid: string}) {
-  return `hardid:${hardid}:zap:${shard}:chat:${chatid}`
+  return `hardid:${hardid}:whatsapp:${shard}:chat:${chatid}`
 }
 
 /**
@@ -83,39 +83,39 @@ const mkchatkey = function mkchatkey ({ shard, chatid }: { shard: string; chatid
  *
  * @example
  * ```
- * "hardid:xyz:zap:ijk:chat:bookphone"
+ * "hardid:xyz:whatsapp:ijk:chat:bookphone"
  * ```
  */
 const mkwebhookkey = function mkwebhookkey ({ shard }: { shard: string; }) {
-  return `hardid:${hardid}:zap:${shard}:webhook`
+  return `hardid:${hardid}:whatsapp:${shard}:webhook`
 }
 
 const mkstatekey = function mkstatekey ({ shard }: { shard: string }) {
-  return `hardid:${hardid}:zap:${shard}:state`
+  return `hardid:${hardid}:whatsapp:${shard}:state`
 }
 
 const mkstmkey = function mkstmkey ({ shard }: { shard: string }) {
-  return `hardid:${hardid}:zap:${shard}:stm`
+  return `hardid:${hardid}:whatsapp:${shard}:stm`
 }
 
 const mktskey = function mktskey ({ shard, type }: { shard: string; type: string }) {
-  return `hardid:${hardid}:zap:${shard}:timeserie:${type}`
+  return `hardid:${hardid}:whatsapp:${shard}:timeserie:${type}`
 }
 
 const mkqrcodekey = function mkqrcodekey ({ shard, qrcode }: { shard: string; qrcode: string }) {
-  return `hardid:${hardid}:zap:${shard}:qrcode:${qrcode}`
+  return `hardid:${hardid}:whatsapp:${shard}:qrcode:${qrcode}`
 }
 
 const mkpongkey = function mkpongkey ({ shard }: { shard: string }) {
-  return `hardid:${hardid}:zap:${shard}:pong`
+  return `hardid:${hardid}:whatsapp:${shard}:pong`
 }
 
 const mkfifokey = function mkfifokey ({ shard }: { shard: string }) {
-  return `hardid:${hardid}:zap:${shard}:fifo`
+  return `hardid:${hardid}:whatsapp:${shard}:fifo`
 }
 
 const mkofifkey = function mkofifkey ({ shard }: { shard: string }) {
-  return `hardid:${hardid}:zap:${shard}:ofif`
+  return `hardid:${hardid}:whatsapp:${shard}:ofif`
 }
 
 /**
@@ -128,10 +128,10 @@ const mkofifkey = function mkofifkey ({ shard }: { shard: string }) {
  *
  * @example
  * ```
- * "hardid:xyz:bot:panoptic"
+ * "hardid:xyz:msteams:panoptic"
  * ```
  */
-const panopticbotkey = `hardid:${hardid}:bot:panoptic`
+const panopticbotkey = `hardid:${hardid}:msteams:panoptic`
 
 /**
  * Chave de relacionamento entre instancias do whatsapp e equipes do teams
@@ -139,10 +139,10 @@ const panopticbotkey = `hardid:${hardid}:bot:panoptic`
  *
  *  * @example
  * ```
- * hardid:hlhlny83jghtfbtv:bot:boxengine:556599887766
+ * hardid:hlhlny83jghtfbtv:msteams:boxengine:556599887766
  * ```
  */
-const mkboxenginebotkey = ({ shard }: { shard: string }) => `hardid:${hardid}:bot:boxengine:${shard}`
+const mkboxenginebotkey = ({ shard }: { shard: string }) => `hardid:${hardid}:msteams:boxengine:${shard}`
 
 /**
   * Chave onde as certidões de nascimento do condado são estodas.
@@ -150,21 +150,21 @@ const mkboxenginebotkey = ({ shard }: { shard: string }) => `hardid:${hardid}:bo
   *
   * @example
   * ```
-  * "hardid:xyz:bot:borns"
+  * "hardid:xyz:msteams:borns"
   * ```
   */
-const bornsbotkey = `hardid:${hardid}:bot:borns`
+const bornsbotkey = `hardid:${hardid}:msteams:borns`
 
 /**
  * Chave para marcar instância como pronta
  *
  * @example
  * ```
- * "hardid:xyz:bot:ijk"
+ * "hardid:xyz:msteams:ijk"
  * ```
  */
 const mkbotkey = function mkbotkey ({ shard }: { shard: string; }) {
-  return `hardid:${hardid}:bot:${shard}`
+  return `hardid:${hardid}:msteams:${shard}`
 }
 
 /**
@@ -175,11 +175,11 @@ const mkbotkey = function mkbotkey ({ shard }: { shard: string; }) {
  *
  * @example
  * ```
- * "hardid:xyz:zap:ijk:atende:bcd"
+ * "hardid:xyz:whatsapp:ijk:atende:bcd"
  * ```
  */
 const mkattkey = function mkattkey ({ shard, attid }: { shard: string; attid: string }) {
-  return `hardid:${hardid}:bot:${shard}:atende:${attid}`
+  return `hardid:${hardid}:msteams:${shard}:atende:${attid}`
 }
 /**
  * Chave para as metainformações do atendimento
@@ -190,11 +190,11 @@ const mkattkey = function mkattkey ({ shard, attid }: { shard: string; attid: st
  *
  * @example
  * ```
- * "hardid:xyz:zap:ijk:atende:bcd:meta"
+ * "hardid:xyz:whatsapp:ijk:atende:bcd:meta"
  * ```
  */
 const mkattmetakey = function mkattmetakey ({ shard, attid }: { shard: string; attid: string }) {
-  return `hardid:${hardid}:bot:${shard}:atende:${attid}:meta`
+  return `hardid:${hardid}:msteams:${shard}:atende:${attid}:meta`
 }
 
 /**
@@ -224,6 +224,25 @@ const mkofficekey = function mkofficekey ({ shard, oid }: { shard: string; oid: 
 const mkcompanykey = function mkcompanykey ({ shard, cid }: { shard: string; cid: string }) {
   return `hardid:${hardid}:company:${cid}`
 }
+/**
+ * Chave para as empresas
+ * É um hashmap
+ * fields
+ *  - tenant
+ *  - oid
+ *  - email
+ *  - appid
+ *  - accessTk
+ *  - refreshTk
+ *
+ * @example
+ * ```
+ * "hardid:xyz:user:oid"
+ * ```
+ */
+const mkuserkey = function mkcompanykey ({ oid }: { oid: string; }) {
+  return `hardid:${hardid}:user:${oid}`
+}
 
 export {
   panoptickey,
@@ -247,5 +266,6 @@ export {
   mkofifkey,
   mkwebhookkey,
   mkofficekey,
-  mkcompanykey
+  mkcompanykey,
+  mkuserkey
 }

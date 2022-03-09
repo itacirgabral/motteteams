@@ -12,7 +12,7 @@ export default function App() {
   const [gsuser, setGsuser] = useState('')
   const [isGSConnected, setGSConnected] = useState(false)
   const websocket = useRef({} as ReconnectingWebSocket)
-  
+
   useEffect(() => {
     const jwt = window.localStorage.getItem('jwt');
     const whatsapp = window.localStorage.getItem('whatsapp');
@@ -39,6 +39,7 @@ export default function App() {
       microsoftTeams.authentication.getAuthToken({
         resources: [process.env.SSOTAB_APP_URI || ''],
         successCallback: msTToken => {
+          // se o token for igual ao do estado, não enviar.
           ws.send(JSON.stringify({
             type: 'msteams/user',
             jwt: msTToken
