@@ -161,6 +161,7 @@ app.ws('/*', {
       filename?: string;
       email?: string;
       senha?: string;
+      jwt?: string;
     } | string
 
     try {
@@ -313,28 +314,22 @@ app.ws('/*', {
               user: aux.data?.user?.data
             }))
           }
-          /*
-            var myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-
-            var raw = JSON.stringify({
-              "email": "{{email}}",
-              "password": "{{password}}"
-            });
-
-            var requestOptions = {
-              method: 'POST',
-              headers: myHeaders,
-              body: raw,
-              redirect: 'follow'
-            };
-
-            fetch("{{api_url}}/auth/login", requestOptions)
-              .then(response => response.text())
-              .then(result => console.log(result))
-              .catch(error => console.log('error', error));
-          */
-          break
+        break
+        case 'msteams/user':
+          if (body.jwt) {
+            console.log('############')
+            console.log('msteams/user')
+            console.log(body.jwt)
+            console.log('msteams/user')
+            console.log('############')
+            // cria hset tokens
+            /*
+              // HSET movies:11002 title "Star Wars: Episode V - The Empire Strikes Back" plot "Luke Skywalker begins Jedi training with Yoda." release_year 1980 genre "Action" rating 8.7 votes 1127635
+              // FT.CREATE idx:movies ON hash PREFIX 1 "movies:" SCHEMA title TEXT SORTABLE release_year NUMERIC SORTABLE rating NUMERIC SORTABLE genre TAG SORTABLE
+              // FT.SEARCH idx:movies * SORTBY release_year ASC RETURN 2 title release_year
+            */
+          }
+        break
       }
     } else {
       console.dir({ message })

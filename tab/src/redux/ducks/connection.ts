@@ -10,23 +10,28 @@ const disconnect = () => ({
 })
 
 const initialState = {
-  connected: false
+  isConnected: false
 }
 
-type ActionsConnection = ReturnType<typeof connect> | ReturnType<typeof disconnect>
+export type ActionsConnection = ReturnType<typeof connect> | ReturnType<typeof disconnect>
+
+export const actionsConnection = {
+  connect,
+  disconnect
+}
 
 const reducer = (state = initialState, action: ActionsConnection) => {
   switch (action.type) {
     case CONNECT:
       return {
         ...state,
-        connected: true
+        isConnected: true
       }
       break
     case DISCONNECT:
       return {
         ...state,
-        connected: false
+        isConnected: false
       }
       break
     default:
