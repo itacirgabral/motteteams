@@ -1,5 +1,4 @@
 import { Redis } from 'ioredis'
-import { Observable } from 'rxjs'
 import Yallist from 'yallist'
 import { setTimeout } from 'timers/promises'
 
@@ -7,7 +6,7 @@ type Bread = {
   [key: string]: string;
 }
 
-const stream2bread = function stream2bread ({ log }: { log: Array<string>}): Bread {
+const stream2bread = function stream2bread({ log }: { log: Array<string> }): Bread {
   const keys = log.filter((_el, i) => i % 2 === 0)
   const values = log.filter((_el, i) => i % 2 !== 0)
 
@@ -19,32 +18,7 @@ const stream2bread = function stream2bread ({ log }: { log: Array<string>}): Bre
   return bread
 }
 
-const trafficwand = function trafficwand ({ redis, streamkey, replay = false }: { redis: Redis, streamkey: string, replay?: boolean }) {
-  return new Observable<Bread>(subscriber => {
-    const redisBlock = redis.duplicate()
-    let lastlogid = replay ? '0' : '$'
-    ;(async () => {
-      while (true) {
-        const stream = await redisBlock.xread('BLOCK', 0, 'STREAMS', streamkey, lastlogid)
-        for (const county of stream) {
-          // const countyHead = county[0]
-          const countyBody = county[1]
-          for (const log of countyBody) {
-            const logHead = log[0]
-            const logBody = log[1]
-
-            lastlogid = logHead
-            const bread = stream2bread({ log: logBody })
-
-            subscriber.next(bread)
-          }
-        }
-      }
-    })()
-  })
-}
-
-const trafficwandGen = async function * trafficwandGen ({ redis, streamkey, startAt = '$', stopAt }: { redis: Redis; streamkey: string; startAt?: string; stopAt?: string }) {
+const trafficwandGen = async function* trafficwandGen({ redis, streamkey, startAt = '$', stopAt }: { redis: Redis; streamkey: string; startAt?: string; stopAt?: string }) {
   const redisBlock = redis.duplicate()
   let lastlogid = startAt
   let ends = false
@@ -73,7 +47,7 @@ const trafficwandGen = async function * trafficwandGen ({ redis, streamkey, star
 }
 
 const mkStepwand = ({ delay = 1000, delta = 200, breads = [] }: { delay?: number; delta?: number; breads?: Array<Bread> }) => {
-  const indians = new Yallist<{ goodFor: number; bread: Bread}>()
+  const indians = new Yallist<{ goodFor: number; bread: Bread }>()
   let dontStop = true
 
   for (const bread of breads) {
@@ -118,7 +92,7 @@ const mkStepwand = ({ delay = 1000, delta = 200, breads = [] }: { delay?: number
     }
   }
 
-  const gen = async function * gen () {
+  const gen = async function* gen() {
     while (dontStop) {
       if (indians.head) {
         const sleepms = indians.head?.value.goodFor ?? 0
@@ -151,7 +125,6 @@ const mkStepwand = ({ delay = 1000, delta = 200, breads = [] }: { delay?: number
 }
 
 export {
-  trafficwand,
   trafficwandGen,
   Bread,
   stream2bread,
