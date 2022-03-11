@@ -11,9 +11,9 @@
   "developer": {
     "name": "Gestor Sistemas",
     "mpnId": "6470173",
-    "websiteUrl": "https://gm.inf.br/",
-    "privacyUrl": "https://gm.inf.br/privacy",
-    "termsOfUseUrl": "https://gm.inf.br/termsofuse"
+    "websiteUrl": "https://app.gm.inf.br/",
+    "privacyUrl": "https://app.gm.inf.br/#/privacy",
+    "termsOfUseUrl": "https://app.gm.inf.br/#/termsofuse"
   },
   "description": {
     "short": "WhatsApp Bridge",
@@ -26,27 +26,19 @@
   "accentColor": "#007869",
   "staticTabs": [
     {
-      "entityId": "2831b485-5c99-433b-969f-9ae0a077bf3e",
-      "name": "ControlPainel",
-      "contentUrl": "https://app.gm.inf.br/controlpaineltab",
+      "entityId": "2831b485-5c99-433b-969f-GMadmin",
+      "name": "GMadmin",
+      "contentUrl": "https://app.gm.inf.br/#/gmadminpersonaltab",
       "scopes": [
         "personal"
       ]
     },
     {
-      "entityId": "GestorMessengerContatos",
-      "name": "Contatos",
-      "contentBotId": "de788039-604f-49e0-9545-34dff1e455a9",
+      "entityId": "2831b485-5c99-433b-969f-botconf",
+      "name": "BotConf",
+      "contentUrl": "https://app.gm.inf.br/#/botconfteamtab",
       "scopes": [
-        "personal"
-      ]
-    },
-    {
-      "entityId": "GestorMessengerEquipes",
-      "name": "Equipes",
-      "contentBotId": "de788039-604f-49e0-9545-34dff1e455a9",
-      "scopes": [
-        "personal"
+        "team"
       ]
     }
   ],
@@ -86,14 +78,6 @@
             {
               "title": "reserva",
               "description": "Vincula grupo ou contato neste canal"
-            },
-            {
-              "title": "allchats",
-              "description": "Lista todos os chats do WhatsApp"
-            },
-            {
-              "title": "chatinfo",
-              "description": "Detalha as informações de um chat"
             }
           ]
         },
@@ -103,7 +87,7 @@
           ],
           "commands": [
             {
-              "title": "setup",
+              "title": "logingestor",
               "description": "Inicia processo de instalação"
             }
           ]

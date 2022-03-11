@@ -11,9 +11,9 @@
   "developer": {
     "name": "Gestor Sistemas",
     "mpnId": "6470173",
-    "websiteUrl": "https://gm.inf.br/",
-    "privacyUrl": "https://gm.inf.br/privacy",
-    "termsOfUseUrl": "https://gm.inf.br/termsofuse"
+    "websiteUrl": "https://alfatab.gestormessenger.team/",
+    "privacyUrl": "https://alfatab.gestormessenger.team/#/privacy",
+    "termsOfUseUrl": "https://alfatab.gestormessenger.team/#/termsofuse"
   },
   "description": {
     "short": "WhatsApp Bridge",
@@ -28,9 +28,16 @@
     {
       "entityId": "2831b485-5c99-433b-969f-GMadmin",
       "name": "GMadmin",
-      "contentUrl": "https://app.gm.inf.br/#/gmadmintab",
+      "contentUrl": "https://alfatab.gestormessenger.team/#/gmadminpersonaltab",
       "scopes": [
-        "personal",
+        "personal"
+      ]
+    },
+    {
+      "entityId": "2831b485-5c99-433b-969f-botconf",
+      "name": "BotConf",
+      "contentUrl": "https://alfatab.gestormessenger.team/#/botconfteamtab",
+      "scopes": [
         "team"
       ]
     }
@@ -98,12 +105,12 @@
   ],
   "validDomains": [
     "bot.gm.inf.br",
-    "app.gm.inf.br",
+    "alfatab.gestormessenger.team",
     "ws.gm.inf.br",
     "token.botframework.com"
   ],
   "webApplicationInfo": {
     "id": "9550f6ea-9b4e-4709-975e-3027dae57ce6",
-    "resource": "api://botid-9550f6ea-9b4e-4709-975e-3027dae57ce6"
+    "resource": "api://alfatab.gestormessenger.team/botid-9550f6ea-9b4e-4709-975e-3027dae57ce6"
   }
 }

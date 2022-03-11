@@ -74,15 +74,24 @@ export default function App() {
 
   return <Provider theme={theme || teamsTheme} styles={{ backgroundColor: "#eeeeee" }}><Router>
       <Route exact path="/">
-        <Redirect to="/gmadmintab" />
+        <h1>home</h1>
       </Route>
-      <Route exact path="/gmadmintab">
+      <Route exact path="/privacy">
+        <h1>privacy</h1>
+      </Route>
+      <Route exact path="/termsofuse">
+        <h1>termsofuse</h1>
+      </Route>
+      <Route exact path="/gmadminpersonaltab">
         <DashboadGestorMessenger
           websocket={websocket}
           isGSConnected={isGSConnected}
           setGSConnected={setGSConnected}
           gsuser={gsuser}
         />
+      </Route>
+      <Route exact path="/botconfteamtab">
+        <h1>botconfteamtab</h1>
       </Route>
     </Router>
   </Provider>
