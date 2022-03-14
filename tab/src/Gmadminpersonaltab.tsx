@@ -9,7 +9,7 @@ type Props = {
   websocket: React.MutableRefObject<ReconnectingWebSocket>;
   gsuser: string;
 }
-const DashboadGestorMessenger = ({ isGSConnected, setGSConnected, websocket, gsuser }: Props) => <Flex column>
+const Gmadminpersonaltab = ({ isGSConnected, setGSConnected, websocket, gsuser }: Props) => <Flex column>
   <Image
     style={{ margin: '1rem auto'}}
     src="https://gestormessengerfiles.nyc3.digitaloceanspaces.com/GestorSistemasEngrenagemLogo.png"
@@ -26,4 +26,4 @@ const DashboadGestorMessenger = ({ isGSConnected, setGSConnected, websocket, gsu
   }
 </Flex>
 
-export default DashboadGestorMessenger
+export default Gmadminpersonaltab

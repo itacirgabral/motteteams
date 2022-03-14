@@ -41,7 +41,6 @@
   },
   "dependencies": {
     "ioredis": "^4.28.0",
-    "rxjs": "^7.4.0",
     "yallist": "^4.0.0"
   }
 }

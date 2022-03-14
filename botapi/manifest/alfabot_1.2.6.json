@@ -1,0 +1,116 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.12/MicrosoftTeams.schema.json",
+  "version": "1.2.003",
+  "manifestVersion": "1.12",
+  "id": "64187adc-f9e5-433a-9b3f-a7d5b8335e5c",
+  "packageName": "com.package.name",
+  "name": {
+    "short": "GM",
+    "full": "Gestor Messenger Teams APP"
+  },
+  "developer": {
+    "name": "Gestor Sistemas",
+    "mpnId": "6470173",
+    "websiteUrl": "https://alfatab.gestormessenger.team/",
+    "privacyUrl": "https://alfatab.gestormessenger.team/#/privacy",
+    "termsOfUseUrl": "https://alfatab.gestormessenger.team/#/termsofuse"
+  },
+  "description": {
+    "short": "WhatsApp Bridge",
+    "full": "Gestor Messenger Teams manages multiple whatsapp chats inside channel's message threads."
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#007869",
+  "staticTabs": [
+    {
+      "entityId": "2831b485-5c99-433b-969f-GMadmin",
+      "name": "GMadmin",
+      "contentUrl": "https://alfatab.gestormessenger.team/#/gmadminpersonaltab",
+      "scopes": [
+        "personal"
+      ]
+    },
+    {
+      "entityId": "2831b485-5c99-433b-969f-botconf",
+      "name": "BotConf",
+      "contentUrl": "https://alfatab.gestormessenger.team/#/botconfteamtab",
+      "scopes": [
+        "team"
+      ]
+    }
+  ],
+  "bots": [
+    {
+      "botId": "9550f6ea-9b4e-4709-975e-3027dae57ce6",
+      "scopes": [
+        "team",
+        "personal"
+      ],
+      "isNotificationOnly": false,
+      "supportsCalling": false,
+      "supportsVideo": false,
+      "supportsFiles": true,
+      "commandLists": [
+        {
+          "scopes": [
+            "team"
+          ],
+          "commands": [
+            {
+              "title": "extrato",
+              "description": "Informações"
+            },
+            {
+              "title": "finalizar",
+              "description": "Termina esta conversa"
+            },
+            {
+              "title": "qrcode",
+              "description": "Reconecta ao WhatsApp ou gera novo QRCode"
+            },
+            {
+              "title": "respondercomtextosimples:",
+              "description": "A mensagem que será enviada para o whatsapp"
+            },
+            {
+              "title": "reserva",
+              "description": "Vincula grupo ou contato neste canal"
+            },
+            {
+              "title": "allchats",
+              "description": "Lista todos os chats do WhatsApp"
+            },
+            {
+              "title": "chatinfo",
+              "description": "Detalha as informações de um chat"
+            }
+          ]
+        },
+        {
+          "scopes": [
+            "personal"
+          ],
+          "commands": [
+            {
+              "title": "setup",
+              "description": "Inicia processo de instalação"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "validDomains": [
+    "bot.gm.inf.br",
+    "alfatab.gestormessenger.team",
+    "ws.gm.inf.br",
+    "token.botframework.com"
+  ],
+  "webApplicationInfo": {
+    "id": "9550f6ea-9b4e-4709-975e-3027dae57ce6",
+    "resource": "api://alfatab.gestormessenger.team/botid-9550f6ea-9b4e-4709-975e-3027dae57ce6"
+  }
+}
