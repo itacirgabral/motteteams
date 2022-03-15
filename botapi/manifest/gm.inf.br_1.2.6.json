@@ -24,6 +24,7 @@
     "color": "color.png"
   },
   "accentColor": "#007869",
+  "defaultInstallScope": "team",
   "staticTabs": [
     {
       "entityId": "2831b485-5c99-433b-969f-GMadmin",
