@@ -18,9 +18,7 @@ import Privacidade from './pages/Privacidade'
 import TermosUso from './pages/TermosUso'
 
 export default function App() {
-  // estes 2 mudar pra redux
   const [state, dispatch] = useReducer(Redux.reducer, Redux.initialState)
-
   const websocket = useRef({} as ReconnectingWebSocket)
 
   useEffect(() => {
@@ -96,10 +94,8 @@ export default function App() {
       </Route>
       <Route exact path="/gmadminpersonaltab">
         <GMAdmin
-          isGSConnected={isGSConnected}
-          setGSConnected={setGSConnected}
+          state={state}
           websocket={websocket}
-          gsuser={gsuser}
         />
       </Route>
       <Route exact path="/botconfteamtab">

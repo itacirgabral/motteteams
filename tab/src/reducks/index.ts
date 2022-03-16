@@ -4,7 +4,7 @@ import * as GSAuth from './ducks/gestorsistemas.auth'
 // export type Actions = X.Actions | y.Actions | z.Actions
 export type Actions = Connection.Actions | GSAuth.Actions
 
-interface State {
+export interface State {
   websocketconnection: boolean;
   gestorsistemas: {
     userdata?: string;

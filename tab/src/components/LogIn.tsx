@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { Form, FormInput, FormButton } from "@fluentui/react-northstar";
 
+import { wscallGSAuthLogin } from '../WSCalls'
+
 type Props = {
   websocket: React.MutableRefObject<ReconnectingWebSocket>
 }
@@ -15,12 +17,14 @@ const Login = ({ websocket }: Props) => {
     style={{ margin: '1rem auto', textAlign: 'center'}}
     onSubmit={() => {
       setLoading(true)
-      console.dir({ email, senha })
-      websocket.current.send(JSON.stringify({
-        type: 'gestorsistema/auth/login',
+
+      wscallGSAuthLogin({
+        websocket,
         email,
         senha
-      }))
+      })
+
+      console.log(`mandou conectar ${email}`)
     }}
     >
     <FormInput

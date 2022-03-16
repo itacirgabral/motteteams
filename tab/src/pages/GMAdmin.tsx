@@ -2,15 +2,14 @@ import React from "react";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { Image, Button, Header, Flex, Segment } from "@fluentui/react-northstar";
 import Login from '../components/LogIn'
+import { State } from '../reducks'
 
 type Props = {
-  isGSConnected: boolean;
-  setGSConnected: React.Dispatch<React.SetStateAction<boolean>>;
-  websocket: React.MutableRefObject<ReconnectingWebSocket>;
-  gsuser: string;
+  state: State
+  websocket: React.MutableRefObject<ReconnectingWebSocket>
 }
 
-const GMAdmin = ({ isGSConnected, setGSConnected, websocket, gsuser }: Props) => <Flex column>
+const GMAdmin = ({ state, websocket }: Props) => <Flex column>
   <Image
     style={{ margin: '1rem auto'}}
     src="https://gestormessengerfiles.nyc3.digitaloceanspaces.com/GestorSistemasEngrenagemLogo.png"
@@ -21,9 +20,9 @@ const GMAdmin = ({ isGSConnected, setGSConnected, websocket, gsuser }: Props) =>
     description="Configure o acesso ao Gestor Messenger, importe seus dados e gerencie os whatsapp"
   />
   {
-    isGSConnected ?
-    <p>{gsuser}</p> :
-      <Login websocket={websocket} />
+    state.gestorsistemas.useronline ?
+    <p>{ state.gestorsistemas.userdata }</p> :
+    <Login websocket={websocket} />
 }
 </Flex>
 
