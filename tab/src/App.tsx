@@ -8,6 +8,7 @@ import { useTeamsFx } from "./useTeamsFx";
 
 import * as Redux from './reducks'
 import * as DuckConnection from './reducks/ducks/connection'
+import * as DuckGSAuth from './reducks/ducks/gestorsistemas.auth'
 
 // Pages
 import GMAdmin from './pages/GMAdmin'
@@ -18,9 +19,6 @@ import TermosUso from './pages/TermosUso'
 
 export default function App() {
   // estes 2 mudar pra redux
-  const [gsuser, setGsuser] = useState('')
-  const [isGSConnected, setGSConnected] = useState(false)
-
   const [state, dispatch] = useReducer(Redux.reducer, Redux.initialState)
 
   const websocket = useRef({} as ReconnectingWebSocket)
@@ -32,9 +30,10 @@ export default function App() {
     const user = window.localStorage.getItem('user');
 
     if (user) {
-      setGsuser(user)
-      setGSConnected(true)
+      dispatch(DuckGSAuth.actions.gsSetUserData({ data: user }))
+      dispatch(DuckGSAuth.actions.gsSetUserOn())
     }
+
     const ws = new  ReconnectingWebSocket(`${host}/teamstap?jwt=${jwt}&whatsapp=${whatsapp}`)
     websocket.current = ws
 
@@ -68,8 +67,8 @@ export default function App() {
         switch (message.type) {
           case 'gestorsistema/user':
             console.log('gestorsistema/user')
-            setGSConnected(true)
-            setGsuser(data)
+            dispatch(DuckGSAuth.actions.gsSetUserData({ data }))
+            dispatch(DuckGSAuth.actions.gsSetUserOn())
             window.localStorage.setItem('user', data)
             break
         }
