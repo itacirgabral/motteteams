@@ -1,25 +1,23 @@
+import { initialState } from '../index'
+
+// slug
 const CONNECT = 'CONNECT'
 const DISCONNECT = 'DISCONNECT'
 
+// actions
 const connect = (): { type: 'CONNECT'} => ({
   type: CONNECT
 })
-
 const disconnect = (): { type: 'DISCONNECT'} => ({
   type: DISCONNECT
 })
-
-const initialState = {
-  websocketconnection: false
-}
-
-export type Actions = ReturnType<typeof connect> | ReturnType<typeof disconnect>
-
 export const actions = {
   connect,
   disconnect
 }
+export type Actions = ReturnType<typeof connect> | ReturnType<typeof disconnect>
 
+// reducer
 export const reducer = (state = initialState, action: Actions) => {
   switch (action.type) {
     case CONNECT:

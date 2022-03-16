@@ -5,10 +5,18 @@ export type Actions = Connection.Actions
 
 interface State {
   websocketconnection: boolean;
+  gestorsistemas: {
+    userdata: string;
+    useronline: boolean;
+  }
 }
 
 export const initialState: State = {
-  websocketconnection: false
+  websocketconnection: false,
+  gestorsistemas: {
+    userdata: '',
+    useronline: false
+  }
 }
 
 export const reducer = function reducer(state:  State, action: Actions) {
