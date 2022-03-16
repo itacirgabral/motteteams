@@ -5,8 +5,13 @@ import { Provider, teamsTheme } from "@fluentui/react-northstar";
 import { HashRouter as Router, Redirect, Route } from "react-router-dom";
 
 import { useTeamsFx } from "./useTeamsFx";
-import Gmadminpersonaltab from "./Gmadminpersonaltab";
-import Botconfteamtab from './Botconfteamtab'
+
+// Pages
+import GMAdmin from './pages/GMAdmin'
+import GMBotConf from './pages/GMBotConf'
+import GestorMessenger from './pages/GestorMessenger'
+import Privacidade from './pages/Privacidade'
+import TermosUso from './pages/TermosUso'
 
 export default function App() {
   const [isConnected, setConnected] = useState(false)
@@ -76,27 +81,19 @@ export default function App() {
 
   return <Provider theme={theme || teamsTheme} styles={{ backgroundColor: "#eeeeee" }}><Router>
       <Route exact path="/">
-        <h1>Gestor Messenger</h1>
+        <GestorMessenger />
       </Route>
       <Route exact path="/privacy">
-        <h1>Termos de privacidade</h1>
+        <Privacidade />
       </Route>
       <Route exact path="/termsofuse">
-        <h1>termos de uso</h1>
+        <TermosUso />
       </Route>
       <Route exact path="/gmadminpersonaltab">
-        <Gmadminpersonaltab
-          websocket={websocket}
-          isGSConnected={isGSConnected}
-          setGSConnected={setGSConnected}
-          gsuser={gsuser}
-        />
+        <GMAdmin />
       </Route>
       <Route exact path="/botconfteamtab">
-        <Botconfteamtab
-          websocket={websocket}
-          isGSConnected={isGSConnected}
-        />
+        <GMBotConf />
       </Route>
     </Router>
   </Provider>
