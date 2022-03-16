@@ -1,10 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useReducer } from "react";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import * as microsoftTeams from '@microsoft/teams-js';
 import { Provider, teamsTheme } from "@fluentui/react-northstar";
 import { HashRouter as Router, Redirect, Route } from "react-router-dom";
 
 import { useTeamsFx } from "./useTeamsFx";
+
+import * as Redux from './reducks'
+import * as DuckConnection from './reducks/ducks/connection'
 
 // Pages
 import GMAdmin from './pages/GMAdmin'
@@ -14,9 +17,12 @@ import Privacidade from './pages/Privacidade'
 import TermosUso from './pages/TermosUso'
 
 export default function App() {
-  const [isConnected, setConnected] = useState(false)
+  // estes 2 mudar pra redux
   const [gsuser, setGsuser] = useState('')
   const [isGSConnected, setGSConnected] = useState(false)
+
+  const [state, dispatch] = useReducer(Redux.reducer, Redux.initialState)
+
   const websocket = useRef({} as ReconnectingWebSocket)
 
   useEffect(() => {
@@ -35,7 +41,7 @@ export default function App() {
     ws.onopen = async ev => {
       console.dir({ on: 'open', ev, ws })
 
-      setConnected(true)
+      dispatch(DuckConnection.actions.connect())
 
       ws.send(JSON.stringify({
         type: 'register',
@@ -90,10 +96,18 @@ export default function App() {
         <TermosUso />
       </Route>
       <Route exact path="/gmadminpersonaltab">
-        <GMAdmin />
+        <GMAdmin
+          isGSConnected={isGSConnected}
+          setGSConnected={setGSConnected}
+          websocket={websocket}
+          gsuser={gsuser}
+        />
       </Route>
       <Route exact path="/botconfteamtab">
-        <GMBotConf />
+        <GMBotConf
+          isGSConnected={isGSConnected}
+          websocket={websocket}
+        />
       </Route>
     </Router>
   </Provider>
