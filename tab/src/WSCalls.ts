@@ -11,3 +11,19 @@ export const wscallGSAuthLogin = ({ websocket, email, senha }: { websocket: WSre
     senha
   }))
 }
+
+export const wscallMSTeamsUser = ({ websocket, jwt }: { websocket: WSref; jwt: string; }) => {
+  console.dir({ jwt, wscall: 'MSTeamsUser' })
+  websocket.current.send(JSON.stringify({
+    type: 'msteams/user',
+    jwt
+  }))
+}
+
+export const wscallRegister = ({ websocket, channel }: { websocket: WSref; channel: string; }) => {
+  console.dir({ channel, wscall: 'Register' })
+  websocket.current.send(JSON.stringify({
+    type: 'register',
+    channel
+  }))
+}

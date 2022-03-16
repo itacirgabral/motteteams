@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState, useReducer } from "react";
-import ReconnectingWebSocket from 'reconnecting-websocket';
-import * as microsoftTeams from '@microsoft/teams-js';
-import { Provider, teamsTheme } from "@fluentui/react-northstar";
 import { HashRouter as Router, Redirect, Route } from "react-router-dom";
 
+import * as microsoftTeams from '@microsoft/teams-js';
+import { Provider, teamsTheme } from "@fluentui/react-northstar";
+
+import ReconnectingWebSocket from 'reconnecting-websocket';
+import { wscallMSTeamsUser, wscallRegister } from './WSCalls'
 import { useTeamsFx } from "./useTeamsFx";
 
 import * as Redux from './reducks'
@@ -37,22 +39,13 @@ export default function App() {
 
     ws.onopen = async ev => {
       console.dir({ on: 'open', ev, ws })
-
       dispatch(DuckConnection.actions.connect())
-
-      ws.send(JSON.stringify({
-        type: 'register',
-        channel: 'onlineuser'
-      }))
-
+      wscallRegister({ websocket, channel: 'onlineuser' })
       microsoftTeams.authentication.getAuthToken({
         resources: [process.env.SSOTAB_APP_URI || ''],
         successCallback: msTToken => {
-          // se o token for igual ao do estado, não enviar.
-          ws.send(JSON.stringify({
-            type: 'msteams/user',
-            jwt: msTToken
-          }))
+          // todo se o token for igual ao do estado, não enviar.
+          wscallMSTeamsUser({ websocket, jwt: msTToken})
         }
       })
     }
