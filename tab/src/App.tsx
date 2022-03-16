@@ -103,10 +103,7 @@ export default function App() {
         />
       </Route>
       <Route exact path="/botconfteamtab">
-        <GMBotConf
-          isGSConnected={isGSConnected}
-          websocket={websocket}
-        />
+        <GMBotConf />
       </Route>
     </Router>
   </Provider>
