@@ -1,9 +1,9 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.12/MicrosoftTeams.schema.json",
-  "version": "1.2.003",
+  "version": "1.2.6",
   "manifestVersion": "1.12",
   "id": "64187adc-f9e5-433a-9b3f-a7d5b8335e5c",
-  "packageName": "com.package.name",
+  "packageName": "gestorsistemas_gmapi2",
   "name": {
     "short": "GM",
     "full": "Gestor Messenger Teams APP"
